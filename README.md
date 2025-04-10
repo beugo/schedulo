@@ -29,11 +29,42 @@ SQLite interfaced to via the SQLAlchemy package
 | Prashan Wijesinghe | 23783481       | quarterpie3141     |
 | Nathan Kim         | 23364749       | TODO               |
 
-## Instructions for how to launch the application
-```
-source .venv/bin/activate
-pip freeze > requirements.txt
-python3 deliverables/run.py
-```
+--
+
+## Instructions to Launch Application
+### Requirements
+
+- Python 3.8 or newer
+- `pip` (Python package manager)
+- `virtualenv`
+
+### Setup Instructions
+
+1. **Clone the repository**
+   ```bash
+   git clone <TODO>
+   cd cits3403-project
+   ```
+
+2. **Create and activate a virtual environment**
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. **Install project dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the Flask app**
+   ```bash
+   cd deliverables
+   python run.py
+   ```
+
+5. **Visit the app**
+   Open your browser and go to:  
+   [http://localhost:5000](http://localhost:5000)
 
 ## Instructions for how to run the tests for the application
