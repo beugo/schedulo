@@ -15,8 +15,13 @@ Flask (with plugins described in lectures)
 AJAX/Websockets
 SQLite interfaced to via the SQLAlchemy package
 
-## A table with with each row containing the i) UWA ID ii) name and iii) Github user name of the group members
-By Hugo Smith, Joel Smith, Prashan Wijesinghe, Nathan **Kim**
+## Group Members
+| Name               | Student Number | GitHub Username   |
+|--------------------|----------------|--------------------|
+| Hugo Smith         | 23620112       | beugo              |
+| Joel Smith         | 23338559       | joeldotsmith       |
+| Prashan Wijesinghe | 23783481       | quarterpie3141     |
+| Nathan Kim         | 23364749       | TODO               |
 
 ## Instructions for how to launch the application
 
