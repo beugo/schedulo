@@ -35,7 +35,7 @@ SQLite interfaced to via the SQLAlchemy package
 ### Requirements
 
 - Python 3.8 or newer
-- `pip` (Python package manager)
+- `pip`
 - `virtualenv`
 
 ### Setup Instructions
