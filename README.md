@@ -9,9 +9,6 @@ An "upload data" view, allowing the user to add new data.
 A "visualise data" view, allowing user's to view analysis of either their data or other people's data which has been shared with them.
 A "share data" view, allowing the users to selectively share their data with other specific users.
 
-
-
-
 ### Frontend
 - HTML
 - CSS
