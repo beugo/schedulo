@@ -1,0 +1,38 @@
+HTML 	
+Valid HTML code, using a wide range of elements, clearly organised with appropriate use of Joomla templates.
+
+CSS 	
+Valid, maintainable code, using a wide range of custom selectors and classes, web page is reactive to screen size.
+
+JavaScript 	
+Valid, well formatted code, including validation and DOM manipulation/AJAX that uses JavaScript best practices.
+
+Design 	
+Good website navigation flow that is intuitive to the user with a strong visual design. The website's purpose is clear and brings value to the user.
+
+Content 	
+All the features requested in the project brief are implemented appropriately.
+
+Flask Code 	
+Formatted, commented and well organised code that responds to requests by the client by performing non-trivial data manipulation and page generation operations.
+
+Data Models 	
+Well considered database schema, good authentication, and maintainable models. Some evidence of DB migrations.
+
+Testing 	
+Comprehensive test suite, containing 5+ unit tests and 5+ selenium tests. The latter should run with a live version of the server.
+
+Security 	
+Passwords correctly stored as salted hashes in database. Use of CRSF tokens to prevent CRSF attacks on the website's forms. Correct storage of environment variables in configuration files.
+
+Commits (individual) 	
+Regular commits with high-quality messages providing meaningful but not overly detailed description of and reason for the changes.
+
+Issues (individual) 	
+Excellent use of the Github Issues tab, with issues regularly used both to describe both bugs and missing functionality. The former have detailed instructions about how to reproduce.
+
+Pull requests (individual) 	
+Excellent use of the Github Pull Requests tab, with meaningfully named pull requests regularly used to add both individual features and fix bugs.
+
+Teamwork (individual) 	
+Evidence of collaboration between team members on Github, including in-depth discussion on other people's issues, and helpful code reviews on other people's pull requests with the feedback being taken into account before merging.
