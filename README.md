@@ -30,5 +30,10 @@ SQLite interfaced to via the SQLAlchemy package
 | Nathan Kim         | 23364749       | TODO               |
 
 ## Instructions for how to launch the application
+```
+source .venv/bin/activate
+pip freeze > requirements.txt
+python3 deliverables/run.py
+```
 
 ## Instructions for how to run the tests for the application
