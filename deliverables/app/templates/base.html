@@ -2,14 +2,41 @@
 <html>
     <head>
         <title>{% block title %}{% endblock %}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/style.css') }}">
     </head>
-    <body>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/login">Login</a>
-            <a href="/visualise">Visualise</a>
-            <a href="/share">Share</a>
-        </nav>
+    <body class="p-2 dark-background">
+        <div class="flex flex-row full-width gap-2">
+            <a class="nav-button" href="{{ url_for('main.nav_home') }}">Home</a>
+
+            {% if current_user.is_authenticated %}
+            <a class="nav-button"
+                href="{{ url_for('main.nav_visualise') }}">Visualise</a>
+            <a class="nav-button"
+                href="{{ url_for('main.nav_share') }}">Share</a>
+            <div class="flex-grow"></div>
+            <span class="center">Welcome, {{ current_user.username }}!</span>
+            <a class="nav-button"
+                href="{{ url_for('main.logout') }}">Logout</a>
+            {% else %}
+            <div class="flex-grow"></div>
+            <a class="nav-button"
+                href="{{ url_for('main.nav_login') }}">Login</a>
+            <a class="nav-button"
+                href="{{ url_for('main.nav_register') }}">Register</a>
+            {% endif %}
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
 
         {% block content %}{% endblock %}
     </body>
