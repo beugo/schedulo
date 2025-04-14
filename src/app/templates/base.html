@@ -3,11 +3,12 @@
     <head>
         <title>{% block title %}{% endblock %}</title>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet"
-            href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/alert.css') }}">
     </head>
-    <body class="p-2 dark-background">
-        <div class="flex flex-row full-width gap-2">
+    <body class="dark-background">
+        <div class="sticky top-0 flex gap-2 justify-between nav-bar">
             <a class="nav-button" href="{{ url_for('main.nav_home') }}">Home</a>
 
             {% if current_user.is_authenticated %}
@@ -19,6 +20,7 @@
             <span class="center">Welcome, {{ current_user.username }}!</span>
             <a class="nav-button"
                 href="{{ url_for('main.logout') }}">Logout</a>
+
             {% else %}
             <div class="flex-grow"></div>
             <a class="nav-button"
@@ -30,9 +32,12 @@
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <ul class="flashes">
+        <ul class="p-3">
             {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
+            <div class="alert {{ category }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                {{ message }}
+            </div>
             {% endfor %}
         </ul>
         {% endif %}

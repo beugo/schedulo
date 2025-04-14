@@ -1,0 +1,10 @@
+@import './colours.css';
+span {
+    color: var(--default-dark-theme-text);
+}
+.center {
+    margin: auto;
+}
+.dark-background {
+    background-color:#212830;
+  }
