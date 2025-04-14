@@ -1,5 +1,6 @@
 blinker==1.9.0
 click==8.1.8
+dotenv==0.9.9
 Flask==3.1.0
 Flask-Login==0.6.3
 Flask-SQLAlchemy==3.1.1
@@ -7,6 +8,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 MarkupSafe==3.0.2
 pillow==11.1.0
+python-dotenv==1.1.0
 setuptools==78.1.0
 SQLAlchemy==2.0.40
 svgwrite==1.4.3
