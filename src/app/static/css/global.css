@@ -1,0 +1,15 @@
+@import './colours.css';
+span {
+    color: var(--default-dark-theme-text);
+}
+i {
+    color: var(--default-dark-theme-text);
+    margin: auto;
+}
+.center {
+    margin: auto;
+}
+.dark-background {
+    background: linear-gradient(to bottom, #212830, #1a1f26);
+    height: 100vh;
+  }

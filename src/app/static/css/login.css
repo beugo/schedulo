@@ -1,0 +1,68 @@
+
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.wrapper h1 {
+    color: var(--default-dark-theme-text); 
+    font-weight: 600; 
+    text-align: center;
+    font-size: 28px;
+}
+ .wrapper .input-box {
+    width: 100%;
+    height: 50px;
+    margin: 30pxrem 0;
+ }
+
+ .input-box {
+    border: 1px solid var(--default-dark-theme-text);
+    border-radius: 10px;
+    background-color: #212830;
+ }
+
+ .input-box i {
+    padding-right: 10px;
+ }
+
+ .login-button {
+    width: 100%;
+    height: 45px;
+    background-color: var(--success);
+    border-radius: 10px;
+ }
+ .login-button:hover {
+    background-color: #15803d;
+
+ }
+
+ .input-box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    padding: 0 10px;
+    border: none;
+    outline: none;
+    color: var(--default-dark-theme-text);
+ }
+
+.login-form {
+    margin: auto;
+    width: 60vh;
+    height: 50vh;
+    border-radius: 20px;
+    border: 0.5px solid var(--default-dark-theme-text);
+    padding: 20px;
+    mix-blend-mode: lighten;
+    backdrop-filter: blur(20px) saturate(180%);
+    background-color: rgba(155, 155, 155, 0.2);
+}
+
+.register-link {
+    color: var(--default-dark-theme-text);
+    font-weight: 600;
+    text-decoration: underline;
+}
