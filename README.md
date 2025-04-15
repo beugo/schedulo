@@ -27,7 +27,7 @@ SQLite interfaced to via the SQLAlchemy package
 | Hugo Smith         | 23620112       | beugo              |
 | Joel Smith         | 23338559       | joeldotsmith       |
 | Prashan Wijesinghe | 23783481       | quarterpie3141     |
-| Nathan Kim         | 23364749       | TODO               |
+| Nathan Kim         | 23364749       | nathanbkim         |
 
 --
 
