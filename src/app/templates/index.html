@@ -3,5 +3,52 @@
 {% block title %}Index{% endblock %}
 
 {% block content %}
-<span>Index Page</span>
+<section class="relative bg-white dark:bg-dark-bg transition-colors duration-300">
+    
+    <div class="absolute -top-16 -right-32 w-96 h-96 rounded-full bg-[#FFFFFF]/60 dark:bg-dark-accent/30 blur-3xl pointer-events-none"></div>
+
+    <div class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-10">
+      
+      <div class="flex-1 text-center md:text-left">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-gray-900 dark:text-dark-primary">
+          No More Uni Timetable Headaches
+        </h1>
+        <p class="mb-8 text-lg md:text-xl text-gray-700 dark:text-dark-secondary max-w-2xl">
+          Plan, organize, and visualize your units and timetable effortlessly.<br>
+          <span class="text-blue-700 dark:text-blue-400 font-medium">Avoid clashes, boost productivity, reduce stress.</span><br>
+          (xxxx) is designed by students, for students.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
+          <a href="/login" class="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white text-lg font-semibold shadow-lg">
+            Get Started
+          </a>
+          <a href="#??" class="px-8 py-3 rounded-lg border border-dark-border text-dark-border
+                             dark:text-dark-primary dark:border-dark-border hover:bg-dark-accent/20 
+                              dark:hover:bg-dark-accent/10 transition font-semibold"
+            >
+            Learn More
+          </a>
+        </div>
+      </div>
+      
+      <div class="flex-1 flex justify-center md:justify-end items-center">
+        <!-- this styling looks wierd for some reason, will change it later-->
+        <div class=" bg-gray-500/10 dark:bg-dark-fg rounded-2xl p-4 md:p-8 shadow-xl max-w-md w-full"> 
+          <!-- placeholder, replace with image when vizualizer page is done -->
+          <svg width="320" height="160" viewBox="0 0 320 160" fill="none" xmlns="http://www.w3.org/2000/svg" class="mx-auto">
+            <rect x="8" y="8" width="304" height="144" rx="20" fill="#444" opacity="0.30"/>
+            <rect x="20" y="28" width="120" height="16" rx="8" fill="#B0B0B0"/>
+            <rect x="20" y="54" width="80" height="10" rx="5" fill="#888888"/>
+            <rect x="20" y="74" width="60" height="10" rx="5" fill="#888888"/>
+            <rect x="160" y="36" width="82" height="74" rx="10" fill="#888888"/>
+            <rect x="20" y="102" width="60" height="10" rx="5" fill="#888888"/>
+            <rect x="100" y="102" width="52" height="10" rx="5" fill="#888888"/>
+          </svg>
+          <div class="mt-4 text-center text-sm text-dark-secondary ">
+            Visualize your timetable with ease!
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 {% endblock %}

@@ -3,24 +3,64 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<div class="wrapper">
-    <form class="login-form flex flex-col" style="justify-content: space-between;" action="/register-user" method="POST">
-        <h1>Register</h1>
-        <div class="flex flex-col gap-4">
-            <div class="input-box flex flex-row gap-2">
-                <input type="text" name="username" placeholder="Username" required>
-                <i class="material-icons">account_circle</i>
-            </div>
-            <div class="input-box flex flex-row gap-2">
-                <input type="password" name="password" placeholder="Password" required>
-                <i class="material-icons">lock</i>
-            </div>
-            <div class="input-box flex flex-row gap-2">
-                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-                <i class="material-icons">check</i>
-            </div>
-            <button type="submit" class="login-button"><span style="color: white;">Register</span></button>
+<!-- login section -->
+<section class="flex justify-center transition-colors duration-300 m-auto">
+    <div class="w-full max-w-md mx-auto bg-white dark:bg-dark-fg rounded-xl shadow-2xl px-8 py-10">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-dark-primary mb-2 text-center">
+        Register
+      </h2>
+      <p class="text-gray-700 dark:text-dark-secondary mb-8 text-center">
+        Organize your semesters, avoid timetable clashes, reclaim your time.
+      </p>
+      <form action="{{ url_for('main.login') }}" method="post" class="space-y-6">
+       
+        <div>
+          <label for="username" class="block font-medium text-gray-700 dark:text-dark-secondary mb-1">
+            Username or Email
+          </label>
+          <input required type="text" id="username" name="username"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-dark-border
+                           bg-gray-50 dark:bg-dark-fg text-gray-900 dark:text-dark-primary
+                           focus:outline-none focus:border-blue-500 dark:focus:border-blue-400
+                           transition">
         </div>
-    </form>
-</div>
+
+        <div>
+          <label for="password" class="block font-medium text-gray-700 dark:text-dark-secondary mb-1">
+            Password
+          </label>
+          <input required type="password" id="password" name="password"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-dark-border
+                    bg-gray-50 dark:bg-dark-fg text-gray-900 dark:text-dark-primary
+                    focus:outline-none focus:border-blue-500 dark:focus:border-blue-400
+                    transition">
+        </div>
+        <div>
+            <label for="password" class="block font-medium text-gray-700 dark:text-dark-secondary mb-1">
+              Confirm Password
+            </label>
+            <input required type="password" id="password" name="password"
+                      class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-dark-border
+                      bg-gray-50 dark:bg-dark-fg text-gray-900 dark:text-dark-primary
+                      focus:outline-none focus:border-blue-500 dark:focus:border-blue-400
+                      transition">
+          </div>
+
+        <div>
+          <button type="submit"
+                  class="w-full px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white font-semibold text-lg shadow">
+            Register
+          </button>
+        </div>
+      </form>
+      <!-- Secondary Actions -->
+      <div class="flex items-center mt-6 gap-4 text-sm">
+        <a href="{{ url_for('main.nav_login') }}"
+           class="text-blue-600 dark:text-dark-accent hover:underline font-medium transition">
+          Already have an account? Login.
+        </a>
+      </div>
+    </div>
+  </section>
+  <!-- Login Section End -->
 {% endblock %}

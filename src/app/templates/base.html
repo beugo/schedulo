@@ -1,54 +1,79 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>{% block title %}{% endblock %}</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/colours.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/alert.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-    </head>
-    <body class="dark-background">
-        <div class="sticky top-0 flex gap-2 justify-between nav-bar">
-            <a class="nav-button" href="{{ url_for('main.nav_home') }}">Home</a>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{% endblock %}</title>
+  
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="static/js/tailwindconfig.js"></script>
+  <link href="static/css/tailwindglobals.css" rel="stylesheet"/>
 
-            {% if current_user.is_authenticated %}
-            <a class="nav-button"
-                href="{{ url_for('main.nav_visualise') }}">Visualise</a>
-            <a class="nav-button"
-                href="{{ url_for('main.nav_share') }}">Share</a>
-            <div class="flex-grow"></div>
-            <span class="center">Welcome, {{ current_user.username }}!</span>
-            <a class="nav-button"
-                href="{{ url_for('main.logout') }}">Logout</a>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
-            {% else %}
-            <div class="flex-grow"></div>
-            <a class="nav-button"
-                href="{{ url_for('main.nav_login') }}">Login</a>
-            <a class="nav-button"
-                href="{{ url_for('main.nav_register') }}">Register</a>
-            {% endif %}
-        </div>
+  <script src="static/js/darkmode.js" defer></script>
+</head>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="absolute-container">
-            <ul class="p-3">
-                {% for category, message in messages %}
-                <div class="alert {{ category }}">
-                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-        {% endwith %}
+<body class="bg-white text-gray-900 dark:bg-dark-bg dark:text-dark-primary min-h-screen flex flex-col">
 
-        {% block content %}{% endblock %}
-        <script src="{{ url_for('static', filename='js/alert.js') }}"></script>
-    </body>
+  <nav class="sticky top-0 z-50 flex items-center px-6 py-2 shadow-sm">
+    
+    <div class="flex space-x-4">
+      <a href="{{ url_for('main.nav_home') }}" 
+         class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
+         Home
+      </a>
+
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('main.nav_visualise') }}"
+         class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
+         Visualise
+      </a>
+
+      <a href="{{ url_for('main.nav_share') }}"
+         class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
+         Share
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="flex-grow"></div>
+
+    <div class="flex items-center space-x-4">
+      <button onclick="toggleDarkMode()" 
+              class="p-2 rounded-lg hover:bg-gray-200 transition dark:text-dark-accent dark:hover:bg-dark-border">
+        <span class="material-icons-outlined">brightness_6</span>
+      </button>
+
+      {% if current_user.is_authenticated %}
+      <span class="font-medium dark:text-dark-secondary">Welcome, {{ current_user.username }}!</span>
+      <a href="{{ url_for('main.logout') }}"
+         class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white text-sm transition">
+         Logout
+      </a>
+      {% else %}
+      <a href="{{ url_for('main.nav_login') }}"
+         class="font-medium text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
+         Login
+      </a>
+      <a href="{{ url_for('main.nav_register') }}"
+         class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white text-sm transition">
+         Register
+      </a>
+      {% endif %}
+    </div>
+  </nav>
+
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto flex p-10">
+    {% block content %}
+    
+    {% endblock %}
+  </main>
+
+
+  <script src="{{ url_for('static', filename='js/alert.js') }}"></script>
+</body>
 </html>
