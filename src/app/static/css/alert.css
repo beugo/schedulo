@@ -6,9 +6,10 @@
 }
 
 .absolute-container {
-    position: fixed;
-    top: 20;
-    width: 100%; 
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 20%; 
     z-index: 1000;
 }
 
