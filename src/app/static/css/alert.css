@@ -1,0 +1,52 @@
+@import './colours.css';
+.alert {
+    padding: 20px;
+    border-radius: 5px;
+    color: white;
+}
+
+.absolute-container {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 20%; 
+    z-index: 1000;
+}
+
+.success {
+    background-color: var(--success);
+}
+.error {
+    background-color: var(--error);
+}
+.info {
+    background-color: var(--info);
+}
+.help {
+    background-color: var(--help);
+}
+.warning {
+    background-color: var(--warning);
+}
+
+.closebtn {
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.closebtn:hover {
+    color: black;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; display: none; }
+}
+
+.alert.fade-out {
+    animation: fadeOut 0.7s forwards;
+}
