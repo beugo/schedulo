@@ -15,3 +15,17 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+class Unit(db.Model):
+    __tablename__ = 'units'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    unit_name = db.Column(db.String(64), nullable=False)
+    unit_code = db.Column(db.String(256), nullable=True)
+    exam = db.Column(db.Boolean, nullable=True)
+    url = db.Column(db.String(256), nullable=True)
+    unit_coordinator = db.Column(db.String(256), nullable=True)
+    contact_hours = db.Column(db.Text, nullable=True)
+    prerequisites = db.Column(db.String(256), nullable=True)
+    description = db.Column(db.String(256), nullable=True)
+    is_deleted = db.Column(db.Boolean, default=False)

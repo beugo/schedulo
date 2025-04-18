@@ -67,4 +67,11 @@ SQLite interfaced to via the SQLAlchemy package
    Open your browser and go to:  
    [http://localhost:5000](http://localhost:5000)
 
+6. **Import Existing Units (Optional)**
+   To import existing units run the import_units.py script from the project directory
+   ```bash
+   cd cits3404-Project
+   python3 src/import_units.py
+   ```
+
 ## Instructions for how to run the tests for the application
