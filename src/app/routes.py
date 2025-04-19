@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from app import db
-from app.models import User
+from app.models import User, Unit
 from . import login_manager
 
 
@@ -83,3 +83,14 @@ def logout():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@main.route('/search_units')
+def search_units():
+    query = request.args.get('q', '')
+    search_type = request.args.get('type', '')
+    if search_type == 'code':
+        results = Unit.query.filter(Unit.unit_code.ilike(f'%{query}%')).limit(10).all()
+    else:
+        results = Unit.query.filter(Unit.unit_name.ilike(f'%{query}%')).limit(10).all()
+    return jsonify([{'unit_name': u.unit_name, 'unit_code': u.unit_code} for u in results])

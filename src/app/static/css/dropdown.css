@@ -1,0 +1,24 @@
+#searchInput {
+    position: relative;
+    z-index: 1;
+}
+#results.dropdown-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    top: 9%;
+    position: absolute;
+    width: 200px;
+    background-color: #111;
+    z-index: 2;
+}
+
+#results li {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: white;
+}
+
+#results li:hover {
+    background-color: #333;
+}
