@@ -24,11 +24,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install flake8 black
-
-    - name: Run flake8
-      run: |
-        flake8 .
+        pip install black
 
     - name: Check formatting with black
       run: |

@@ -2,9 +2,10 @@ from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'  
-    
+    __tablename__ = "users"
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)  # Renamed for clarity
@@ -16,9 +17,10 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+
 class Unit(db.Model):
-    __tablename__ = 'units'
-    
+    __tablename__ = "units"
+
     id = db.Column(db.Integer, primary_key=True)
     unit_name = db.Column(db.String(64), nullable=False)
     unit_code = db.Column(db.String(256), nullable=True)
