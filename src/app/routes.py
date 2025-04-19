@@ -10,8 +10,13 @@ main = Blueprint('main', __name__)
 ### Pages
 
 @main.route('/')
-def nav_home():
+def nav_landingpage():
     return render_template('index.html')
+
+@main.route('/home')
+@login_required
+def nav_home():
+    return render_template('home.html')
 
 @main.route('/login')
 def nav_login():
@@ -58,7 +63,7 @@ def register_user():
     db.session.commit()
 
     login_user(new_user)
-    return redirect(url_for('main.nav_home'))
+    return redirect(url_for('main.nav_homepage'))
 
 
 @main.route('/login-user', methods=['POST'])
@@ -70,7 +75,7 @@ def login():
     if user and user.check_password(password):
         login_user(user)
         flash('Login successful!', 'success')
-        return redirect(url_for('main.nav_home'))  
+        return redirect(url_for('main.nav_homepage'))  
     else:
         flash('Invalid username or password', 'error')
         return redirect(url_for('main.nav_login'))  
@@ -78,7 +83,7 @@ def login():
 @main.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('main.nav_home'))
+    return redirect(url_for('main.nav_landingpage'))
 
 @login_manager.user_loader
 def load_user(user_id):

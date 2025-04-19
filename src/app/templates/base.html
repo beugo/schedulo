@@ -22,12 +22,17 @@
   <nav class="sticky top-0 z-50 flex items-center px-6 py-2 shadow-sm">
     
     <div class="flex space-x-4">
-      <a href="{{ url_for('main.nav_home') }}" 
+      <a href="{{ url_for('main.nav_landingpage') }}" 
          class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
-         Home
+         [Insert Logo Here]
       </a>
 
       {% if current_user.is_authenticated %}
+      <a href="{{ url_for('main.nav_home') }}" 
+      class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
+      Home
+      </a>
+
       <a href="{{ url_for('main.nav_visualise') }}"
          class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
          Visualise
