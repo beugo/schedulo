@@ -3,23 +3,11 @@
 
 ## Design and Use
 
-### Design Minimums
-An "introductory" view, describing the context and purpose of the application, and allowing the user to create an account or log in.
-An "upload data" view, allowing the user to add new data.
-A "visualise data" view, allowing user's to view analysis of either their data or other people's data which has been shared with them.
-A "share data" view, allowing the users to selectively share their data with other specific users.
+This tool helps new UWA Computer Science students plan their course schedules by generating a personalized unit plan based on their major. It simplifies handbook requirements and prerequisites through a clear, guided interface. (TODO: figure out whether we are prioritising the three-year unit plan or the weekly class scheduler)
 
-### Frontend
-- HTML
-- CSS
-- JavaScript
-- Tailwind 
-
-### Backend 
-JQuery
-Flask (with plugins described in lectures)
-AJAX/Websockets
-SQLite interfaced to via the SQLAlchemy package
+### Tech Stack
+Frontend: HTML, CSS, JavaScript, Tailwind
+Backend: Flask, jQuery, AJAX/Websockets, SQLite (via SQLAlchemy)
 
 ## Group Members
 | Name               | Student Number | GitHub Username   |
@@ -42,7 +30,7 @@ SQLite interfaced to via the SQLAlchemy package
 
 1. **Clone the repository**
    ```bash
-   git clone <TODO>
+   git clone git@github.com:beugo/cits3403-project.git
    cd cits3403-project
    ```
 
