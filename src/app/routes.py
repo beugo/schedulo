@@ -24,10 +24,10 @@ def nav_landingpage():
     return render_template("index.html")
 
 
-@main.route("/home")
+@main.route("/dashboard")
 @login_required
-def nav_home():
-    return render_template("home.html")
+def nav_dashboard():
+    return render_template("dashboard.html")
 
 
 @main.route("/login")
@@ -80,7 +80,7 @@ def register_user():
     db.session.commit()
 
     login_user(new_user)
-    return redirect(url_for("main.nav_home"))
+    return redirect(url_for("main.nav_dashboard"))
 
 
 @main.route("/login-user", methods=["POST"])
@@ -92,7 +92,7 @@ def login():
     if user and user.check_password(password):
         login_user(user)
         flash("Login successful!", "success")
-        return redirect(url_for("main.nav_homepage"))
+        return redirect(url_for("main.nav_dashboard"))
     else:
         flash("Invalid username or password", "error")
         return redirect(url_for("main.nav_login"))
