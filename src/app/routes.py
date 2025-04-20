@@ -40,16 +40,21 @@ def nav_register():
     return render_template("register.html")
 
 
-@main.route("/visualise")
+@main.route("/unitplans")
 @login_required
-def nav_visualise():
-    return render_template("visualise.html")
+def nav_unitplans():
+    return render_template("unitplans.html")
 
 
-@main.route("/share")
+@main.route("/shared")
 @login_required
-def nav_share():
-    return render_template("share.html")
+def nav_shared():
+    return render_template("shared.html")
+
+@main.route("/create")
+@login_required
+def nav_create():
+    return render_template("create.html")
 
 
 ### API
