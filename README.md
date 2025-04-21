@@ -1,4 +1,4 @@
-# cits3403-project
+# Schedulo
 
 
 ## Design and Use
@@ -6,8 +6,8 @@
 This tool helps new UWA Computer Science students plan their course schedules by generating a personalized unit plan based on their major. It simplifies handbook requirements and prerequisites through a clear, guided interface. (TODO: figure out whether we are prioritising the three-year unit plan or the weekly class scheduler)
 
 ### Tech Stack
-Frontend: HTML, CSS, JavaScript, Tailwind
-Backend: Flask, jQuery, AJAX/Websockets, SQLite (via SQLAlchemy)
+- Frontend: HTML, CSS, JavaScript, Tailwind
+- Backend: Flask, jQuery, AJAX/Websockets, SQLite (via SQLAlchemy)
 
 ## Group Members
 | Name               | Student Number | GitHub Username   |
@@ -17,7 +17,6 @@ Backend: Flask, jQuery, AJAX/Websockets, SQLite (via SQLAlchemy)
 | Prashan Wijesinghe | 23783481       | quarterpie3141     |
 | Nathan Kim         | 23364749       | nathanbkim         |
 
---
 
 ## Instructions to Launch Application
 ### Requirements
@@ -30,7 +29,7 @@ Backend: Flask, jQuery, AJAX/Websockets, SQLite (via SQLAlchemy)
 
 1. **Clone the repository**
    ```bash
-   git clone git@github.com:beugo/cits3403-project.git
+   git clone git@github.com:beugo/schedulo.git
    cd cits3403-project
    ```
 
@@ -51,15 +50,16 @@ Backend: Flask, jQuery, AJAX/Websockets, SQLite (via SQLAlchemy)
    python run.py
    ```
 
-5. **Visit the app**
-   Open your browser and go to:  
-   [http://localhost:5000](http://localhost:5000)
+5. **Visit the app**  
+   Visit the app at this address --> [http://localhost:5000](http://localhost:5000)
 
 6. **Import Existing Units (Optional)**
    To import existing units run the import_units.py script from the project directory
    ```bash
-   cd cits3404-Project
+   cd schedulo
    python3 src/import_units.py
    ```
 
 ## Instructions for how to run the tests for the application
+
+TODO
