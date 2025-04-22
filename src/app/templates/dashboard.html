@@ -3,5 +3,46 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-Welcome to your dashboard
+<div class="flex w-full gap-8">
+
+  <!-- Left Sidebar -->
+  <div class="w-1/5 flex flex-col gap-4">
+    <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
+      Create New Unit Plan
+    </button>
+
+    <div class="mt-4">
+      <h3 class="font-bold text-lg mb-2">Your Unit Plans</h3>
+      <ul class="space-y-2">
+        <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan A</li>
+        <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan B</li>
+        <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan C</li>
+        <!-- Replace these with dynamic data later -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- Center Feed -->
+  <div class="w-3/5 flex flex-col items-center">
+    <button class="mb-6 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium shadow">
+      Post Your Unit Plan
+    </button>
+
+    <div class="w-full bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-6 shadow text-center">
+      <p class="text-gray-600 dark:text-dark-secondary">Your friend feed is empty for now. When friends share unit plans, they’ll appear here!</p>
+    </div>
+  </div>
+
+  <!-- Right Sidebar -->
+  <div class="w-1/5">
+    <h3 class="font-bold text-lg mb-2">Your Friends</h3>
+    <ul class="space-y-2">
+      <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Alice</li>
+      <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Bob</li>
+      <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Charlie</li>
+      <!-- Replace these with dynamic friend list later -->
+    </ul>
+  </div>
+
+</div>
 {% endblock %}

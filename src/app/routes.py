@@ -46,11 +46,6 @@ def nav_unitplans():
     return render_template("unitplans.html")
 
 
-@main.route("/shared")
-@login_required
-def nav_shared():
-    return render_template("shared.html")
-
 @main.route("/create")
 @login_required
 def nav_create():
