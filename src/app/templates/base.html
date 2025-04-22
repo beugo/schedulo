@@ -22,18 +22,13 @@
   <nav class="sticky top-0 z-50 flex items-center px-6 py-2 shadow-sm">
     
     <div class="flex space-x-4 items-center">
-      <a href="{{ url_for('main.nav_landingpage') }}" 
+      <a href="{% if current_user.is_authenticated %}{{ url_for('main.nav_dashboard') }}{% else %}{{ url_for('main.nav_landingpage') }}{% endif %}" 
          class="text-xl font-bold text-blue-600 hover:text-blue-500 drop-shadow-[0_0_4px_rgba(59,130,246,0.8)] 
                dark:text-white dark:hover:text-white dark:drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] transition">
          Schedulo
       </a>
 
       {% if current_user.is_authenticated %}
-      <a href="{{ url_for('main.nav_dashboard') }}" 
-      class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
-      Dashboard
-      </a>
-
       <a href="{{ url_for('main.nav_unitplans') }}"
          class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
          My Unit Plans
