@@ -27,6 +27,7 @@ def nav_landingpage():
 @main.route("/dashboard")
 @login_required
 def nav_dashboard():
+    """Render the user dashboard"""
     return render_template("dashboard.html")
 
 

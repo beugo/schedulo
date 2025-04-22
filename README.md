@@ -3,7 +3,7 @@
 
 ## Design and Use
 
-This tool helps new UWA Computer Science students plan their course schedules by generating a personalized unit plan based on their major. It simplifies handbook requirements and prerequisites through a clear, guided interface. (TODO: figure out whether we are prioritising the three-year unit plan or the weekly class scheduler)
+This tool helps new UWA Computer Science students plan their degree over three years by generating a personalized unit plan based on their major. It simplifies handbook requirements, prerequisites, and credit tracking through a clear, guided interface that maps out each semester from start to finish.
 
 ### Tech Stack
 - Frontend: HTML, CSS, JavaScript, Tailwind
