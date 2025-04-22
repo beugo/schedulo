@@ -5,22 +5,22 @@ from flask import (
     redirect,
     url_for,
     flash,
-    session,
     jsonify,
 )
-from flask_login import login_user, current_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required
 from app import db
 from app.models import User, Unit
 from . import login_manager
 
-
 main = Blueprint("main", __name__)
+
 
 ### Pages
 
 
 @main.route("/")
 def nav_landingpage():
+    """Render the landing page."""
     return render_template("index.html")
 
 
@@ -32,34 +32,35 @@ def nav_dashboard():
 
 @main.route("/login")
 def nav_login():
+    """Render the login page."""
     return render_template("login.html")
 
 
 @main.route("/register")
 def nav_register():
+    """Render the registration page."""
     return render_template("register.html")
 
 
 @main.route("/unitplans")
 @login_required
 def nav_unitplans():
+    """Render the unit plan page."""
     return render_template("unitplans.html")
 
 
 @main.route("/create")
 @login_required
 def nav_create():
+    """Render the unit plan creation page."""
     return render_template("create.html")
-
 
 ### API
 
 
-## Login
-
-
 @main.route("/register-user", methods=["POST"])
 def register_user():
+    """Handle user registration form submission."""
     username = request.form["username"]
     password = request.form["password"]
     confirm_password = request.form["confirm_password"]
@@ -85,6 +86,7 @@ def register_user():
 
 @main.route("/login-user", methods=["POST"])
 def login():
+    """Handle user login form submission."""
     username = request.form["username"]
     password = request.form["password"]
 
@@ -92,31 +94,36 @@ def login():
     if user and user.check_password(password):
         login_user(user)
         flash("Login successful!", "success")
-        return redirect(url_for("main.nav_dashboard"))
-    else:
-        flash("Invalid username or password", "error")
-        return redirect(url_for("main.nav_login"))
+        return redirect(url_for("main.nav_home"))
+
+    flash("Invalid username or password", "error")
+    return redirect(url_for("main.nav_login"))
 
 
 @main.route("/logout")
 def logout():
+    """Log the user out and redirect to home."""
     logout_user()
     return redirect(url_for("main.nav_landingpage"))
 
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Load user for Flask-Login session management."""
     return User.query.get(int(user_id))
 
 
 @main.route("/search_units")
 def search_units():
+    """Search unit data by name or code."""
     query = request.args.get("q", "")
     search_type = request.args.get("type", "")
+
     if search_type == "code":
         results = Unit.query.filter(Unit.unit_code.ilike(f"%{query}%")).limit(10).all()
     else:
         results = Unit.query.filter(Unit.unit_name.ilike(f"%{query}%")).limit(10).all()
+
     return jsonify(
         [{"unit_name": u.unit_name, "unit_code": u.unit_code} for u in results]
     )

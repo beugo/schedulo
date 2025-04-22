@@ -3,7 +3,7 @@ name: Lint Python Code
 on:
     push:
       branches:
-        - main
+        - **
     pull_request:
       branches:
         - main
@@ -24,8 +24,12 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install black
+        pip install black pylint
 
     - name: Check formatting with black
       run: |
         black --check .
+
+    - name: Lint Python code with pylint
+      run: |
+        pylint src/ --disable=C0114,C0415,R0903,R0401
