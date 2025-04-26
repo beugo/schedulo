@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('searchInput');
+    const saveButton = document.getElementById('saveButton');
     const unitList = document.getElementById('unitList');
     const dropCells = document.querySelectorAll('.flex-grow > div.border-2');
     let allUnits = [];
@@ -60,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!cell.querySelector('div')) {
                 const newDiv = document.createElement('div');
-                newDiv.className = 'p-2 rounded text-center cursor-move text-xs ';
+                newDiv.className = 'p-2 rounded text-center cursor-move text-xs unit';
                 newDiv.textContent = text;
                 newDiv.draggable = true;
                 newDiv.addEventListener('dragstart', dragStart);
@@ -98,4 +99,26 @@ document.addEventListener('DOMContentLoaded', function () {
         );
         renderUnits(filtered);
     });
+
+    saveButton.addEventListener('click', function () {
+        const selectedUnits = Array.from(document.querySelectorAll('.unit')).map(div => {
+            const text = div.textContent;
+            const [unitName, unitCode] = text.split(' (');
+            return {
+                unit_name: unitName.trim(),
+                unit_code: unitCode.replace(')', '').trim(),
+                column: Number(div.parentElement.className.match(/col-start-(\d+)/)?.[1])- 1, // Adjust for Year Column 
+                row: Number(div.parentElement.className.match(/row-start-(\d+)/)?.[1]) 
+            };
+        });
+        const data = { units: selectedUnits };
+        fetch('/save_units', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    });
+
 });

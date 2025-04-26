@@ -7,9 +7,9 @@ from flask import (
     flash,
     jsonify,
 )
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from app import db
-from app.models import User, Unit
+from app.models import User, Unit, UnitPlan, UnitPlanToUnit
 from . import login_manager
 
 main = Blueprint("main", __name__)
@@ -138,3 +138,58 @@ def all_units():
     return jsonify(
         [{"unit_name": u.unit_name, "unit_code": u.unit_code} for u in results]
     )
+
+@main.route("/save_units", methods=["POST"])
+def save_units():
+    """Saves the selected units to the database."""
+
+    units = request.json.get("units", [])
+
+    if not units:
+        flash("No units selected", "error")
+        return jsonify({"message": "No units selected"}), 400
+    if current_user.id is None:
+        flash("User not logged in", "error")
+        return jsonify({"message": "User not logged in"}), 401
+    
+    seen_positions = set()
+    
+    #  Add Plan to the database to get plan id
+    user_id = current_user.id
+    new_plan = UnitPlan(user_id=user_id)
+    db.session.add(new_plan)
+    db.session.commit()
+
+    # Add Unit Links to the database
+    for unit in units:
+        unit_code = unit['unit_code']
+        row = unit['row']
+        col = unit['column']
+        pos = (row, col)
+        if pos in seen_positions:
+            raise ValueError('Duplicate position detected')
+        seen_positions.add(pos)
+
+        # Ensure Unit exists
+        unit_obj = Unit.query.filter_by(unit_code=unit_code).first()
+        if not unit_obj:
+            flash(f"Unit {unit_code} does not exist", "error")
+            return jsonify({"message": f"Unit {unit_code} does not exist"}), 400
+
+
+        unit_plan_to_unit = UnitPlanToUnit(
+            unit_plan_id=new_plan.id,
+            unit_id=unit_obj.id,
+            row=row,
+            col=col
+        )
+        db.session.add(unit_plan_to_unit)
+    
+    db.session.commit()
+
+
+    # Should be safe hopefully
+
+    flash("Saved Unit Plan", "success")
+    return jsonify({"message": "Units saved successfully"})
+
