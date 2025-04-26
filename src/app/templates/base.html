@@ -21,21 +21,22 @@
 
   <nav class="sticky top-0 z-50 flex items-center px-6 py-2 shadow-sm">
     
-    <div class="flex space-x-4">
-      <a href="{{ url_for('main.nav_home') }}" 
-         class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
-         Home
+    <div class="flex space-x-4 items-center">
+      <a href="{% if current_user.is_authenticated %}{{ url_for('main.nav_dashboard') }}{% else %}{{ url_for('main.nav_landingpage') }}{% endif %}" 
+         class="text-xl font-bold text-blue-600 hover:text-blue-500 drop-shadow-[0_0_4px_rgba(59,130,246,0.8)] 
+               dark:text-white dark:hover:text-white dark:drop-shadow-[0_0_4px_rgba(255,255,255,0.8)] transition">
+         Schedulo
       </a>
 
       {% if current_user.is_authenticated %}
-      <a href="{{ url_for('main.nav_visualise') }}"
+      <a href="{{ url_for('main.nav_unitplans') }}"
          class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
-         Visualise
+         My Unit Plans
       </a>
 
-      <a href="{{ url_for('main.nav_share') }}"
+      <a href="{{ url_for('main.nav_create') }}"
          class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
-         Share
+         Create a Plan
       </a>
       {% endif %}
     </div>
@@ -44,7 +45,7 @@
 
     <div class="flex items-center space-x-4">
       <button onclick="toggleDarkMode()" 
-              class="p-2 rounded-lg hover:bg-gray-200 transition dark:text-dark-accent dark:hover:bg-dark-border">
+              class="p-2 rounded-lg hover:bg-gray-200 transition flex items-center justify-center dark:text-dark-accent dark:hover:bg-dark-border">
         <span class="material-icons-outlined">brightness_6</span>
       </button>
 

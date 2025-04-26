@@ -19,9 +19,16 @@ main = Blueprint("main", __name__)
 
 
 @main.route("/")
-def nav_home():
-    """Render the home page."""
+def nav_landingpage():
+    """Render the landing page."""
     return render_template("index.html")
+
+
+@main.route("/dashboard")
+@login_required
+def nav_dashboard():
+    """Render the user dashboard"""
+    return render_template("dashboard.html")
 
 
 @main.route("/login")
@@ -36,19 +43,18 @@ def nav_register():
     return render_template("register.html")
 
 
-@main.route("/visualise")
+@main.route("/unitplans")
 @login_required
-def nav_visualise():
-    """Render the data visualisation page."""
-    return render_template("visualise.html")
+def nav_unitplans():
+    """Render the unit plan page."""
+    return render_template("unitplans.html")
 
 
-@main.route("/share")
+@main.route("/create")
 @login_required
-def nav_share():
-    """Render the data sharing page."""
-    return render_template("share.html")
-
+def nav_create():
+    """Render the unit plan creation page."""
+    return render_template("create.html")
 
 ### API
 
@@ -76,7 +82,7 @@ def register_user():
     db.session.commit()
 
     login_user(new_user)
-    return redirect(url_for("main.nav_home"))
+    return redirect(url_for("main.nav_dashboard"))
 
 
 @main.route("/login-user", methods=["POST"])
@@ -89,7 +95,7 @@ def login():
     if user and user.check_password(password):
         login_user(user)
         flash("Login successful!", "success")
-        return redirect(url_for("main.nav_home"))
+        return redirect(url_for("main.nav_dashboard"))
 
     flash("Invalid username or password", "error")
     return redirect(url_for("main.nav_login"))
@@ -99,7 +105,7 @@ def login():
 def logout():
     """Log the user out and redirect to home."""
     logout_user()
-    return redirect(url_for("main.nav_home"))
+    return redirect(url_for("main.nav_landingpage"))
 
 
 @login_manager.user_loader
