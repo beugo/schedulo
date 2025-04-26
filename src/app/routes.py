@@ -121,9 +121,19 @@ def search_units():
     search_type = request.args.get("type", "")
 
     if search_type == "code":
-        results = Unit.query.filter(Unit.unit_code.ilike(f"%{query}%")).limit(10).all()
+        results = Unit.query.filter(Unit.unit_code.ilike(f"%{query}%")).limit(5).all()
     else:
-        results = Unit.query.filter(Unit.unit_name.ilike(f"%{query}%")).limit(10).all()
+        results = Unit.query.filter(Unit.unit_name.ilike(f"%{query}%")).limit(5).all()
+
+    return jsonify(
+        [{"unit_name": u.unit_name, "unit_code": u.unit_code} for u in results]
+    )
+
+
+@main.route("/all_units")
+def all_units():
+    """Gets all units to choose from."""
+    results = Unit.query.filter(Unit.is_deleted == False).all()
 
     return jsonify(
         [{"unit_name": u.unit_name, "unit_code": u.unit_code} for u in results]
