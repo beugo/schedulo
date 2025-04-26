@@ -95,7 +95,7 @@ def login():
     if user and user.check_password(password):
         login_user(user)
         flash("Login successful!", "success")
-        return redirect(url_for("main.nav_home"))
+        return redirect(url_for("main.nav_dashboard"))
 
     flash("Invalid username or password", "error")
     return redirect(url_for("main.nav_login"))
