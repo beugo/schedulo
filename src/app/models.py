@@ -38,6 +38,7 @@ class Unit(db.Model):
     description = db.Column(db.String(256), nullable=True)
     is_deleted = db.Column(db.Boolean, default=False)
 
+
 class UnitPlan(db.Model):
     """UnitPlan model representing unit plan metadata."""
 
@@ -47,6 +48,7 @@ class UnitPlan(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     name = db.Column(db.String(64), nullable=False)
     is_deleted = db.Column(db.Boolean, default=False)
+
 
 class UnitPlanToUnit(db.Model):
     """Links units to unit plans."""
