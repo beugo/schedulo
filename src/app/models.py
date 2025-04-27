@@ -45,6 +45,7 @@ class UnitPlan(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
     is_deleted = db.Column(db.Boolean, default=False)
 
 class UnitPlanToUnit(db.Model):

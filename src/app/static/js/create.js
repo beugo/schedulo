@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('searchInput');
     const saveButton = document.getElementById('saveButton');
     const unitList = document.getElementById('unitList');
+    const planName = document.getElementById('planName');
     const dropCells = document.querySelectorAll('.flex-grow > div.border-2');
     let allUnits = [];
 
@@ -101,6 +102,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     saveButton.addEventListener('click', function () {
+        const planNameValue = planName.value.trim();
+        if (!planNameValue) {
+            alert('Please enter a plan name.');
+            return;
+        }
         const selectedUnits = Array.from(document.querySelectorAll('.unit')).map(div => {
             const text = div.textContent;
             const [unitName, unitCode] = text.split(' (');
@@ -111,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 row: Number(div.parentElement.className.match(/row-start-(\d+)/)?.[1]) 
             };
         });
-        const data = { units: selectedUnits };
+        const data = { plan_name: planNameValue, units: selectedUnits };
         fetch('/save_units', {
             method: 'POST',
             headers: {
@@ -120,5 +126,4 @@ document.addEventListener('DOMContentLoaded', function () {
             body: JSON.stringify(data)
         })
     });
-
 });
