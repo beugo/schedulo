@@ -37,3 +37,27 @@ class Unit(db.Model):
     prerequisites = db.Column(db.String(256), nullable=True)
     description = db.Column(db.String(256), nullable=True)
     is_deleted = db.Column(db.Boolean, default=False)
+
+
+class UnitPlan(db.Model):
+    """UnitPlan model representing unit plan metadata."""
+
+    __tablename__ = "unit_plans"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False)
+
+
+class UnitPlanToUnit(db.Model):
+    """Links units to unit plans."""
+
+    __tablename__ = "unit_plan_to_unit"
+
+    id = db.Column(db.Integer, primary_key=True)
+    unit_plan_id = db.Column(db.Integer, db.ForeignKey("unit_plans.id"), nullable=False)
+    unit_id = db.Column(db.Integer, db.ForeignKey("units.id"), nullable=False)
+    row = db.Column(db.Integer, nullable=False)
+    col = db.Column(db.Integer, nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False)

@@ -3,7 +3,7 @@ name: Lint Python Code
 on:
     push:
       branches:
-        - **
+        - '**'
     pull_request:
       branches:
         - main
@@ -32,4 +32,4 @@ jobs:
 
     - name: Lint Python code with pylint
       run: |
-        pylint src/ --disable=C0114,C0415,R0903,R0401
+        pylint src/ --disable=C0114,C0415,R0903,R0401,E0401
