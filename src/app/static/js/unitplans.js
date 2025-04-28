@@ -29,8 +29,6 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => {
             allUnits = data;
             renderTable(allUnits);
-        }).then(data => {
-            showAlert(data.message, response.ok ? "success" : "error");
         });
 
     input.addEventListener('input', function () {
@@ -38,15 +36,4 @@ document.addEventListener("DOMContentLoaded", function() {
         const filtered = allUnits.filter(unit => unit.name.toLowerCase().includes(query));
         renderTable(filtered);
     });
-
-    function showAlert(message, category) {
-        const container = document.querySelector('.absolute-container ul');
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert ${category}`;
-        alertDiv.innerHTML = `
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-            ${message}
-        `;
-        container.appendChild(alertDiv);
-    }
 });

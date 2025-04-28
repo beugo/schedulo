@@ -3,6 +3,7 @@
     padding: 20px;
     border-radius: 5px;
     color: white;
+    margin-bottom: 10px;
 }
 
 .absolute-container {
@@ -48,5 +49,6 @@
 }
 
 .alert.fade-out {
-    animation: fadeOut 0.7s forwards;
+    animation: fadeOut 1s forwards;
+    animation-delay: 5s;
 }

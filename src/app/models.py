@@ -29,7 +29,7 @@ class Unit(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     unit_name = db.Column(db.String(64), nullable=False)
-    unit_code = db.Column(db.String(256), nullable=True)
+    unit_code = db.Column(db.String(256), unique=True, nullable=True)
     exam = db.Column(db.Boolean, nullable=True)
     url = db.Column(db.String(256), nullable=True)
     unit_coordinator = db.Column(db.String(256), nullable=True)

@@ -1,6 +1,7 @@
 window.addEventListener('load', () => {
     const alertContainer = document.querySelector('ul.p-3');
-    const alerts = alertContainer.querySelectorAll('.alert');
+    if (!alertContainer) return;
+    const alerts = Array.from(alertContainer.querySelectorAll('.alert'));
 
     alerts.forEach(alert => {
         setTimeout(() => {
