@@ -5,11 +5,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const planName = document.getElementById('planName');
     const dropCells = Array.from(document.querySelectorAll('.flex-grow > div.border-2')).filter(el => !el.className.includes('year'));
     let allUnits = [];
+    let avaliableUnits = [];
 
     fetch('/all_units')
         .then(response => response.json())
         .then(data => {
             allUnits = data;
+            avaliableUnits = data;
             renderUnits(data);
         });
 
@@ -36,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.dataTransfer.setData('fromCell', e.target.closest('.border-2') ? 'true' : 'false');
     }
 
+    // timetable drag and drop
     dropCells.forEach(cell => {
         cell.addEventListener('dragover', e => {
             e.preventDefault();
@@ -47,6 +50,18 @@ document.addEventListener('DOMContentLoaded', function () {
             const text = e.dataTransfer.getData('text/plain');
             const fromCell = e.dataTransfer.getData('fromCell') === 'true';
             if (!text) return;
+
+            // if the cell already has a unit, remove it
+            const existingDiv = cell.querySelector('div');
+            if (existingDiv) {
+                existingDiv.className = 'p-2 rounded-lg border border-gray-300 mb-2 cursor-move'
+                unitList.appendChild(existingDiv);
+                // add it back to the available units
+                avaliableUnits.push({
+                    unit_name: existingDiv.textContent.split(' (')[0],
+                    unit_code: existingDiv.textContent.split(' (')[1].replace(')', '')
+                });
+            }
 
             if (fromCell) {
                 const allDivs = document.querySelectorAll('.flex-grow > div.border-2 > div');
@@ -60,24 +75,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
 
-            if (!cell.querySelector('div')) {
-                const newDiv = document.createElement('div');
-                newDiv.className = 'p-2 rounded text-center cursor-move text-xs unit';
-                newDiv.textContent = text;
-                newDiv.draggable = true;
-                newDiv.addEventListener('dragstart', dragStart);
-                cell.appendChild(newDiv);
-            }
+            const newDiv = document.createElement('div');
+            newDiv.className = 'p-2 rounded text-center cursor-move text-xs unit';
+            newDiv.textContent = text;
+            newDiv.draggable = true;
+            newDiv.addEventListener('dragstart', dragStart);
+            cell.appendChild(newDiv);
+
+            // remove the unit from available units
+            const unit_code = text.split(' (')[1].replace(')', '');
+            avaliableUnits = avaliableUnits.filter(unit => unit.unit_code !== unit_code);
+
+
         });
     });
 
+    // unit list drag and drop
     unitList.addEventListener('dragover', e => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
     });
-
-
-
     unitList.addEventListener('drop', e => {
         e.preventDefault();
         const text = e.dataTransfer.getData('text/plain');
@@ -89,12 +106,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             unitList.appendChild(createUnitDiv(text));
+            avaliableUnits.push({
+                unit_name: text.split(' (')[0],
+                unit_code: text.split(' (')[1].replace(')', '')
+            });
         }
     });
 
     input.addEventListener('input', function () {
         const query = input.value.trim().toLowerCase();
-        const filtered = allUnits.filter(unit => 
+        const filtered = avaliableUnits.filter(unit => 
             unit.unit_name.toLowerCase().includes(query) || 
             unit.unit_code.toLowerCase().includes(query)
         );
