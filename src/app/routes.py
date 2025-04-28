@@ -166,6 +166,15 @@ def save_units():
     if len(unit_objs) != len(units):
         return jsonify({"message": "Some units do not exist?", "ok": False}), 400
 
+    
+    # Check if the plan name already exists for the user
+    existing_plan = UnitPlan.query.filter_by(
+        user_id=current_user.id, name=plan_name
+    ).first()
+
+    if existing_plan:
+        return jsonify({"message": "Plan name already exists", "ok": False}), 400
+
     #  Add Plan to the database to get plan id
     user_id = current_user.id
     new_plan = UnitPlan(user_id=user_id, name=plan_name)
