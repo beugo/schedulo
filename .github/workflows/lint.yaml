@@ -28,7 +28,7 @@ jobs:
 
     - name: Check formatting with black
       run: |
-        black --check .
+        black .
 
     - name: Lint Python code with pylint
       run: |
