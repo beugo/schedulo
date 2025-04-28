@@ -146,6 +146,8 @@ def save_units():
 
     plan_name = request.json.get("plan_name", "")
     units = request.json.get("units", [])
+    unit_codes = [unit["unit_code"] for unit in units]
+
 
     if not units:
         flash("No units selected", "error")
@@ -158,6 +160,15 @@ def save_units():
         return jsonify({"message": "No plan name provided"}), 400
 
     seen_positions = set()
+
+    # Gets all unit objects and if they don't all exist then return error
+    # I think this is safe and better than before
+    # Then into a dict for easy access
+    unit_objs = Unit.query.filter(Unit.unit_code.in_(unit_codes)).all()    
+    unit_dict = {unit.unit_code: unit.id for unit in unit_objs}
+    if len(unit_objs) != len(units):
+        flash("Something went wrong", "error")
+        return jsonify({"message": "Something went wrong"}), 400
 
     #  Add Plan to the database to get plan id
     user_id = current_user.id
@@ -175,14 +186,8 @@ def save_units():
             raise ValueError("Duplicate position detected")
         seen_positions.add(pos)
 
-        # Ensure Unit exists
-        unit_obj = Unit.query.filter_by(unit_code=unit_code).first()
-        if not unit_obj:
-            flash(f"Unit {unit_code} does not exist", "error")
-            return jsonify({"message": f"Unit {unit_code} does not exist"}), 400
-
         unit_plan_to_unit = UnitPlanToUnit(
-            unit_plan_id=new_plan.id, unit_id=unit_obj.id, row=row, col=col
+            unit_plan_id=new_plan.id, unit_id=unit_dict[unit_code] , row=row, col=col
         )
         db.session.add(unit_plan_to_unit)
 

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const saveButton = document.getElementById('saveButton');
     const unitList = document.getElementById('unitList');
     const planName = document.getElementById('planName');
-    const dropCells = document.querySelectorAll('.flex-grow > div.border-2');
+    const dropCells = Array.from(document.querySelectorAll('.flex-grow > div.border-2')).filter(el => !el.className.includes('year'));
     let allUnits = [];
 
     fetch('/all_units')
