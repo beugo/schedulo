@@ -9,7 +9,7 @@ from flask import (
 )
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db
-from app.models import User, Unit, UnitPlan, UnitPlanToUnit
+from app.models import User, Unit, UnitPlan, UnitPlanToUnit, UserFriend
 from . import login_manager
 
 main = Blueprint("main", __name__)
@@ -57,7 +57,17 @@ def nav_create():
     return render_template("create.html")
 
 
+@main.route("/friends")
+@login_required
+def nav_friends():
+    """Render the friends page."""
+    return render_template("friends.html")
+
+
 ### API
+
+
+### Login
 
 
 @main.route("/register-user", methods=["POST"])
@@ -115,6 +125,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+### Units
+
+
 @main.route("/search_units")
 def search_units():
     """Search unit data by name or code."""
@@ -138,6 +151,9 @@ def all_units():
     return jsonify(
         [{"unit_name": u.unit_name, "unit_code": u.unit_code} for u in results]
     )
+
+
+### Unit Plans
 
 
 @main.route("/save_units", methods=["POST"])
@@ -217,3 +233,95 @@ def get_user_unit_plans():
             ]
         )
     return jsonify({"message": "User not logged in", "ok": False}), 401
+
+
+### Friends
+
+
+@main.route("/get_friends", methods=["GET"])
+def get_user_friends():
+    """Get all friends for the current user."""
+    if current_user.id:
+        user_friend_link = UserFriend.query.filter_by(
+            user_id=current_user.id, is_deleted=False
+        ).all()
+        user_friend_ids = [f.friend_id for f in user_friend_link]
+
+        user_friends = User.query.filter(User.id.in_(user_friend_ids))
+        return jsonify(
+            [
+                {
+                    "username": friend.username,
+                }
+                for friend in user_friends
+            ]
+        )
+    return jsonify({"message": "User not logged in", "ok": False}), 401
+
+
+@main.route("/search_friends", methods=["GET"])
+def search_friends():
+    """Search friends by name, excluding the current logged-in user."""
+    query = request.args.get("q", "")
+    current_f_id = db.session.query(UserFriend.friend_id).filter_by(
+        user_id=current_user.id, is_deleted=False
+    )
+    results = (
+        User.query.filter(
+            User.username.ilike(f"%{query}%"),
+            User.id != current_user.id,
+            ~User.id.in_(current_f_id),
+        )
+        .limit(5)
+        .all()
+    )
+
+    return jsonify([{"username": u.username} for u in results])
+
+
+@main.route("/add_friend", methods=["POST"])
+def add_friend():
+    """Add a friend to the current user."""
+    friend_username = request.json.get("q", "")
+    if not friend_username:
+        return jsonify({"message": "No friend username provided", "ok": False}), 400
+
+    friend = User.query.filter_by(username=friend_username).first()
+    if not friend:
+        return jsonify({"message": "Friend not found", "ok": False}), 404
+
+    existing_friendship = UserFriend.query.filter_by(
+        user_id=current_user.id, friend_id=friend.id
+    ).first()
+    if existing_friendship:
+        if existing_friendship.is_deleted:
+            existing_friendship.is_deleted = not existing_friendship.is_deleted
+            db.session.commit()
+            return jsonify({"message": "Friend added successfully", "ok": True}), 200
+        return jsonify({"message": "Already friends", "ok": False}), 400
+
+    new_friendship = UserFriend(user_id=current_user.id, friend_id=friend.id)
+    db.session.add(new_friendship)
+    db.session.commit()
+
+    return jsonify({"message": "Friend added successfully", "ok": True}), 200
+
+
+@main.route("/remove_friend", methods=["PATCH"])
+def remove_friend():
+    """Toggle Soft Delete friend to the current user."""
+    friend_username = request.json.get("q", "")
+    if not friend_username:
+        return jsonify({"message": "No friend username provided", "ok": False}), 400
+    friend = User.query.filter_by(username=friend_username).first()
+    if not friend:
+        return jsonify({"message": "Friend not found", "ok": False}), 404
+    existing_friendship = UserFriend.query.filter_by(
+        user_id=current_user.id, friend_id=friend.id
+    ).first()
+    if not existing_friendship:
+        return jsonify({"message": "You are not friends?", "ok": False}), 404
+
+    existing_friendship.is_deleted = not existing_friendship.is_deleted
+    db.session.commit()
+    return jsonify({"message": "Friendship updated", "ok": True}), 200

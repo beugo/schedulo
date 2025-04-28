@@ -61,3 +61,14 @@ class UnitPlanToUnit(db.Model):
     row = db.Column(db.Integer, nullable=False)
     col = db.Column(db.Integer, nullable=False)
     is_deleted = db.Column(db.Boolean, default=False)
+
+
+class UserFriend(db.Model):
+    """UserFriend representing user friendships."""
+
+    __tablename__ = "user_friends"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    friend_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    is_deleted = db.Column(db.Boolean, default=False)

@@ -3,7 +3,7 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="flex w-full gap-8">
+<div class="flex w-full gap-8 items-start">
 
   <!-- Left Sidebar -->
   <div class="w-1/5 flex flex-col gap-4">
@@ -17,7 +17,6 @@
         <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan A</li>
         <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan B</li>
         <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan C</li>
-        <!-- Replace these with dynamic data later -->
       </ul>
     </div>
   </div>
@@ -34,15 +33,22 @@
   </div>
 
   <!-- Right Sidebar -->
-  <div class="w-1/5">
-    <h3 class="font-bold text-lg mb-2">Your Friends</h3>
-    <ul class="space-y-2">
-      <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Alice</li>
-      <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Bob</li>
-      <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Charlie</li>
-      <!-- Replace these with dynamic friend list later -->
-    </ul>
+  <div class="w-1/5 flex flex-col gap-4 bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-2">
+    <div class="flex flex-row items-center justify-between p-2">
+      <h3 class="font-bold text-lg mb-2" style="margin: auto;">Your Friends</h3>
+      <div class="flex-grow"></div>
+      <a href="{{ url_for('main.nav_friends') }}" class="p-2 rounded-lg hover:bg-gray-200 transition flex items-center justify-center dark:text-dark-accent dark:hover:bg-dark-border">
+        <span class="material-icons-outlined">add</span>
+      </a>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white dark:bg-dark-fg rounded-lg shadow-md">
+          <tbody id="friendTable">
+          </tbody>
+      </table>
   </div>
+</div>
 
 </div>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
