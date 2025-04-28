@@ -150,14 +150,11 @@ def save_units():
 
 
     if not units:
-        flash("No units selected", "error")
-        return jsonify({"message": "No units selected"}), 400
+        return jsonify({"message": "No units selected", "ok": False}), 400
     if current_user.id is None:
-        flash("User not logged in", "error")
-        return jsonify({"message": "User not logged in"}), 401
+        return jsonify({"message": "User not logged in", "ok": False}), 401
     if not plan_name:
-        flash("No plan name provided", "error")
-        return jsonify({"message": "No plan name provided"}), 400
+        return jsonify({"message": "No plan name provided", "ok": False}), 400
 
     seen_positions = set()
 
@@ -167,8 +164,7 @@ def save_units():
     unit_objs = Unit.query.filter(Unit.unit_code.in_(unit_codes)).all()    
     unit_dict = {unit.unit_code: unit.id for unit in unit_objs}
     if len(unit_objs) != len(units):
-        flash("Something went wrong", "error")
-        return jsonify({"message": "Something went wrong"}), 400
+        return jsonify({"message": "Some units do not exist?", "ok": False}), 400
 
     #  Add Plan to the database to get plan id
     user_id = current_user.id
@@ -194,8 +190,7 @@ def save_units():
     db.session.commit()
 
     # Should be safe hopefully
-    flash("Saved Unit Plan", "success")
-    return jsonify({"message": "Units saved successfully"})
+    return jsonify({"message": "Units saved successfully", "ok": True}), 200
 
 
 @main.route("/UserUnitPlans", methods=["GET"])
@@ -214,4 +209,4 @@ def get_user_unit_plans():
                 for plan in unit_plans
             ]
         )
-    return jsonify({"message": "User not logged in"}), 401
+    return jsonify({"message": "User not logged in", "ok": False}), 401

@@ -118,12 +118,27 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         });
         const data = { plan_name: planNameValue, units: selectedUnits };
+
         fetch('/save_units', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data)  
         })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) createAlert(data.message, data.ok ? 'success' : 'error'); 
+        })
+        .catch(error => {
+            createAlert('An error occurred while saving the plan.', 'error'); 
+        });
     });
+
+    function createAlert(message, category) {
+        const alertDiv = document.createElement('div');
+        alertDiv.classList.add('alert', category, 'fade-out');
+        alertDiv.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>${message}`;
+        document.querySelector('.absolute-container ul').appendChild(alertDiv);
+    }
 });
