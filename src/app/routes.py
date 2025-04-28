@@ -298,8 +298,7 @@ def add_friend():
             existing_friendship.is_deleted = not existing_friendship.is_deleted
             db.session.commit()
             return jsonify({"message": "Friend added successfully", "ok": True}), 200
-        else:
-            return jsonify({"message": "Already friends", "ok": False}), 400
+        return jsonify({"message": "Already friends", "ok": False}), 400
 
     new_friendship = UserFriend(user_id=current_user.id, friend_id=friend.id)
     db.session.add(new_friendship)
