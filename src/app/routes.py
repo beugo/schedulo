@@ -148,7 +148,6 @@ def save_units():
     units = request.json.get("units", [])
     unit_codes = [unit["unit_code"] for unit in units]
 
-
     if not units:
         return jsonify({"message": "No units selected", "ok": False}), 400
     if current_user.id is None:
@@ -161,12 +160,11 @@ def save_units():
     # Gets all unit objects and if they don't all exist then return error
     # I think this is safe and better than before
     # Then into a dict for easy access
-    unit_objs = Unit.query.filter(Unit.unit_code.in_(unit_codes)).all()    
+    unit_objs = Unit.query.filter(Unit.unit_code.in_(unit_codes)).all()
     unit_dict = {unit.unit_code: unit.id for unit in unit_objs}
     if len(unit_objs) != len(units):
         return jsonify({"message": "Some units do not exist?", "ok": False}), 400
 
-    
     # Check if the plan name already exists for the user
     existing_plan = UnitPlan.query.filter_by(
         user_id=current_user.id, name=plan_name
@@ -192,7 +190,7 @@ def save_units():
         seen_positions.add(pos)
 
         unit_plan_to_unit = UnitPlanToUnit(
-            unit_plan_id=new_plan.id, unit_id=unit_dict[unit_code] , row=row, col=col
+            unit_plan_id=new_plan.id, unit_id=unit_dict[unit_code], row=row, col=col
         )
         db.session.add(unit_plan_to_unit)
 
