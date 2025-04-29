@@ -8,11 +8,11 @@
   <!-- Left Sidebar -->
   <div class="w-1/5 flex flex-col gap-4">
     <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
-      <a href="{{ url_for('main.nav_create') }}">Create New Unit Plan</a>
+      <a href="{{ url_for('main.create_page') }}">Create New Unit Plan</a>
     </button>
 
     <div class="mt-4">
-      <h3 class="font-bold text-lg mb-2"><a href="{{ url_for('main.nav_unitplans') }}">Your Unit Plans</a></h3>
+      <h3 class="font-bold text-lg mb-2"><a href="{{ url_for('main.unitplans_page') }}">Your Unit Plans</a></h3>
       <ul class="space-y-2">
         <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan A</li>
         <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan B</li>
@@ -37,7 +37,7 @@
     <div class="flex flex-row items-center justify-between p-2">
       <h3 class="font-bold text-lg mb-2" style="margin: auto;">Your Friends</h3>
       <div class="flex-grow"></div>
-      <a href="{{ url_for('main.nav_friends') }}" class="p-2 rounded-lg hover:bg-gray-200 transition flex items-center justify-center dark:text-dark-accent dark:hover:bg-dark-border">
+      <a href="{{ url_for('main.friends_page') }}" class="p-2 rounded-lg hover:bg-gray-200 transition flex items-center justify-center dark:text-dark-accent dark:hover:bg-dark-border">
         <span class="material-icons-outlined">add</span>
       </a>
     </div>
