@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Learn More{% endblock %}
+
+{% block content %}
+<section class="flex justify-center transition-colors duration-300 m-auto">
+    <div class="w-full max-w-6xl mx-auto bg-white dark:bg-dark-fg rounded-xl shadow-2xl px-8 py-10" >
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-dark-primary mb-2 text-center">
+            What is Schedulo?
+        </h2>
+        <p class="text-gray-700 dark:text-dark-secondary mb-8 text-left">
+             Schedulo provides an intuitive tool to effortlessly plan your study schedule and organise your timetable
+            <br> Schedulo is designed to help you avoid clashes, boost productivity and reduce stress so you can focus <br> on what matters most:
+            <strong> your studies </strong>
+
+        </p>
+        <div class='space-y-8'>
+            <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100"> 
+                    How It Works</h2>
+                <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                    <li><strong>Select Your Units</strong> – Enter subjects & key details.</li>
+                    <li><strong>Customize Your Schedule</strong> – Adjust times, priorities, and deadlines.</li>
+                    <li><strong>Visualize Your Timetable</strong> – Instantly see your weekly plan.</li>
+                    <li><strong>Optimize Productivity</strong> – Get suggestions & avoid conflicts.</li>
+                </ul>
+            </div>
+
+            <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+                    Key Features</h2>
+                
+                <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                    <li><strong>Smart Scheduling</strong> – Detect clashes automatically and suggest optimized timetables.</li>
+                    <li><strong>Visual Timetable</strong> – Interactive calendar with color-coded events.</li>
+                    <li><strong>Customizable Units</strong> – Add subjects, priorities, and deadlines.</li>
+                    <li><strong>Collaboration Tools</strong> – Share schedules with classmates or colleagues.</li>
+                    <li><strong>Notifications & Reminders</strong> – Stay on track with smart alerts.</li>
+                </ul>
+            </div>
+            
+            <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center mb-8">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">What are you waiting for?</h2>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">
+                    <strong>Click the button below to start planning smarter today!</strong> 
+                </p>
+                <a href="/register" class="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition inline-block">
+                    Sign Up Now
+                </a>
+            </div>
+       </div>
+        
+    </div>
+    
+    
+</section>    
+{% endblock %}

@@ -64,6 +64,12 @@ def nav_friends():
     return render_template("friends.html")
 
 
+@main.route("/learnMore")
+def nav_learn_more():
+    """Render the learn more page."""
+    return render_template("learnMore.html")
+
+
 ### API
 
 
