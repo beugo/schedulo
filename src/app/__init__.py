@@ -26,22 +26,24 @@ def create_app(config_class=Config):
     login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
 
-    from app.blueprints.auth   import auth_bp
-    from app.blueprints.main   import main_bp
-    from app.blueprints.units  import units_bp
-    from app.blueprints.plans  import plans_bp
+    from app.blueprints.auth import auth_bp
+    from app.blueprints.main import main_bp
+    from app.blueprints.units import units_bp
+    from app.blueprints.plans import plans_bp
     from app.blueprints.friends import friends_bp
-    
+
     # register blueprints
-    app.register_blueprint(auth_bp,   url_prefix="/auth")
+    app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(main_bp)  # no prefix for pages
-    app.register_blueprint(units_bp,  url_prefix="/units")
-    app.register_blueprint(plans_bp,  url_prefix="/plans")
+    app.register_blueprint(units_bp, url_prefix="/units")
+    app.register_blueprint(plans_bp, url_prefix="/plans")
     app.register_blueprint(friends_bp, url_prefix="/friend")
 
     return app
 
+
 @login_manager.user_loader
 def load_user(user_id):
     from .models import User
+
     return User.query.get(int(user_id))

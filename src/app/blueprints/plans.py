@@ -3,9 +3,10 @@ from flask_login import current_user
 from app import db
 from app.models import Unit, UnitPlan, UnitPlanToUnit
 
-plans_bp = Blueprint('plans', __name__)
+plans_bp = Blueprint("plans", __name__)
 
-@plans_bp.route('/save', methods=['POST'])
+
+@plans_bp.route("/save", methods=["POST"])
 def save_plan():
     plan_name = request.json.get("plan_name", "")
     units = request.json.get("units", [])
@@ -62,9 +63,10 @@ def save_plan():
     # Should be safe hopefully
     return jsonify({"message": "Units saved successfully", "ok": True}), 200
 
-@plans_bp.route('/user', methods=['GET'])
+
+@plans_bp.route("/user", methods=["GET"])
 def get_plans():
     if not current_user.is_authenticated:
-        return jsonify({'ok':False,'message':'Not logged in'}),401
+        return jsonify({"ok": False, "message": "Not logged in"}), 401
     plans = UnitPlan.query.filter_by(user_id=current_user.id, is_deleted=False).all()
-    return jsonify([{ 'id':p.id,'name':p.name } for p in plans])
+    return jsonify([{"id": p.id, "name": p.name} for p in plans])
