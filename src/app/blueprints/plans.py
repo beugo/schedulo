@@ -62,9 +62,9 @@ def save_plan():
     # Should be safe hopefully
     return jsonify({"message": "Units saved successfully", "ok": True}), 200
 
-@plans_bp.route('/', methods=['GET'])
+@plans_bp.route('/user', methods=['GET'])
 def get_plans():
     if not current_user.is_authenticated:
         return jsonify({'ok':False,'message':'Not logged in'}),401
-    plans = UnitPlan.query.filter_by(user_id=current_user.id).all()
+    plans = UnitPlan.query.filter_by(user_id=current_user.id, is_deleted=False).all()
     return jsonify([{ 'id':p.id,'name':p.name } for p in plans])

@@ -29,7 +29,7 @@ function renderTable(friends) {
 }
 
 function refreshTable(){
-    fetch("/get_friends")
+    fetch("/friend/get")
         .then(response => response.json())
         .then(data => {
             friends = data;

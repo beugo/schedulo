@@ -4,13 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const unitList = document.getElementById('unitList');
     const planName = document.getElementById('planName');
     const dropCells = Array.from(document.querySelectorAll('.flex-grow > div.border-2')).filter(el => !el.className.includes('year'));
-    let allUnits = [];
     let avaliableUnits = [];
 
-    fetch('/all_units')
+    fetch('/units/all')
         .then(response => response.json())
         .then(data => {
-            allUnits = data;
             avaliableUnits = data;
             renderUnits(data);
         });
@@ -140,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         const data = { plan_name: planNameValue, units: selectedUnits };
 
-        fetch('/save_units', {
+        fetch('/plans/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

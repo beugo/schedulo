@@ -1,1 +1,31 @@
 Single-database configuration for Flask.
+
+# On first start up
+You will need to delete the old database then running.
+``` bash
+cd src
+flask db upgrade
+```
+Will create the database, then 
+``` bash
+cd src
+python3 seed.py
+```
+Will seed the database with default data.
+
+
+# Ongoing development
+## Update Database
+``` bash
+cd src
+flask db upgrade
+```
+This will run all migrations in the folder
+
+## Add Migration
+``` bash
+cd src
+flask db migrate -m "exmaple_message"
+flask db upgrade
+```
+Once you have made changes to the models eg. add columns you need to create a migration then after update the database to that migration.

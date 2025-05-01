@@ -37,7 +37,7 @@ def create_app(config_class=Config):
     app.register_blueprint(main_bp)  # no prefix for pages
     app.register_blueprint(units_bp,  url_prefix="/units")
     app.register_blueprint(plans_bp,  url_prefix="/plans")
-    app.register_blueprint(friends_bp, url_prefix="/friends-api")
+    app.register_blueprint(friends_bp, url_prefix="/friend")
 
     return app
 
