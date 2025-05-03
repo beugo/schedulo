@@ -2,30 +2,48 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_login import LoginManager
 
-db = SQLAlchemy()
-login_manager = LoginManager()
+from .config import Config
+
 load_dotenv()
 
+db = SQLAlchemy()
+migrate = Migrate()
+login_manager = LoginManager()
 
-def create_app():
-    """Create and configure the Flask application."""
+
+def create_app(config_class=Config):
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+    app.config.from_object(config_class)
 
+    # extensions
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
 
-    login_manager.login_view = "main.login"
+    login_manager.login_view = "auth.login"
     login_manager.login_message_category = "info"
 
-    from .routes import main
+    from app.blueprints.auth import auth_bp
+    from app.blueprints.main import main_bp
+    from app.blueprints.units import units_bp
+    from app.blueprints.plans import plans_bp
+    from app.blueprints.friends import friends_bp
 
-    app.register_blueprint(main)
-
-    with app.app_context():
-        db.create_all()
+    # register blueprints
+    app.register_blueprint(auth_bp, url_prefix="/auth")
+    app.register_blueprint(main_bp)  # no prefix for pages
+    app.register_blueprint(units_bp, url_prefix="/units")
+    app.register_blueprint(plans_bp, url_prefix="/plans")
+    app.register_blueprint(friends_bp, url_prefix="/friend")
 
     return app
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    from .models import User
+
+    return User.query.get(int(user_id))

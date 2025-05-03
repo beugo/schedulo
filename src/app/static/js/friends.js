@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         debounceTimer = setTimeout(() => {
-            fetch(`/search_friends?q=${encodeURIComponent(query)}`)
+            fetch(`/friend/search?q=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
                     results.innerHTML = '';
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         li.addEventListener('click', () => {
                             input.value = '';
                             results.innerHTML = '';
-                            fetch(`/add_friend?q=${encodeURIComponent(person.username)}`, {
+                            fetch(`/friend/add?q=${encodeURIComponent(person.username)}`, {
                                 method: 'POST',
                                 body: JSON.stringify({ q: person.username }),
                                 headers: {
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 function deleteFriend(username){
-    fetch(`/remove_friend?q=${encodeURIComponent(username)}`, {
+    fetch(`/friend/remove?q=${encodeURIComponent(username)}`, {
         method: 'PATCH',
         body: JSON.stringify({ q: username }),
         headers: {
@@ -92,7 +92,7 @@ function renderTable(friends) {
 }
 
 function refreshTable(){
-    fetch("/get_friends")
+    fetch("/friend/get")
         .then(response => response.json())
         .then(data => {
             friends = data;

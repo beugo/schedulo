@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    fetch("/UserUnitPlans")
+    fetch("/plans/user")
         .then(response => response.json())
         .then(data => {
             allUnits = data;

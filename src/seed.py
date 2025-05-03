@@ -16,7 +16,7 @@ def parse_bool(val):
 
 def import_units():
     """Load units from CSV and insert into the database."""
-    with open("data-scraping/cits.csv", newline="", encoding="utf-8") as f:
+    with open("../data-scraping/cits.csv", newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
             unit = Unit(

@@ -30,12 +30,12 @@ This tool helps new UWA Computer Science students plan their degree over three y
 1. **Clone the repository**
    ```bash
    git clone git@github.com:beugo/schedulo.git
-   cd cits3403-project
+   cd schedulo
    ```
 
 2. **Create and activate a virtual environment**
    ```bash
-   python3 -m venv .venv
+   python -m venv .venv
    source .venv/bin/activate
    ```
 
@@ -46,7 +46,7 @@ This tool helps new UWA Computer Science students plan their degree over three y
 
 4. **Run the Flask app**
    ```bash
-   cd deliverables
+   cd src
    python run.py
    ```
 
@@ -57,7 +57,7 @@ This tool helps new UWA Computer Science students plan their degree over three y
    To import existing units run the import_units.py script from the project directory
    ```bash
    cd schedulo
-   python3 src/import_units.py
+   python seed.py
    ```
 
 ## Instructions for how to run the tests for the application
