@@ -29,7 +29,13 @@ def recommended_units():
     if not current_user.is_authenticated:
         return jsonify({"ok": False}), 401
 
-    friend_ids = db.session.query(UserFriend.friend_id).filter_by(user_id=current_user.id, is_deleted=False)
+    friend_ids = db.session.query(UserFriend.user_id).filter( 
+        UserFriend.friend_id == current_user.id, UserFriend.is_deleted == False
+    ).union(
+        db.session.query(UserFriend.friend_id).filter( 
+            UserFriend.user_id == current_user.id, UserFriend.is_deleted == False)
+    ).subquery()
+
     unit_counts = (
         db.session.query(Unit.id, db.func.count(Unit.id).label("count"))
         .join(UnitPlanToUnit, Unit.id == UnitPlanToUnit.unit_id)
