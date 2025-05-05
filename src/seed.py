@@ -6,8 +6,6 @@ from app.models import Unit
 from app import create_app, db
 
 app = create_app()
-app.app_context().push()
-
 
 def parse_bool(val):
     """Parse 'yes' string as boolean True."""
@@ -36,4 +34,5 @@ def import_units():
 
 
 if __name__ == "__main__":
-    import_units()
+    with app.app_context():
+        import_units()
