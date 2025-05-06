@@ -140,7 +140,7 @@ function acceptFriendRequest(username, req) {
     }).then(response => { response.json().then( res => {
             if (res.ok){
                 createAlert(res.message, 'success');
-                removeFriendRequest();
+                removeFriendRequest(username, req);
                 refreshTable();
             } else{
                 createAlert(res.message, 'error');
