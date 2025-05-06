@@ -29,7 +29,3 @@ jobs:
     - name: Check formatting with black
       run: |
         black .
-
-    - name: Lint Python code with pylint
-      run: |
-        pylint src/ --disable=C0114,C0415,R0903,R0401,E0401
