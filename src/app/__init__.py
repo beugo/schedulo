@@ -32,6 +32,7 @@ def create_app(config_class=Config):
     from app.blueprints.plans import plans_bp
     from app.blueprints.friends import friends_bp
     from app.blueprints.friendrequests import friend_req
+    from app.blueprints.posts import post_bp
 
     # register blueprints
     app.register_blueprint(auth_bp, url_prefix="/auth")
@@ -40,6 +41,7 @@ def create_app(config_class=Config):
     app.register_blueprint(plans_bp, url_prefix="/plans")
     app.register_blueprint(friends_bp, url_prefix="/friend")
     app.register_blueprint(friend_req, url_prefix="/friend_requests")
+    app.register_blueprint(post_bp, url_prefix="/share")
 
     return app
 

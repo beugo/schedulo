@@ -2,8 +2,21 @@ from flask import Blueprint, request, jsonify
 from flask_login import current_user
 from app import db
 from app.models import Unit, UnitPlan, UnitPlanToUnit
+from app.utils.unit_plan_helper import get_plan_core_info
 
 plans_bp = Blueprint("plans", __name__)
+
+
+@plans_bp.route("/get", methods=["GET"])
+def get_plan():
+    if not current_user.is_authenticated: return jsonify({"ok": False, "message": "Not logged in"}), 401
+
+    plan_id = request.args.get("id", "")
+    plan_data = get_plan_core_info(plan_id, current_user.id)
+
+    if not plan_data: return jsonify({"ok": False, "message": "Plan not found"}), 404
+
+    return jsonify({"ok": True, "plan": plan_data}) 
 
 
 @plans_bp.route("/save", methods=["POST"])

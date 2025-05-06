@@ -33,7 +33,7 @@ def send_friend_request():
     existing_friendship = UserFriend.query.filter_by(
         user_id=current_user.id, friend_id=friend.id
     ).union(UserFriend.query.filter_by(
-        user_id=friend.id, friend_id=cure.id
+        user_id=friend.id, friend_id=current_user.id
     )).first()
     if existing_friendship:
         return jsonify({"message": "Already previously friends", "ok": False}), 400

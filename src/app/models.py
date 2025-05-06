@@ -89,6 +89,17 @@ class FriendRequests(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_deleted = db.Column(db.Boolean, default=False)
 
+class Post(db.Model):
+
+    """Post/Share UnitPlan"""
+
+    __tablename__ = "posts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    unit_plan_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    posted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_deleted = db.Column(db.Boolean, default=False)
 
 
 

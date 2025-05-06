@@ -3,37 +3,28 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="flex w-full gap-8 items-start">
-
+<div class="flex w-full gap-8 items-start" style="max-height: 80vh;">
   <!-- Left Sidebar -->
-  <div class="w-1/5 flex flex-col gap-4">
+  <div class="w-1/5 flex flex-col gap-4 bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-2 overflow-auto" style="max-height: inherit">
     <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
       <a href="{{ url_for('main.create_page') }}">Create New Unit Plan</a>
     </button>
-
-    <div class="mt-4">
-      <h3 class="font-bold text-lg mb-2"><a href="{{ url_for('main.unitplans_page') }}">Your Unit Plans</a></h3>
-      <ul class="space-y-2">
-        <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan A</li>
-        <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan B</li>
-        <li class="bg-gray-100 dark:bg-dark-fg p-2 rounded">Plan C</li>
-      </ul>
+    <h3 class="font-bold text-lg mb-2" style="margin: auto;">Your Unit Plans</h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white dark:bg-dark-fg rounded-lg shadow-md">
+          <tbody id="plansTable">
+          </tbody>
+      </table>
     </div>
   </div>
 
   <!-- Center Feed -->
-  <div class="w-3/5 flex flex-col items-center">
-    <button class="mb-6 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium shadow">
-      Post Your Unit Plan
-    </button>
-
-    <div class="w-full bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-6 shadow text-center">
-      <p class="text-gray-600 dark:text-dark-secondary">Your friend feed is empty for now. When friends share unit plans, they’ll appear here!</p>
-    </div>
+  <div class="w-3/5 flex flex-col items-center overflow-auto" style="max-height: inherit">
+    <div id="postFeed" class="w-full flex flex-col gap-4"></div>
   </div>
 
   <!-- Right Sidebar -->
-  <div class="w-1/5 flex flex-col gap-4 bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-2">
+  <div class="w-1/5 flex flex-col gap-4 bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-2 overflow-auto" style="max-height: inherit">
     <div class="flex flex-row items-center justify-between p-2">
       <h3 class="font-bold text-lg mb-2" style="margin: auto;">Your Friends</h3>
       <div class="flex-grow"></div>
@@ -47,8 +38,6 @@
           </tbody>
       </table>
   </div>
-</div>
-
 </div>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
