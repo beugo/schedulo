@@ -1,171 +1,200 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const input = document.getElementById('searchInput');
-    const saveButton = document.getElementById('saveButton');
-    const unitList = document.getElementById('unitList');
-    const planName = document.getElementById('planName');
-    const dropCells = Array.from(document.querySelectorAll('.flex-grow > div.border-2')).filter(el => !el.className.includes('year'));
-    let avaliableUnits = [];
-    let allUnits = [];
-
-    fetch('/units/recommended')
-      .then(response => response.json())
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById("searchInput");
+    const saveBtn = document.getElementById("saveButton");
+    const unitList = document.getElementById("unitList");
+    const planName = document.getElementById("planName");
+    const dropCells = Array.from(
+      document.querySelectorAll(".flex-grow > div.border-2")
+    ).filter(c => !c.classList.contains("year"));
+  
+    let allUnits = [], availableUnits = [];
+  
+    // Load recommended units
+    fetch("/units/recommended")
+      .then(res => res.json())
       .then(data => {
-        avaliableUnits = data;
-        allUnits = data;
-        renderUnits(allUnits);
+        allUnits = availableUnits = data;
+        renderUnits(availableUnits);
       });
-
+  
+    // Render unit list with filtering and sorting
     function renderUnits(units) {
-        // sort by recommendation value then by id
-        let l = units.sort((a, b) => {
-            if (b.value !== a.value) return b.value - a.value;
-            return a.id - b.id;
-        });
-        unitList.innerHTML = '';
-
-        let q = input.value.trim().toLowerCase();
-        if (q === null) q = '';
-        let f = l.filter(unit => 
-            unit.unit_name.toLowerCase().includes(q) || 
-            unit.unit_code.toLowerCase().includes(q)
+      const q = input.value.trim().toLowerCase();
+      unitList.innerHTML = "";
+      units
+        .sort((a, b) => (b.value - a.value) || (a.id - b.id))
+        .filter(u =>
+          u.unit_name.toLowerCase().includes(q) ||
+          u.unit_code.toLowerCase().includes(q)
+        )
+        .forEach(u =>
+          unitList.appendChild(
+            createUnitDiv(u.unit_name + " (" + u.unit_code + ")")
+          )
         );
-
-        f.forEach(unit => {
-            unitList.appendChild(createUnitDiv(`${unit.unit_name} (${unit.unit_code})`));
-        });
     }
-
+  
+    // Create a draggable unit element
     function createUnitDiv(text) {
-        const div = document.createElement('div');
-        div.className = 'p-2 rounded-lg border border-gray-300 mb-2 cursor-move';
-        div.textContent = text;
-        div.draggable = true;
-        div.addEventListener('dragstart', dragStart);
-        return div;
+      const div = document.createElement("div");
+      div.className =
+        "p-2 rounded-lg border border-gray-300 mb-2 cursor-move";
+      div.textContent = text;
+      div.draggable = true;
+      div.addEventListener("dragstart", dragStart);
+      return div;
     }
-
+  
+    // Handle drag start
     function dragStart(e) {
-        e.dataTransfer.setData('text/plain', e.target.textContent);
-        e.dataTransfer.effectAllowed = 'move';
-        e.target.classList.add('opacity-50');
-        e.dataTransfer.setData('fromCell', e.target.closest('.border-2') ? 'true' : 'false');
+      e.dataTransfer.setData("text/plain", e.target.textContent);
+      e.dataTransfer.setData(
+        "fromCell",
+        !!e.target.closest(".border-2")
+      );
+      e.dataTransfer.effectAllowed = "move";
+      e.target.classList.add("opacity-50");
     }
-
-    // timetable drag and drop
+  
+    // Common dragover behavior
+    const onDragOver = e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    };
+  
+    // Remove a unit from grid or list
+    function removeUnit(text, fromCell) {
+      if (fromCell) {
+        document
+          .querySelectorAll(".flex-grow > div.border-2 > div")
+          .forEach(div => {
+            if (div.textContent === text) div.remove();
+          });
+      } else {
+        Array.from(unitList.children).forEach(div => {
+          if (div.textContent === text) div.remove();
+        });
+      }
+    }
+  
+    // Handle dropping onto a grid cell
+    function onCellDrop(e) {
+      e.preventDefault();
+      const text = e.dataTransfer.getData("text/plain");
+      const fromCell =
+        e.dataTransfer.getData("fromCell") === "true";
+      if (!text) return;
+  
+      // If cell occupied, move existing back to list
+      const existing = this.querySelector("div");
+      if (existing) {
+        const parts = existing.textContent.split(" (");
+        existing.remove();
+        const unit = allUnits.find(
+          u => u.unit_code === parts[1].slice(0, -1)
+        );
+        availableUnits.push(unit);
+        unitList.appendChild(
+          createUnitDiv(unit.unit_name + " (" + unit.unit_code + ")")
+        );
+      }
+  
+      removeUnit(text, fromCell);
+  
+      const newDiv = document.createElement("div");
+      newDiv.className =
+        "p-2 rounded text-center cursor-move text-xs unit";
+      newDiv.textContent = text;
+      newDiv.draggable = true;
+      newDiv.addEventListener("dragstart", dragStart);
+      this.appendChild(newDiv);
+  
+      // Update available units
+      const code = text.split("(")[1].slice(0, -1);
+      availableUnits = availableUnits.filter(u => u.unit_code !== code);
+      renderUnits(availableUnits);
+    }
+  
+    // Attach cell drag/drop events
     dropCells.forEach(cell => {
-        cell.addEventListener('dragover', e => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        });
-
-        cell.addEventListener('drop', e => {
-            e.preventDefault();
-            const text = e.dataTransfer.getData('text/plain');
-            const fromCell = e.dataTransfer.getData('fromCell') === 'true';
-            if (!text) return;
-
-            // if the cell already has a unit, remove it
-            const existingDiv = cell.querySelector('div');
-            if (existingDiv) {
-                let u = allUnits.find(unit => unit.unit_name === existingDiv.textContent.split(' (')[0] && unit.unit_code === existingDiv.textContent.split(' (')[1].replace(')', ''));
-                existingDiv.remove();
-                avaliableUnits.push(u);
-                unitList.appendChild(createUnitDiv(`${u.unit_name} (${u.unit_code})`));
-            }
-
-            // from another cell
-            if (fromCell) {
-                const allDivs = document.querySelectorAll('.flex-grow > div.border-2 > div');
-                allDivs.forEach(div => {
-                    if (div.textContent === text) div.remove();
-                });
-
-            // from unit list
-            } else {
-                const unitDivs = unitList.querySelectorAll('div');
-                unitDivs.forEach(div => {
-                    if (div.textContent === text) div.remove();
-                });
-            }
-
-            const newDiv = document.createElement('div');
-            newDiv.className = 'p-2 rounded text-center cursor-move text-xs unit';
-            newDiv.textContent = text;
-            newDiv.draggable = true;
-            newDiv.addEventListener('dragstart', dragStart);
-            cell.appendChild(newDiv);
-
-            // remove the unit from available units
-            const unit_code = text.split(' (')[1].replace(')', '');
-            avaliableUnits = avaliableUnits.filter(unit => unit.unit_code !== unit_code);
-            renderUnits(avaliableUnits);
-        });
+      cell.addEventListener("dragover", onDragOver);
+      cell.addEventListener("drop", onCellDrop);
     });
-
-    // unit list drag and drop
-    unitList.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
+  
+    // Handle dragging back to unit list
+    unitList.addEventListener("dragover", onDragOver);
+    unitList.addEventListener("drop", e => {
+      e.preventDefault();
+      const text = e.dataTransfer.getData("text/plain");
+      const fromCell =
+        e.dataTransfer.getData("fromCell") === "true";
+      if (!text || !fromCell) return;
+      removeUnit(text, true);
+      unitList.appendChild(createUnitDiv(text));
+      const unit = allUnits.find(
+        u => u.unit_code === text.split("(")[1].slice(0, -1)
+      );
+      availableUnits.push(unit);
+      renderUnits(availableUnits);
     });
-    unitList.addEventListener('drop', e => {
-        e.preventDefault();
-        const text = e.dataTransfer.getData('text/plain');
-        const fromCell = e.dataTransfer.getData('fromCell') === 'true';
-        if (text && fromCell) {
-            const allDivs = document.querySelectorAll('.flex-grow > div.border-2 > div');
-            allDivs.forEach(div => {
-                if (div.textContent === text) div.remove();
-            });
-
-            unitList.appendChild(createUnitDiv(text));
-            let u = allUnits.find(unit => unit.unit_name === text.split(' (')[0] && unit.unit_code === text.split(' (')[1].replace(')', ''));
-            avaliableUnits.push(u);
-            renderUnits(avaliableUnits);
-        }
-    });
-
-    input.addEventListener('input', function () {
-        renderUnits(avaliableUnits);
-    });
-
-    saveButton.addEventListener('click', function () {
-        const planNameValue = planName.value.trim();
-        if (!planNameValue) {
-            alert('Please enter a plan name.');
-            return;
-        }
-        const selectedUnits = Array.from(document.querySelectorAll('.unit')).map(div => {
-            const text = div.textContent;
-            const [unitName, unitCode] = text.split(' (');
-            return {
-                unit_name: unitName.trim(),
-                unit_code: unitCode.replace(')', '').trim(),
-                column: Number(div.parentElement.className.match(/col-start-(\d+)/)?.[1])- 1, // Adjust for Year Column 
-                row: Number(div.parentElement.className.match(/row-start-(\d+)/)?.[1]) 
-            };
-        });
-        const data = { plan_name: planNameValue, units: selectedUnits };
-
-        fetch('/plans/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)  
-        })
-        .then(response => response.json())
+  
+    // Live filtering
+    input.addEventListener("input", () => renderUnits(availableUnits));
+  
+    // Save plan
+    saveBtn.addEventListener("click", () => {
+      const name = planName.value.trim();
+      if (!name) return alert("Please enter a plan name.");
+      const units = Array.from(
+        document.querySelectorAll(".unit")
+      ).map(div => {
+        const parts = div.textContent.split(" (");
+        const col =
+          parseInt(
+            div.parentElement.className.match(/col-start-(\d+)/)[1]
+          ) - 1;
+        const row =
+          parseInt(
+            div.parentElement.className.match(/row-start-(\d+)/)[1]
+          );
+        return {
+          unit_name: parts[0].trim(),
+          unit_code: parts[1].slice(0, -1).trim(),
+          column: col,
+          row: row
+        };
+      });
+      fetch("/plans/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan_name: name, units: units })
+      })
+        .then(res => res.json())
         .then(data => {
-            if (data.message) createAlert(data.message, data.ok ? 'success' : 'error'); 
+          if (data.message)
+            createAlert(
+              data.message,
+              data.ok ? "success" : "error"
+            );
         })
-        .catch(error => {
-            createAlert('An error occurred while saving the plan.', 'error'); 
-        });
+        .catch(() =>
+          createAlert(
+            "An error occurred while saving the plan.",
+            "error"
+          )
+        );
     });
-
+  
+    // Alert helper
     function createAlert(message, category) {
-        const alertDiv = document.createElement('div');
-        alertDiv.classList.add('alert', category, 'fade-out');
-        alertDiv.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>${message}`;
-        document.querySelector('.absolute-container ul').appendChild(alertDiv);
+      const alertDiv = document.createElement("div");
+      alertDiv.className = `alert ${category} fade-out`;
+      alertDiv.innerHTML =
+        '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>' +
+        message;
+      document
+        .querySelector(".absolute-container ul")
+        .appendChild(alertDiv);
     }
-});
+  });
+  
