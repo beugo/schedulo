@@ -17,3 +17,7 @@ function toggleDarkMode() {
       localStorage.theme = 'dark';
   }
 }
+// only enable transitions after the utility classes are applied
+window.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('transitions-enabled');
+});
