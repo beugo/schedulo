@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}View Unit Plan{% endblock %}
+{% block content %}
+<div class="w-full flex flex-col lg:flex-row gap-8 min-h-[80vh]">
+  <!-- Side Info Panel -->
+  <aside class="flex flex-col rounded-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[26%] p-6 gap-7">
+    <div>
+      <span class="uppercase text-xs text-gray-400 tracking-widest">Plan Overview</span>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-2 flex items-center gap-2">
+        {{ plan_name or "Untitled Plan" }}
+      </h2>
+    </div>
+    <div>
+      <h3 class="font-semibold text-gray-700 dark:text-gray-100 text-lg mb-2 tracking-tight">Units Included</h3>
+      <ul class="divide-y divide-gray-100 dark:divide-gray-800 bg-gray-50 dark:bg-gray-900 rounded-xl p-4 max-h-[50vh] overflow-y-auto shadow-inner scroll-smooth">
+        {% if plan_units_list %}
+          {% for unit in plan_units_list %}
+            <li class="py-2 flex items-center gap-3 group">
+              <span class="font-semibold text-gray-900 dark:text-white transition group-hover:text-primary-600">
+                {{ unit.name }}
+              </span>
+              <span class="ml-auto px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs font-mono tracking-tight">
+                {{ unit.code }}
+              </span>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li class="py-3 text-gray-400 dark:text-gray-600 italic text-center">
+            No units found.
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    <div class="mt-auto pt-2">
+      <a href="{{ url_for('main.unitplans_page') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-gradient-to-r from-sky-400 to-blue-600 text-white text-sm font-bold shadow-md hover:from-sky-500 hover:to-blue-700 focus:outline-offset-2 outline-blue-400 transition-all duration-150">
+        <span class="mr-2">←</span> Back to Unit Plans
+      </a>
+    </div>
+  </aside>
+
+  <!-- main Grid Section -->
+  <main class="flex-grow w-full">
+    {% set year_units_list = [year1_units, year2_units, year3_units, year4_units] %}
+    {% set year_bg_colors = [
+      'from-purple-50 dark:from-purple-900/50',
+      'from-orange-50 dark:from-orange-900/50',
+      'from-pink-50 dark:from-pink-900/40',
+      'from-cyan-50 dark:from-cyan-900/40'
+    ] %}
+    <div class="flex flex-col gap-8 w-full">
+      {% for year_units in year_units_list %}
+        <section class="p-5 rounded-2xl bg-gradient-to-br to-white dark:to-gray-950 {{ year_bg_colors[loop.index0] }} shadow-inner border border-gray-200 dark:border-gray-800">
+          <div class="mb-4 flex items-center gap-2">
+            <span class="text-xs text-gray-400 dark:text-gray-500 uppercase font-semibold tracking-widest pl-1">
+              Year {{ loop.index }}
+            </span>
+            <div class="flex-1 h-px bg-gray-100 dark:bg-gray-800 mt-1"></div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {% for col_key in [1, 2, 3, 4] %}
+              <div class="flex flex-col gap-5">
+                {% for unit in year_units[col_key] %}
+                  <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-900/80 shadow-sm px-4 py-3 group hover:ring-2 hover:ring-blue-400/40 transition-all h-24 flex flex-col justify-center">
+                    <div class="text-sm font-semibold text-gray-800 dark:text-white mb-0.5 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
+                      {{ unit.name }}
+                    </div>
+                    <div class="text-xs text-gray-400 dark:text-gray-300">
+                      {{ unit.code }}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% endfor %}
+    </div>
+  </main>
+</div>
+{% endblock %}

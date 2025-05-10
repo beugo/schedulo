@@ -4,33 +4,34 @@ document.addEventListener('DOMContentLoaded', function () {
     const unitList = document.getElementById('unitList');
     const planName = document.getElementById('planName');
     const dropCells = Array.from(document.querySelectorAll('.flex-grow > div.border-2')).filter(el => !el.className.includes('year'));
-    let avaliableUnits = [];
     let allUnits = [];
+    const init = window.INIT_PLAN || { name: '', units: {} };
+    planName.value = init.name;
 
-    fetch('/units/recommended')
-      .then(response => response.json())
-      .then(data => {
-        avaliableUnits = data;
-        allUnits = data;
-        renderUnits(allUnits);
+    // pre-populate each cell
+    Object.entries(init.units).forEach(([key, unit]) => {
+        // key is "row,col"
+        const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
+        if (!cell) return;
+        const div = document.createElement('div');
+        div.className = 'p-2 rounded text-center cursor-move text-xs unit';
+        div.textContent = `${unit.name} (${unit.code})`;
+        div.draggable = true;
+        div.addEventListener('dragstart', dragStart);
+        cell.appendChild(div);
       });
 
-    function renderUnits(units) {
-        // sort by recommendation value then by id
-        let l = units.sort((a, b) => {
-            if (b.value !== a.value) return b.value - a.value;
-            return a.id - b.id;
+    fetch('/units/recommended')
+        .then(response => response.json())
+        .then(data => {
+            allUnits = data;
+            avaliableUnits = data;
+            renderUnits(data);
         });
+
+    function renderUnits(units) {
         unitList.innerHTML = '';
-
-        let q = input.value.trim().toLowerCase();
-        if (q === null) q = '';
-        let f = l.filter(unit => 
-            unit.unit_name.toLowerCase().includes(q) || 
-            unit.unit_code.toLowerCase().includes(q)
-        );
-
-        f.forEach(unit => {
+        units.forEach(unit => {
             unitList.appendChild(createUnitDiv(`${unit.unit_name} (${unit.unit_code})`));
         });
     }
@@ -67,20 +68,20 @@ document.addEventListener('DOMContentLoaded', function () {
             // if the cell already has a unit, remove it
             const existingDiv = cell.querySelector('div');
             if (existingDiv) {
-                let u = allUnits.find(unit => unit.unit_name === existingDiv.textContent.split(' (')[0] && unit.unit_code === existingDiv.textContent.split(' (')[1].replace(')', ''));
-                existingDiv.remove();
-                avaliableUnits.push(u);
-                unitList.appendChild(createUnitDiv(`${u.unit_name} (${u.unit_code})`));
+                existingDiv.className = 'p-2 rounded-lg border border-gray-300 mb-2 cursor-move'
+                unitList.appendChild(existingDiv);
+                // add it back to the available units
+                avaliableUnits.push({
+                    unit_name: existingDiv.textContent.split(' (')[0],
+                    unit_code: existingDiv.textContent.split(' (')[1].replace(')', '')
+                });
             }
 
-            // from another cell
             if (fromCell) {
                 const allDivs = document.querySelectorAll('.flex-grow > div.border-2 > div');
                 allDivs.forEach(div => {
                     if (div.textContent === text) div.remove();
                 });
-
-            // from unit list
             } else {
                 const unitDivs = unitList.querySelectorAll('div');
                 unitDivs.forEach(div => {
@@ -98,7 +99,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // remove the unit from available units
             const unit_code = text.split(' (')[1].replace(')', '');
             avaliableUnits = avaliableUnits.filter(unit => unit.unit_code !== unit_code);
-            renderUnits(avaliableUnits);
+
+
         });
     });
 
@@ -118,14 +120,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             unitList.appendChild(createUnitDiv(text));
-            let u = allUnits.find(unit => unit.unit_name === text.split(' (')[0] && unit.unit_code === text.split(' (')[1].replace(')', ''));
-            avaliableUnits.push(u);
-            renderUnits(avaliableUnits);
+            avaliableUnits.push({
+                unit_name: text.split(' (')[0],
+                unit_code: text.split(' (')[1].replace(')', '')
+            });
         }
     });
 
     input.addEventListener('input', function () {
-        renderUnits(avaliableUnits);
+        const query = input.value.trim().toLowerCase();
+        const filtered = avaliableUnits.filter(unit => 
+            unit.unit_name.toLowerCase().includes(query) || 
+            unit.unit_code.toLowerCase().includes(query)
+        );
+        renderUnits(filtered);
     });
 
     saveButton.addEventListener('click', function () {
@@ -156,6 +164,10 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             if (data.message) createAlert(data.message, data.ok ? 'success' : 'error'); 
+            setTimeout(() => {
+                // redirect home after 3 seconds
+                window.location.href = '/dashboard';
+            }, 2500);
         })
         .catch(error => {
             createAlert('An error occurred while saving the plan.', 'error'); 

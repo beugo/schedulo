@@ -1,7 +1,7 @@
 import json
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from flask_login import login_required, current_user
-from app.models import User, Unit, UnitPlan, UserFriend
+from app.models import User, Unit, UnitPlan, UserFriend, UnitPlanToUnit
 
 main_bp = Blueprint("main", __name__)
 
@@ -28,10 +28,41 @@ def unitplans_page():
     return render_template("unitplans.html")
 
 
-@main_bp.route("/create")
+@main_bp.route('/create', methods=['GET'])
 @login_required
 def create_page():
-    return render_template("create.html")
+    plan_id = request.args.get('id')
+    context = {
+        'plan_name': '',
+        'grid_units': {}, 
+    }
+    if plan_id:
+        plan = UnitPlan.query.filter_by(
+            id=plan_id,
+            user_id=current_user.id,
+            is_deleted=False
+        ).first_or_404()
+        context['plan_name'] = plan.name
+
+        plan_units = UnitPlanToUnit.query.filter_by(
+            unit_plan_id=plan.id,
+            is_deleted=False
+        ).all()
+
+        #populate the context with all the units in that unit plan
+        grid = {}
+        for pu in plan_units:
+            unit = Unit.query.get(pu.unit_id)
+            if not unit:
+                continue
+            # stringify the key
+            key = f"{pu.row},{pu.col}"
+            grid[key] = {
+                "name": unit.unit_name,
+                "code": unit.unit_code
+            }
+        context["grid_units"] = grid
+    return render_template('create.html', **context)
 
 
 @main_bp.route("/friends")
