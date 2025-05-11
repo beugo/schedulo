@@ -6,15 +6,17 @@ def import_units(db_session, csv_path):
     """Load units from CSV into whatever session you pass in."""
     with open(csv_path, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
+            sems = [s.strip() for s in row["Semesters"].split(",")]
+
             u = Unit(
                 unit_name=row["Unit Name"].strip(),
                 unit_code=row["Unit Code"].strip(),
                 exam=row["Exam"].strip().lower() == "yes",
                 url=row["URL"].strip(),
                 unit_coordinator=row["Unit Coordinator"].strip(),
-                contact_hours=json.dumps(ast.literal_eval(row["Contact Hours"])),
                 prerequisites=row["Prerequisites"].strip(),
-                description=row["Description"].strip(),
+                semester1       = "Semester 1" in sems,
+                semester2       = "Semester 2" in sems,
             )
             db_session.add(u)
     db_session.commit()
