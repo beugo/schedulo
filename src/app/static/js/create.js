@@ -12,32 +12,50 @@ document.addEventListener('DOMContentLoaded', () => {
     let availableUnits = [];
 
     const prefillTemplates = {
-      cs: [
-      { unit_code: 'CITS1401', row: 1, col: 1 },
-      { unit_code: 'CITS1402', row: 1, col: 2 },
-      { unit_code: 'CITS1003', row: 2, col: 1 },
-      { unit_code: 'CITS2005', row: 3, col: 1 },
-      { unit_code: 'CITS2200', row: 3, col: 2 },
-      { unit_code: 'CITS2002', row: 4, col: 1 },
-      { unit_code: 'CITS2211', row: 4, col: 2 },
-      { unit_code: 'CITS3403', row: 5, col: 1 },
-      { unit_code: 'CITS3002', row: 5, col: 2 },
-      { unit_code: 'CITS3007', row: 5, col: 3 },
-      { unit_code: 'CITS3200', row: 6, col: 1 },
-      { unit_code: 'CITS3001', row: 6, col: 2 }
-      ],
-      cyber: [
-      { unit_code: 'CITS1401', row: 1, col: 1 },
-      { unit_code: 'PHIL1001', row: 1, col: 2 },
-      { unit_code: 'CITS1003', row: 2, col: 1 },
-      { unit_code: 'CITS2006', row: 3, col: 1 },
-      { unit_code: 'CITS2002', row: 4, col: 1 },
-      { unit_code: 'CITS3002', row: 5, col: 1 },
-      { unit_code: 'CITS3403', row: 5, col: 2 },
-      { unit_code: 'CITS3007', row: 5, col: 3 },
-      { unit_code: 'CITS3200', row: 6, col: 1 },
-      { unit_code: 'CITS3006', row: 6, col: 2 },
-      ],
+        cs: [
+            { unit_code: 'CITS1401', row: 1, col: 1 },
+            { unit_code: 'CITS1402', row: 1, col: 2 },
+            { unit_code: 'CITS1003', row: 2, col: 1 },
+            { unit_code: 'CITS2005', row: 3, col: 1 },
+            { unit_code: 'CITS2200', row: 3, col: 2 },
+            { unit_code: 'CITS2002', row: 4, col: 1 },
+            { unit_code: 'CITS2211', row: 4, col: 2 },
+            { unit_code: 'CITS3403', row: 5, col: 1 },
+            { unit_code: 'CITS3002', row: 5, col: 2 },
+            { unit_code: 'CITS3007', row: 5, col: 3 },
+            { unit_code: 'CITS3200', row: 6, col: 1 },
+            { unit_code: 'CITS3001', row: 6, col: 2 }
+            ],
+        cyber: [
+            { unit_code: 'CITS1401', row: 1, col: 1 },
+            { unit_code: 'PHIL1001', row: 1, col: 2 },
+            { unit_code: 'CITS1003', row: 2, col: 1 },
+            { unit_code: 'CITS2006', row: 3, col: 1 },
+            { unit_code: 'CITS2002', row: 4, col: 1 },
+            { unit_code: 'CITS3002', row: 5, col: 1 },
+            { unit_code: 'CITS3403', row: 5, col: 2 },
+            { unit_code: 'CITS3007', row: 5, col: 3 },
+            { unit_code: 'CITS3200', row: 6, col: 1 },
+            { unit_code: 'CITS3006', row: 6, col: 2 },
+            ],
+        cs_cyber: [
+            { unit_code: 'CITS1401', row: 1, col: 1 },
+            { unit_code: 'PHIL1001', row: 1, col: 2 },
+            { unit_code: 'CITS1402', row: 1, col: 3 },
+            { unit_code: 'CITS1003', row: 2, col: 1 },
+            { unit_code: 'CITS2006', row: 3, col: 1 },
+            { unit_code: 'CITS2200', row: 3, col: 2 },
+            { unit_code: 'CITS2005', row: 3, col: 3 },
+            { unit_code: 'CITS2002', row: 4, col: 1 },
+            { unit_code: 'CITS2211', row: 4, col: 2 },
+            { unit_code: 'CITS3002', row: 5, col: 1 },
+            { unit_code: 'CITS3403', row: 5, col: 2 },
+            { unit_code: 'CITS3007', row: 5, col: 3 },
+            { unit_code: 'CITS3200', row: 6, col: 1 },
+            { unit_code: 'CITS3006', row: 6, col: 2 },
+            { unit_code: 'CITS3001', row: 6, col: 3 },
+            { unit_code: 'CITS3005', row: 6, col: 4 }
+            ],
     }
 
     // ─────────────── Initialization ───────────────
