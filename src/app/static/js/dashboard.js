@@ -57,7 +57,7 @@ function renderPosts(posts) {
     } else {
       posts.forEach(post => {
           const div = document.createElement("div");
-          div.className = "bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-4 shadow h-[55vh]";
+          div.className = "bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-4 shadow h-[45vh]";
           div.innerHTML = `
               <div class="flex flex-col h-full gap-4">
                 <div class="flex flex-row items-center text-center">
@@ -65,7 +65,7 @@ function renderPosts(posts) {
                   <div class="flex flex-grow"></div>
                   <p class="text-sm text-gray-500">${post.user_name} • ${new Date(post.posted_at).toLocaleString()}</p>
                 </div>
-                <div class="grid h-full w-full flex-grow" style="grid-template-columns: repeat(4, 20%); grid-template-rows: repeat(8, 10%); justify-content: space-between; align-content: space-between;">
+                <div class="grid h-full w-full flex-grow" style="grid-template-columns: repeat(4, 20%); grid-template-rows: repeat(6, 12%); justify-content: center; align-content: space-between; gap: 15px;">
                   <!-- Year 1 -->
                   <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-1 row-start-1 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 1)}</div>
                   <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-2 row-start-1 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 1)}</div>
@@ -98,17 +98,6 @@ function renderPosts(posts) {
                   <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-2 row-start-6 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 6)}</div>
                   <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-3 row-start-6 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 6)}</div>
                   <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-4 row-start-6 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 6)}</div>
-
-                  <!-- Year 4 -->
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-1 row-start-7 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 7)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-2 row-start-7 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 7)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-3 row-start-7 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 7)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-4 row-start-7 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 7)}</div>
-
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-1 row-start-8 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 8)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-2 row-start-8 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 8)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-3 row-start-8 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 8)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-cyan-400 col-start-4 row-start-8 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 8)}</div>
               </div>
             </div>
           `;

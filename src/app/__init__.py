@@ -34,9 +34,8 @@ def create_app(config_class=Config):
     from app.blueprints.posts import post_bp
     from app.blueprints.friendrequests import friend_req_bp
 
-    # register blueprints
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(main_bp)  # no prefix for pages
+    app.register_blueprint(main_bp) 
     app.register_blueprint(units_bp, url_prefix="/units")
     app.register_blueprint(plans_bp, url_prefix="/plans")
     app.register_blueprint(friends_bp, url_prefix="/friend")
@@ -49,5 +48,4 @@ def create_app(config_class=Config):
 @login_manager.user_loader
 def load_user(user_id):
     from .models import User
-
     return User.query.get(int(user_id))

@@ -14,6 +14,19 @@
   <div class="w-full flex flex-row gap-10 h-[80vh]">
     <!-- Search Bar Side -->
     <div class="flex flex-col h-full rounded-lg bg-gray-200 border border-gray-600 dark:bg-dark-border w-[30%] p-5 gap-4">
+
+      <!-- Prefill Unit Plan -->
+      <div class="flex items-center gap-2 mb-4">
+        <label for="prefillSelect" class="text-sm font-medium">Prefill template:</label>
+        <select id="prefillSelect"
+                class="px-3 py-2 border rounded bg-white dark:bg-dark-fg text-gray-900 dark:text-dark-primary">
+          <option value="">— Select one —</option>
+          <option value="cs">Computer Science</option>
+          <option value="cyber">Cybersecurity</option>
+          <option value="cs_cyber">Computer Science and Cybersecurity</option>
+        </select>
+      </div>
+
       <!-- Search Unit -->
       <div class="w-full flex flex-row gap-4 transition-colors duration-300">
         <div>
@@ -60,7 +73,5 @@
         {% endfor %}
       {% endfor %}
     </div>
-  </div>
-
-  <script src="{{ url_for('static', filename='js/create.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/create.js') }}"></script>
 {% endblock %}
