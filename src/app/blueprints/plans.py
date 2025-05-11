@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from flask_login import current_user
 from app import db
 from app.models import Unit, UnitPlan, UnitPlanToUnit
@@ -18,6 +18,24 @@ def get_plan():
 
     return jsonify({"ok": True, "plan": plan_data}) 
 
+@plans_bp.route("/delete", methods=["POST"])
+def delete_plan():
+    if not current_user.is_authenticated:
+        return jsonify({"ok": False, "message": "Not logged in"}), 401
+    #does not seem safe ?
+    plan_id = request.args.get("id", type=int)
+    if not plan_id:
+        return jsonify({"ok": False, "message": "No plan ID provided"}), 400
+
+    plan_to_delete = UnitPlan.query.filter_by(user_id=current_user.id, is_deleted=False, id=plan_id).first()
+
+    if not plan_to_delete:
+        return jsonify({"ok": False, "message": "Plan not found or already deleted"}), 404
+
+    plan_to_delete.is_deleted = True
+    db.session.commit()
+
+    return jsonify({"ok": True, "message": 'Plan ' + str(plan_id) + ' Deleted'})
 
 @plans_bp.route("/save", methods=["POST"])
 def save_plan():
@@ -83,3 +101,71 @@ def get_plans():
         return jsonify({"ok": False, "message": "Not logged in"}), 401
     plans = UnitPlan.query.filter_by(user_id=current_user.id, is_deleted=False).all()
     return jsonify([{"id": p.id, "name": p.name} for p in plans])
+
+@plans_bp.route("/view", methods=["GET"])
+def view_plan():
+    plan_id = request.args.get("id")
+    if not plan_id:
+        return jsonify({"ok": False, "message": "No plan ID provided"}), 400
+
+    plan = UnitPlan.query.filter_by(
+        id=plan_id,
+        user_id=current_user.id,
+        is_deleted=False
+    ).first()
+    if not plan:
+        return jsonify({"ok": False, "message": "Plan not found"}), 404
+
+    # pind all the units in the unit plan
+    plan_units = UnitPlanToUnit.query.filter_by(
+        unit_plan_id=plan.id,
+        is_deleted=False
+    ).all()
+
+    # make just a regular list for the side bar
+    sidebar_units = []
+    for pu in plan_units:
+        unit = Unit.query.get(pu.unit_id)
+        if unit:
+            sidebar_units.append({
+                "name": unit.unit_name,
+                "code": unit.unit_code
+            })
+
+    # make a ordered dict for the actual plan.
+    year_cols = {
+        1: {1: [], 2: [], 3: [], 4: []},
+        2: {1: [], 2: [], 3: [], 4: []},
+        3: {1: [], 2: [], 3: [], 4: []},
+        4: {1: [], 2: [], 3: [], 4: []}
+    }
+
+    # seperate the semesters into years(might not need later on)
+    def get_year(row):
+        if row in (1, 2): return 1
+        if row in (3, 4): return 2
+        if row in (5, 6): return 3
+        if row in (7, 8): return 4
+        return None
+
+    # populate the dict
+    #there has to be a better way of doing this?
+    for pu in plan_units:
+        unit = Unit.query.get(pu.unit_id)
+        if not unit:
+            continue
+        unit_info = {"name": unit.unit_name, "code": unit.unit_code}
+        year = get_year(pu.row)
+        col = pu.col 
+
+        year_cols[year][col].append(unit_info)
+
+    return render_template(
+        "viewonlyplan.html",
+        plan_name=plan.name,
+        plan_units_list=sidebar_units,
+        year1_units=year_cols[1],
+        year2_units=year_cols[2],
+        year3_units=year_cols[3],
+        year4_units=year_cols[4],
+    )

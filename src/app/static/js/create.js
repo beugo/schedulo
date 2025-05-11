@@ -1,103 +1,71 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById("searchInput");
-    const saveBtn = document.getElementById("saveButton");
-    const unitList = document.getElementById("unitList");
-    const planName = document.getElementById("planName");
-    const dropCells = Array.from(
-      document.querySelectorAll(".flex-grow > div.border-2")
-    ).filter(c => !c.classList.contains("year"));
-  
-    let allUnits = [], availableUnits = [];
-  
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('searchInput');
+    const saveButton = document.getElementById('saveButton');
+    const unitList = document.getElementById('unitList');
+    const planName = document.getElementById('planName');
+    const dropCells = Array.from(document.querySelectorAll('.flex-grow > div.border-2')).filter(el => !el.className.includes('year'));
+    let allUnits = [];
+
     const prefillTemplates = {
-        cs: [
-        { unit_code: 'CITS1401', row: 1, col: 1 },
-        { unit_code: 'CITS1003', row: 1, col: 2 },
-        { unit_code: 'CITS1402', row: 1, col: 3 },
-        { unit_code: 'CITS2005', row: 3, col: 1 },
-        { unit_code: 'CITS2200', row: 3, col: 2 },
-        { unit_code: 'CITS2211', row: 3, col: 3 },
-        { unit_code: 'CITS2002', row: 4, col: 1 },
-        { unit_code: 'CITS3001', row: 5, col: 1 },
-        { unit_code: 'CITS3403', row: 5, col: 2 },
-        { unit_code: 'CITS3002', row: 5, col: 3 },
-        { unit_code: 'CITS3200', row: 6, col: 1 },
-        { unit_code: 'CITS3007', row: 6, col: 2 }
-        ],
-        cyber: [
-        { unit_code: 'CITS1401', row: 1, col: 1 },
-        { unit_code: 'CITS1003', row: 1, col: 2 },
-        { unit_code: 'PHIL1001', row: 1, col: 3 },
-        { unit_code: 'CITS2002', row: 4, col: 1 },
-        { unit_code: 'CITS2006', row: 3, col: 1 },
-        { unit_code: 'CITS3002', row: 5, col: 1 },
-        { unit_code: 'CITS3403', row: 5, col: 2 },
-        { unit_code: 'CITS3007', row: 5, col: 3 },
-        { unit_code: 'CITS3200', row: 6, col: 1 },
-        { unit_code: 'CITS3006', row: 6, col: 2 },
-        ],
-};
+      cs: [
+      { unit_code: 'CITS1401', row: 1, col: 1 },
+      { unit_code: 'CITS1003', row: 1, col: 2 },
+      { unit_code: 'CITS1402', row: 1, col: 3 },
+      { unit_code: 'CITS2005', row: 3, col: 1 },
+      { unit_code: 'CITS2200', row: 3, col: 2 },
+      { unit_code: 'CITS2211', row: 3, col: 3 },
+      { unit_code: 'CITS2002', row: 4, col: 1 },
+      { unit_code: 'CITS3001', row: 5, col: 1 },
+      { unit_code: 'CITS3403', row: 5, col: 2 },
+      { unit_code: 'CITS3002', row: 5, col: 3 },
+      { unit_code: 'CITS3200', row: 6, col: 1 },
+      { unit_code: 'CITS3007', row: 6, col: 2 }
+      ],
+      cyber: [
+      { unit_code: 'CITS1401', row: 1, col: 1 },
+      { unit_code: 'CITS1003', row: 1, col: 2 },
+      { unit_code: 'PHIL1001', row: 1, col: 3 },
+      { unit_code: 'CITS2002', row: 4, col: 1 },
+      { unit_code: 'CITS2006', row: 3, col: 1 },
+      { unit_code: 'CITS3002', row: 5, col: 1 },
+      { unit_code: 'CITS3403', row: 5, col: 2 },
+      { unit_code: 'CITS3007', row: 5, col: 3 },
+      { unit_code: 'CITS3200', row: 6, col: 1 },
+      { unit_code: 'CITS3006', row: 6, col: 2 },
+      ],
+    }
 
-    // Load recommended units
-    fetch("/units/recommended")
-      .then(res => res.json())
-      .then(data => {
-        allUnits = availableUnits = data;
-        renderUnits(availableUnits);
+    const init = window.INIT_PLAN || { name: '', units: {} };
+    planName.value = init.name;
+
+    // pre-populate each cell
+    Object.entries(init.units).forEach(([key, unit]) => {
+        // key is "row,col"
+        const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
+        if (!cell) return;
+        const div = document.createElement('div');
+        div.className = 'p-2 rounded text-center cursor-move text-xs unit';
+        div.textContent = `${unit.name} (${unit.code})`;
+        div.draggable = true;
+        div.addEventListener('dragstart', dragStart);
+        cell.appendChild(div);
       });
-  
-    // Render unit list with filtering and sorting
+
+    fetch('/units/recommended')
+        .then(response => response.json())
+        .then(data => {
+            allUnits = data;
+            avaliableUnits = data;
+            renderUnits(data);
+        });
+
     function renderUnits(units) {
-      const q = input.value.trim().toLowerCase();
-      unitList.innerHTML = "";
-      units
-        .sort((a, b) => (b.value - a.value) || (a.id - b.id))
-        .filter(u =>
-          u.unit_name.toLowerCase().includes(q) ||
-          u.unit_code.toLowerCase().includes(q)
-        )
-        .forEach(u =>
-          unitList.appendChild(
-            createUnitDiv(u.unit_name + " (" + u.unit_code + ")")
-          )
-        );
+        unitList.innerHTML = '';
+        units.forEach(unit => {
+            unitList.appendChild(createUnitDiv(`${unit.unit_name} (${unit.unit_code})`));
+        });
     }
 
-    // Prefill unit plan
-    function clearUnitPlan() {
-        document.querySelectorAll('.unit').forEach(div => div.remove());
-        availableUnits = [...allUnits];
-        renderUnits(availableUnits);
-    }
-
-    async function fillPrefilledPlan(template) {
-        for (const { unit_code, row, col } of template) {
-          const unit = allUnits.find(u => u.unit_code === unit_code);
-          if (!unit) continue;
-          const cell = dropCells.find(c =>
-            c.classList.contains(`col-start-${col}`) &&
-            c.classList.contains(`row-start-${row}`)
-          );
-          if (!cell) continue;
-          const text = `${unit.unit_name} (${unit.unit_code})`;
-          removeUnit(text, false);
-          const div = createUnitDiv(text);
-          div.className = 'p-2 rounded text-center cursor-move text-xs unit';
-          cell.appendChild(div);
-          availableUnits = availableUnits.filter(u => u.unit_code !== unit_code);
-        }
-        renderUnits(availableUnits);
-    }
-
-    degreeSelect.addEventListener('change', () => {
-        const key = degreeSelect.value;
-        if (!prefillTemplates[key]) return;
-        clearUnitPlan();
-        fillPrefilledPlan(prefillTemplates[key]); // TODO: add some extra units (PHIL1001)
-    });
-    
-  
-    // Create a draggable unit element
     function createUnitDiv(text) {
       const div = document.createElement("div");
       div.className =
@@ -118,127 +86,123 @@ document.addEventListener('DOMContentLoaded', () => {
       e.dataTransfer.effectAllowed = "move";
       e.target.classList.add("opacity-50");
     }
-  
-    // Common dragover behavior
-    const onDragOver = e => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "move";
-    };
-  
-    // Remove a unit from grid or list
-    function removeUnit(text, fromCell) {
-      if (fromCell) {
-        document
-          .querySelectorAll(".flex-grow > div.border-2 > div")
-          .forEach(div => {
-            if (div.textContent === text) div.remove();
-          });
-      } else {
-        Array.from(unitList.children).forEach(div => {
-          if (div.textContent === text) div.remove();
-        });
-      }
-    }
-  
-    // Handle dropping onto a grid cell
-    function onCellDrop(e) {
-      e.preventDefault();
-      const text = e.dataTransfer.getData("text/plain");
-      const fromCell =
-        e.dataTransfer.getData("fromCell") === "true";
-      if (!text) return;
-  
-      // If cell occupied, move existing back to list
-      const existing = this.querySelector("div");
-      if (existing) {
-        const parts = existing.textContent.split(" (");
-        existing.remove();
-        const unit = allUnits.find(
-          u => u.unit_code === parts[1].slice(0, -1)
-        );
-        availableUnits.push(unit);
-        unitList.appendChild(
-          createUnitDiv(unit.unit_name + " (" + unit.unit_code + ")")
-        );
-      }
-  
-      removeUnit(text, fromCell);
-  
-      const newDiv = document.createElement("div");
-      newDiv.className =
-        "p-2 rounded text-center cursor-move text-xs unit";
-      newDiv.textContent = text;
-      newDiv.draggable = true;
-      newDiv.addEventListener("dragstart", dragStart);
-      this.appendChild(newDiv);
-  
-      // Update available units
-      const code = text.split("(")[1].slice(0, -1);
-      availableUnits = availableUnits.filter(u => u.unit_code !== code);
-      renderUnits(availableUnits);
-    }
-  
-    // Attach cell drag/drop events
+
+    // timetable drag and drop
     dropCells.forEach(cell => {
-      cell.addEventListener("dragover", onDragOver);
-      cell.addEventListener("drop", onCellDrop);
+        cell.addEventListener('dragover', e => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        });
+
+        cell.addEventListener('drop', e => {
+            e.preventDefault();
+            const text = e.dataTransfer.getData('text/plain');
+            const fromCell = e.dataTransfer.getData('fromCell') === 'true';
+            if (!text) return;
+
+            // if the cell already has a unit, remove it
+            const existingDiv = cell.querySelector('div');
+            if (existingDiv) {
+                existingDiv.className = 'p-2 rounded-lg border border-gray-300 mb-2 cursor-move'
+                unitList.appendChild(existingDiv);
+                // add it back to the available units
+                avaliableUnits.push({
+                    unit_name: existingDiv.textContent.split(' (')[0],
+                    unit_code: existingDiv.textContent.split(' (')[1].replace(')', '')
+                });
+            }
+
+            if (fromCell) {
+                const allDivs = document.querySelectorAll('.flex-grow > div.border-2 > div');
+                allDivs.forEach(div => {
+                    if (div.textContent === text) div.remove();
+                });
+            } else {
+                const unitDivs = unitList.querySelectorAll('div');
+                unitDivs.forEach(div => {
+                    if (div.textContent === text) div.remove();
+                });
+            }
+
+            const newDiv = document.createElement('div');
+            newDiv.className = 'p-2 rounded text-center cursor-move text-xs unit';
+            newDiv.textContent = text;
+            newDiv.draggable = true;
+            newDiv.addEventListener('dragstart', dragStart);
+            cell.appendChild(newDiv);
+
+            // remove the unit from available units
+            const unit_code = text.split(' (')[1].replace(')', '');
+            avaliableUnits = avaliableUnits.filter(unit => unit.unit_code !== unit_code);
+
+
+        });
     });
-  
-    // Handle dragging back to unit list
-    unitList.addEventListener("dragover", onDragOver);
-    unitList.addEventListener("drop", e => {
-      e.preventDefault();
-      const text = e.dataTransfer.getData("text/plain");
-      const fromCell =
-        e.dataTransfer.getData("fromCell") === "true";
-      if (!text || !fromCell) return;
-      removeUnit(text, true);
-      unitList.appendChild(createUnitDiv(text));
-      const unit = allUnits.find(
-        u => u.unit_code === text.split("(")[1].slice(0, -1)
-      );
-      availableUnits.push(unit);
-      renderUnits(availableUnits);
+
+    // unit list drag and drop
+    unitList.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
     });
-  
-    // Live filtering
-    input.addEventListener("input", () => renderUnits(availableUnits));
-  
-    // Save plan
-    saveBtn.addEventListener("click", () => {
-      const name = planName.value.trim();
-      if (!name) return alert("Please enter a plan name.");
-      const units = Array.from(
-        document.querySelectorAll(".unit")
-      ).map(div => {
-        const parts = div.textContent.split(" (");
-        const col =
-          parseInt(
-            div.parentElement.className.match(/col-start-(\d+)/)[1]
-          ) - 1;
-        const row =
-          parseInt(
-            div.parentElement.className.match(/row-start-(\d+)/)[1]
-          );
-        return {
-          unit_name: parts[0].trim(),
-          unit_code: parts[1].slice(0, -1).trim(),
-          column: col,
-          row: row
-        };
-      });
-      fetch("/plans/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan_name: name, units: units })
-      })
-        .then(res => res.json())
+    unitList.addEventListener('drop', e => {
+        e.preventDefault();
+        const text = e.dataTransfer.getData('text/plain');
+        const fromCell = e.dataTransfer.getData('fromCell') === 'true';
+        if (text && fromCell) {
+            const allDivs = document.querySelectorAll('.flex-grow > div.border-2 > div');
+            allDivs.forEach(div => {
+                if (div.textContent === text) div.remove();
+            });
+
+            unitList.appendChild(createUnitDiv(text));
+            avaliableUnits.push({
+                unit_name: text.split(' (')[0],
+                unit_code: text.split(' (')[1].replace(')', '')
+            });
+        }
+    });
+
+    input.addEventListener('input', function () {
+        const query = input.value.trim().toLowerCase();
+        const filtered = avaliableUnits.filter(unit => 
+            unit.unit_name.toLowerCase().includes(query) || 
+            unit.unit_code.toLowerCase().includes(query)
+        );
+        renderUnits(filtered);
+    });
+
+    saveButton.addEventListener('click', function () {
+        const planNameValue = planName.value.trim();
+        if (!planNameValue) {
+            alert('Please enter a plan name.');
+            return;
+        }
+        const selectedUnits = Array.from(document.querySelectorAll('.unit')).map(div => {
+            const text = div.textContent;
+            const [unitName, unitCode] = text.split(' (');
+            return {
+                unit_name: unitName.trim(),
+                unit_code: unitCode.replace(')', '').trim(),
+                column: Number(div.parentElement.className.match(/col-start-(\d+)/)?.[1])- 1, // Adjust for Year Column 
+                row: Number(div.parentElement.className.match(/row-start-(\d+)/)?.[1]) 
+            };
+        });
+        const data = { plan_name: planNameValue, units: selectedUnits };
+
+        fetch('/plans/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)  
+        })
+        .then(response => response.json())
         .then(data => {
-          if (data.message)
-            createAlert(
-              data.message,
-              data.ok ? "success" : "error"
-            );
+            if (data.message) createAlert(data.message, data.ok ? 'success' : 'error'); 
+            setTimeout(() => {
+                // redirect home after 3 seconds
+                window.location.href = '/dashboard';
+            }, 2500);
         })
         .catch(() =>
           createAlert(
@@ -259,5 +223,4 @@ document.addEventListener('DOMContentLoaded', () => {
         .querySelector(".absolute-container ul")
         .appendChild(alertDiv);
     }
-  });
-  
+});

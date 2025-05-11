@@ -15,10 +15,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 <td class="px-6 py-4 whitespace-nowrap">${unit.name}</td>
                 <td class="px-6 py-4 whitespace-nowrap">${unit.is_deleted ? 'Deleted' : 'Active'}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                    <button onclick="post(${unit.id})" class="text-green-600 hover:text-green-900">Share</a>
-                    <a href="#" class="text-blue-600 hover:text-blue-900 ml-2">View</a>
-                    <a href="#" class="text-blue-600 hover:text-blue-900 ml-2">Edit</a>
-                    <a href="#" class="text-red-600 hover:text-red-900 ml-2">Delete</a>
+                    <a onclick="post_share(${unit.id})" class="text-green-600 hover:text-green-900">Share</a>
+                    <a href="/plans/view?id=${unit.id}" class="text-blue-600 hover:text-blue-900 ml-2">View</a>
+                    <a href="/create?id=${unit.id}" class="text-blue-600 hover:text-blue-900 ml-2">Edit</a>
+                    <a onclick="post_delete(${unit.id})" class="text-red-600 hover:text-red-900 ml-2">Delete</a>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
-function post(id){
+function post_share(id){
     fetch(`/share/post?id=${encodeURIComponent(id)}`, {
         method: 'POST',
         body: JSON.stringify({ id: id }),
@@ -55,6 +55,23 @@ function post(id){
         })
     })
 }
+function post_delete(id){
+    fetch(`/plans/delete?id=${encodeURIComponent(id)}`, {
+        method: 'POST',
+        body: JSON.stringify({ id: id }),
+        headers: {
+            'Content-Type': 'application/json'
+        } 
+    }).then(response => { response.json().then( res => {
+            if (res.ok){
+                createAlert(res.message, 'success');
+            } else{
+                createAlert(res.message, 'error');
+            }
+        })
+        location.reload(); 
+    })
+}
 
 function createAlert(message, category) {
     const alertDiv = document.createElement('div');
@@ -62,5 +79,3 @@ function createAlert(message, category) {
     alertDiv.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>${message}`;
     document.querySelector('.absolute-container ul').appendChild(alertDiv);
 }
-
-
