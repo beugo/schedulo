@@ -44,13 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function init() {
         applyInitialPlan();
         loadUnits();
+        setupPrefillHandler();
         setupSearchFilter();
         setupSaveHandler();
         setupGridDragAndDrop();
         setupListDragAndDrop();
     }
 
-    // Pre-populate from server-provided INIT_PLAN
     function applyInitialPlan() {
         const init = window.INIT_PLAN || { name: '', units: {} };
         planName.value = init.name;
@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fetch and render the master list
     function loadUnits() {
         fetch('/units/recommended')
         .then(res => res.json())
@@ -74,6 +73,35 @@ document.addEventListener('DOMContentLoaded', () => {
             renderUnits(availableUnits);
         })
         .catch(() => console.error('Failed to load units'));
+    }
+
+    // ─────────────── Unit Plan Prefillers ───────────────
+    function setupPrefillHandler() {
+        const select = document.getElementById('prefillSelect');
+        select.addEventListener('change', () => {
+            const key = select.value;
+            if (!key) return clearGrid();
+            applyTemplate(prefillTemplates[key]);
+        });
+    }
+
+
+    function applyTemplate(template) {
+        clearGrid();
+        template.forEach(({ unit_code, row, col }) => {
+            const unit = allUnits.find(u => u.unit_code === unit_code);
+            if (!unit) return console.warn(`Unit ${unit_code} not found`);
+            const text = `${unit.unit_name} (${unit.unit_code})`;
+
+            const cell = document.querySelector(`.unit-cell[data-key="${row},${col}"]`);
+            if (!cell) return;
+
+            const div = createUnitDiv(text, { small: true });
+            cell.appendChild(div);
+
+            availableUnits = availableUnits.filter(u => u.unit_code !== unit_code);
+        });
+        renderUnits(availableUnits);
     }
 
     // ─────────────── Rendering Helpers ───────────────
@@ -96,6 +124,18 @@ document.addEventListener('DOMContentLoaded', () => {
         div.draggable = true;
         div.addEventListener('dragstart', onDragStart);
         return div;
+    }
+
+    function clearGrid() {
+        dropZones.forEach(zone => {
+            const old = zone.querySelector('div');
+            if (!old) return;
+            const text = old.textContent;
+            unitList.appendChild(createUnitDiv(text));
+            old.remove();
+        });
+        availableUnits = [...allUnits];
+        renderUnits(availableUnits);
     }
 
     // ─────────────── Drag & Drop ───────────────
@@ -126,11 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
         removeExistingInCell(cell);
         removeSourceDiv(text, fromCell);
 
-        // Place new
         const newDiv = createUnitDiv(text, { small: true });
         cell.appendChild(newDiv);
 
-        // Update availableUnits
         const code = text.match(/\(([^)]+)\)$/)[1];
         availableUnits = availableUnits.filter(u => u.unit_code !== code);
     }
