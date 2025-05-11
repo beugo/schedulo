@@ -40,6 +40,8 @@ class Unit(db.Model):
     prerequisites = db.Column(db.String(256), nullable=True)
     description = db.Column(db.String(256), nullable=True)
     is_deleted = db.Column(db.Boolean, default=False)
+    semester1 = db.Column(db.Boolean, default=False, nullable=False)
+    semester2 = db.Column(db.Boolean, default=False, nullable=False)
 
 
 class UnitPlan(db.Model):
