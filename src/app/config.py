@@ -9,10 +9,7 @@ class Config:
 
 class DeploymentConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL",
-        "sqlite:///" + os.path.join(basedir, "site.db")
-    )
+    SQLALCHEMY_DATABASE_URI = "sqlite:///site.db"
 
 
 class TestConfig(Config):
