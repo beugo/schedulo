@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwindglobals.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/alert.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/discover.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dropdown.css') }}">
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
@@ -38,6 +39,10 @@
       <a href="{{ url_for('main.create_page') }}"
          class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
          Create a Plan
+      </a>
+      <a href="{{ url_for('main.discover') }}"
+         class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
+         Discover Units
       </a>
       {% endif %}
     </div>
