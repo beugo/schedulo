@@ -19,11 +19,58 @@ document.addEventListener('DOMContentLoaded', () => {
     let allUnits = [];
     let availableUnits = [];
     let placedUnits = {}; // cell key is unit_code
+    const prefillTemplates = {
+        cs: [
+            { unit_code: 'CITS1401', row: 1, col: 1 },
+            { unit_code: 'CITS1402', row: 1, col: 2 },
+            { unit_code: 'CITS1003', row: 2, col: 1 },
+            { unit_code: 'CITS2005', row: 3, col: 1 },
+            { unit_code: 'CITS2200', row: 3, col: 2 },
+            { unit_code: 'CITS2002', row: 4, col: 1 },
+            { unit_code: 'CITS2211', row: 4, col: 2 },
+            { unit_code: 'CITS3403', row: 5, col: 1 },
+            { unit_code: 'CITS3002', row: 5, col: 2 },
+            { unit_code: 'CITS3007', row: 5, col: 3 },
+            { unit_code: 'CITS3200', row: 6, col: 1 },
+            { unit_code: 'CITS3001', row: 6, col: 2 }
+            ],
+        cyber: [
+            { unit_code: 'CITS1401', row: 1, col: 1 },
+            { unit_code: 'PHIL1001', row: 1, col: 2 },
+            { unit_code: 'CITS1003', row: 2, col: 1 },
+            { unit_code: 'CITS2006', row: 3, col: 1 },
+            { unit_code: 'CITS2002', row: 4, col: 1 },
+            { unit_code: 'CITS3002', row: 5, col: 1 },
+            { unit_code: 'CITS3403', row: 5, col: 2 },
+            { unit_code: 'CITS3007', row: 5, col: 3 },
+            { unit_code: 'CITS3200', row: 6, col: 1 },
+            { unit_code: 'CITS3006', row: 6, col: 2 },
+            ],
+        cs_cyber: [
+            { unit_code: 'CITS1401', row: 1, col: 1 },
+            { unit_code: 'PHIL1001', row: 1, col: 2 },
+            { unit_code: 'CITS1402', row: 1, col: 3 },
+            { unit_code: 'CITS1003', row: 2, col: 1 },
+            { unit_code: 'CITS2006', row: 3, col: 1 },
+            { unit_code: 'CITS2200', row: 3, col: 2 },
+            { unit_code: 'CITS2005', row: 3, col: 3 },
+            { unit_code: 'CITS2002', row: 4, col: 1 },
+            { unit_code: 'CITS2211', row: 4, col: 2 },
+            { unit_code: 'CITS3002', row: 5, col: 1 },
+            { unit_code: 'CITS3403', row: 5, col: 2 },
+            { unit_code: 'CITS3007', row: 5, col: 3 },
+            { unit_code: 'CITS3200', row: 6, col: 1 },
+            { unit_code: 'CITS3006', row: 6, col: 2 },
+            { unit_code: 'CITS3001', row: 6, col: 3 },
+            { unit_code: 'CITS3005', row: 6, col: 4 }
+            ],
+    }
 
     // ───── Initialization ─────
     function init() {
         applyInitialPlan();
         loadUnits();
+        setupPrefillHandler();
         setupSearchFilter();
         setupSaveHandler();
         setupDragAndDrop();
@@ -46,6 +93,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         validateAllCells();
+    }
+    // ───── Prefill template logic ─────
+    function setupPrefillHandler() {
+        const select = document.getElementById('prefillSelect');
+        if (!select) return;
+        select.addEventListener('change', () => {
+            const key = select.value;
+            if (!key) return clearGrid();
+            applyTemplate(prefillTemplates[key]);
+        });
+    }
+
+    function applyTemplate(template) {
+        clearGrid();
+        template.forEach(({ unit_code, row, col }) => {
+            const unit = allUnits.find(u => u.unit_code === unit_code);
+            if (!unit) return console.warn(`Unit ${unit_code} not found`);
+            const text = `${unit.unit_name} (${unit.unit_code})`;
+    
+            // Locate cell by data-key!
+            const cell = document.querySelector(`.unit-cell[data-key="${row},${col}"]`);
+            if (!cell) return;
+    
+            const div = createUnitDiv(text, { small: true });
+            cell.innerHTML = "";            // clear cell before adding, in case of remnant
+            cell.appendChild(div);
+    
+            // Remove from available
+            availableUnits = availableUnits.filter(u => u.unit_code !== unit_code);
+        });
+        renderUnitList(availableUnits);
+    }
+
+    function clearGrid() {
+        dropZones.forEach(zone => {
+            // Remove any .unit divs
+            const oldUnits = Array.from(zone.querySelectorAll('.unit'));
+            oldUnits.forEach(div => div.remove());
+        });
+        availableUnits = [...allUnits];
+        renderUnitList(availableUnits);
     }
 
     // ───── Fetch all units for the list ─────
