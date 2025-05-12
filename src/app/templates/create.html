@@ -2,15 +2,15 @@
 {% block title %}Create Plan{% endblock %}
 {% block content %}
 <script>
+  // change this to be client side js later
   window.INIT_PLAN = {
     name: {{ plan_name|tojson }},
     units: {{ grid_units|tojson }},
   };
 </script>
 <div class="w-full flex flex-col lg:flex-row gap-8 min-h-[80vh]">
-  <!-- change these comments -->
-  {# --- Side Panel --- #}
-  <aside class="flex flex-col rounded-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[26%] p-6 gap-7">
+  <!-- Side Panel -->
+  <aside class="flex flex-col rounded-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[30%] p-6 gap-7">
     <div>
       <span class="uppercase text-xs text-gray-400 tracking-widest">Plan Editing</span>
       <input type="text" id="planName" placeholder="Unit Plan Name" value="{{ plan_name }}"
@@ -26,29 +26,17 @@
         <input id="searchInput" type="text" placeholder="Filter units..." autocomplete="off"
           class="flex-grow px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 transition"/>
       </div>
-      <div class="flex items-center p-2 rounded-lg border border-gray-300 mb-2 cursor-move gap-2 bg-white dark:bg-gray-900 shadow-sm unit">
-        <span class="flex-grow font-semibold">Foundations of Choice</span>
-        <div class="flex flex-wrap gap-1 items-center ml-2">
-            <span class="tag px-2 py-1 text-xs rounded font-semibold mr-1 mb-1 inline-block bg-blue-100 text-blue-800">Sem 1</span>
-            <span class="tag px-2 py-1 text-xs rounded font-semibold mr-1 mb-1 inline-block bg-red-100 text-red-700">Exam</span>
-            <span class="tag px-2 py-1 text-xs rounded font-semibold mr-1 mb-1 inline-block bg-slate-200 text-slate-700">MTH1010</span>
-        </div>
+      <ul id="unitList" class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 max-h-[60vh] overflow-y-auto shadow-inner border border-gray-100 dark:border-gray-800"></ul>
     </div>
-      <ul id="results" class="dropdown-list w-full"></ul>
-    </div>
-    <div>
-      <h3 class="font-semibold text-gray-700 dark:text-gray-100 text-md mb-1">Your Plan Units</h3>
-      <div id="unitList" class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 max-h-[30vh] overflow-y-auto shadow-inner scroll-smooth border border-gray-100 dark:border-gray-800"></div>
-    </div>
-    <div class="mt-auto flex flex-row gap-4 pt-2">
+    <div class="mb-auto flex flex-row gap-4 pt-2">
       <a href="{{ url_for('main.create_page') }}" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white text-sm transition font-semibold">Clear</a>
       <div class="flex-grow"></div>
-      <a id="saveButton" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 rounded-lg text-white text-sm transition font-bold shadow-md cursor-pointer">Save</a>
+      <button id="saveButton" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 rounded-lg text-white text-sm transition font-bold shadow-md">Save</button>
     </div>
   </aside>
-  {# --- Main Grid Section --- #}
+  <!-- Main Grid -->
   <main class="flex-grow w-full">
-    {% set year_titles = ["Year 1", "Year 2", "Year 3", "Year 4"] %}
+    {% set year_titles = ["Year 1","Year 2","Year 3","Year 4"] %}
     {% set year_bg_colors = [
       'from-purple-50 dark:from-purple-900/50',
       'from-orange-50 dark:from-orange-900/50',
@@ -58,55 +46,61 @@
     <div class="flex flex-col gap-8 w-full">
       {% for y in range(4) %}
       <section class="p-5 rounded-2xl bg-gradient-to-br to-white dark:to-gray-950 {{ year_bg_colors[y] }} shadow-inner border border-gray-200 dark:border-gray-800">
+        <!-- Year Header -->
         <div class="mb-4 flex items-center gap-3">
-          <span class="text-xs text-gray-400 dark:text-gray-500 uppercase font-semibold tracking-widest pl-1">
-            {{ year_titles[y] }}
-          </span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 uppercase font-semibold tracking-widest pl-1">{{ year_titles[y] }}</span>
           <div class="flex-1 h-px bg-gray-100 dark:bg-gray-800 mt-1"></div>
         </div>
+        <!-- Semesters -->
         <div>
+          <!-- Sem 1 -->
           <span class="text-xs text-gray-400 dark:text-gray-600 font-semibold px-1">Semester 1</span>
           <div class="grid grid-cols-4 gap-5 relative">
-            {# Row 1: Semester 1 #}
-            {% for slot in range(1, 5) %}
-              {% set grid_key = ((y*2)+1, slot) %}
-              {% set cell = grid_units.get(grid_key) %}
-              <div
-                class="rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm px-4 py-3 group hover:ring-2 hover:ring-blue-400/40 transition-all h-24 flex flex-col justify-center unit-cell"
-                data-key="{{ (y*2)+1 }},{{ slot }}"
-                {% if not cell %}style="opacity:.75;"{% endif %}
-              >
+            {% for slot in range(1,5) %}
+              {% set key = (y*2+1, slot) %}
+              {% set cell = grid_units.get(key) %}
+              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex items-stretch justify-stretch flex-col px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}">
                 {% if cell %}
-                  <div class="text-sm font-semibold text-gray-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition cursor-move unit" draggable="true">
-                    {{ cell.name }}
+                <div class="flex flex-col h-full w-full p-1 rounded-lg border border-gray-300 cursor-move gap-1 bg-white dark:bg-gray-900 shadow-sm unit overflow-hidden" draggable="true" style="min-width:0;">
+                  <span class="flex-grow font-bold text-xs leading-tight truncate" style="min-width:0; word-break:break-word;">{{ cell.name }}</span>
+                  <div class="flex flex-wrap gap-1 items-center mt-0">
+                    {% if cell.semester1 %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-blue-100 text-blue-800">Sem 1</span>
+                    {% endif %}
+                    {% if cell.semester2 %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-green-100 text-green-800">Sem 2</span>
+                    {% endif %}
+                    {% if cell.exam %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-red-100 text-red-700">Exam</span>
+                    {% endif %}
+                    <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-slate-200 text-slate-700">{{ cell.code }}</span>
                   </div>
-                  <div class="text-xs text-gray-400 dark:text-gray-300">{{ cell.code }}</div>
+                </div>
                 {% else %}
-                  <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
+                <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
                 {% endif %}
               </div>
             {% endfor %}
-            {# --- Divider between semesters (across all columns) --- #}
+            <!-- Divider & Sem 2 -->
             <div class="absolute left-0 right-0 mx-2 top-[calc(50%)] h-0.5 bg-gray-100 dark:bg-gray-800 rounded" style="z-index:1;"></div>
-            <span class=" mt-8 col-span-4 text-xs text-gray-400 dark:text-gray-600 font-semibold px-1">Semester 2</span>
-
-            {# Row 2: Semester 2 #}
-            {% for slot in range(1, 5) %}
-              {% set grid_key = ((y*2)+2, slot) %}
-              {% set cell = grid_units.get(grid_key) %}
-              <div
-                class="rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm px-4 pb-3 group hover:ring-2 hover:ring-blue-400/40 transition-all h-24 flex flex-col justify-center unit-cell"
-                style="margin-top: 0.5rem"
-                data-key="{{ (y*2)+2 }},{{ slot }}"
-                {% if not cell %}style="opacity:.75;"{% endif %}
-              >
+            <span class="mt-8 col-span-4 text-xs text-gray-400 dark:text-gray-600 font-semibold px-1">Semester 2</span>
+            {% for slot in range(1,5) %}
+              {% set key = (y*2+2, slot) %}
+              {% set cell = grid_units.get(key) %}
+              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex items-stretch justify-stretch flex-col px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}" ...>
                 {% if cell %}
-                  <div class="text-sm font-semibold text-gray-800 dark:text-white mb-0.5 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition cursor-move unit" draggable="true">
-                    {{ cell.name }}
+                <div class="flex items-center p-2 rounded-lg border border-gray-300 mb-2 cursor-move gap-2 bg-white dark:bg-gray-900 shadow-sm unit" draggable="true">
+                  <span class="flex-grow font-semibold">{{ cell.name }}</span>
+                  <div class="flex flex-wrap gap-1 items-center ml-2">
+                    <span class="tag px-2 py-1 text-xs rounded font-semibold inline-block bg-green-100 text-green-800">Sem 2</span>
+                    {% if cell.exam %}
+                    <span class="tag px-2 py-1 text-xs rounded font-semibold inline-block bg-red-100 text-red-700">Exam</span>
+                    {% endif %}
+                    <span class="tag px-2 py-1 text-xs rounded font-semibold inline-block bg-slate-200 text-slate-700">{{ cell.code }}</span>
                   </div>
-                  <div class="text-xs text-gray-400 dark:text-gray-300">{{ cell.code }}</div>
+                </div>
                 {% else %}
-                  <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
+                <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
                 {% endif %}
               </div>
             {% endfor %}
