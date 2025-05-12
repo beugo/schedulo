@@ -110,13 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
         template.forEach(({ unit_code, row, col }) => {
             const unit = allUnits.find(u => u.unit_code === unit_code);
             if (!unit) return console.warn(`Unit ${unit_code} not found`);
-            const text = `${unit.unit_name} (${unit.unit_code})`;
     
             // Locate cell by data-key!
             const cell = document.querySelector(`.unit-cell[data-key="${row},${col}"]`);
             if (!cell) return;
     
-            const div = createUnitDiv(text, { small: true });
+            const div = createUnitDiv(unit);
             cell.innerHTML = "";            // clear cell before adding, in case of remnant
             cell.appendChild(div);
     
