@@ -1,7 +1,6 @@
-import json
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
-from app.models import User, Unit, UnitPlan, UserFriend, UnitPlanToUnit
+from app.models import Unit, UnitPlan, UnitPlanToUnit
 
 main_bp = Blueprint("main", __name__)
 
@@ -34,7 +33,7 @@ def create_page():
     plan_id = request.args.get('id')
     context = {
         'plan_name': '',
-        'grid_units': {}, 
+        'grid_units': {},
     }
     if plan_id:
         plan = UnitPlan.query.filter_by(
@@ -49,7 +48,7 @@ def create_page():
             is_deleted=False
         ).all()
 
-        #populate the context with all the units in that unit plan
+        # populate the context with all the units in that unit plan
         grid = {}
         for pu in plan_units:
             unit = Unit.query.get(pu.unit_id)
