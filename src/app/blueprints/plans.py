@@ -114,7 +114,13 @@ def get_plans():
         return jsonify({"ok": False, "message": "Not logged in"}), 401
     plans = UnitPlan.query.filter_by(
         user_id=current_user.id, is_deleted=False).all()
-    return jsonify([{"id": p.id, "name": p.name} for p in plans])
+
+    result = []
+    for p in plans:
+        shared = db.session.query(Post).filter_by(
+            unit_plan_id=p.id, is_deleted=False).first() is not None
+        result.append({"id": p.id, "name": p.name, "shared": shared})
+    return jsonify(result)
 
 
 @plans_bp.route("/view", methods=["GET"])
