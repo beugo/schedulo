@@ -7,58 +7,65 @@ let input;
 let debounceTimer;
 
 document.addEventListener("DOMContentLoaded", function() {
-    tbody = document.getElementById('friendTable');
-    plansTable = document.getElementById('plansTable');
-    input = document.getElementById('searchInput');
+  tbody = document.getElementById('friendTable');
+  plansTable = document.getElementById('plansTable');
+  input = document.getElementById('searchInput');
 
-    refreshTable();
-    refreshPlansTable();
-    refreshPosts();
+  refreshTable();
+  refreshPlansTable();
+  refreshPosts();
 
 });
 function createAlert(message, category) {
-    const alertDiv = document.createElement('div');
-    alertDiv.classList.add('alert', category, 'fade-out');
-    alertDiv.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>${message}`;
-    document.querySelector('.absolute-container ul').appendChild(alertDiv);
+  const alertDiv = document.createElement('div');
+  alertDiv.classList.add('alert', category, 'fade-out');
+  alertDiv.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>${message}`;
+  document.querySelector('.absolute-container ul').appendChild(alertDiv);
 }
 function renderFriendsTable(friends) {
-    tbody.innerHTML = "";
-    friends.forEach(friend => {
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-gray-100 dark:hover:bg-dark-secondary";
-        tr.innerHTML = `
+  tbody.innerHTML = "";
+  friends.forEach(friend => {
+    const tr = document.createElement("tr");
+    tr.className = "hover:bg-gray-100 dark:hover:bg-dark-secondary";
+    tr.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap">${friend.username}</td>
         `;
-        tbody.appendChild(tr);
-    });
+    tbody.appendChild(tr);
+  });
 }
 
 function renderPlansTable(plans) {
-    plansTable.innerHTML = "";
-    plans.forEach(plan => {
-        const tr = document.createElement("tr");
-        tr.className = "hover:bg-gray-100 dark:hover:bg-dark-secondary";
-        tr.innerHTML = `
+  plansTable.innerHTML = "";
+  plans.forEach(plan => {
+    const tr = document.createElement("tr");
+    tr.className = "hover:bg-gray-100 dark:hover:bg-dark-secondary";
+    tr.onclick = () => {
+      window.location.href = `/plans/view?id=${plan.id}`;
+    };
+    tr.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap">${plan.name}</td>
         `;
-        plansTable.appendChild(tr);
-    });
+    plansTable.appendChild(tr);
+  });
 }
 
 function renderPosts(posts) {
-    const feed = document.getElementById("postFeed");
-    feed.innerHTML = "";
-    if (posts.length === 0) {
-          const div = document.createElement("div");
-          div.className = "w-full bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-6 shadow text-center text-gray-600 dark:text-dark-secondary";
-          div.innerHTML = `Your friend feed is empty for now. When friends share unit plans, they’ll appear here!`;
-          feed.appendChild(div);
-    } else {
-      posts.forEach(post => {
-          const div = document.createElement("div");
-          div.className = "bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-4 shadow h-[45vh]";
-          div.innerHTML = `
+  const feed = document.getElementById("postFeed");
+  feed.innerHTML = "";
+  if (posts.length === 0) {
+    const div = document.createElement("div");
+    div.className = "w-full bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-6 shadow text-center text-gray-600 dark:text-dark-secondary";
+    div.innerHTML = `Your friend feed is empty for now. When friends share unit plans, they’ll appear here!`;
+    feed.appendChild(div);
+  } else {
+    posts.forEach(post => {
+      const div = document.createElement("div");
+      div.id = "post";
+      div.onclick = () => {
+        window.location.href = `/plans/view?id=${post.id}`;
+      };
+      div.className = "bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-4 shadow h-[45vh]";
+      div.innerHTML = `
               <div class="flex flex-col h-full gap-4">
                 <div class="flex flex-row items-center text-center">
                   <h3 class="font-bold text-lg">${post.unit_plan.name}</h3>
@@ -101,9 +108,9 @@ function renderPosts(posts) {
               </div>
             </div>
           `;
-          feed.appendChild(div);
-      });
-    }
+      feed.appendChild(div);
+    });
+  }
 };
 
 function getText(units, col, row) {
@@ -111,29 +118,29 @@ function getText(units, col, row) {
   return unit ? `${unit.unitcode}` : "";
 }
 
-function refreshTable(){
-    fetch("/friend/get")
-        .then(response => response.json())
-        .then(data => {
-            friends = data;
-            renderFriendsTable(friends);
-        });
-    };
+function refreshTable() {
+  fetch("/friend/get")
+    .then(response => response.json())
+    .then(data => {
+      friends = data;
+      renderFriendsTable(friends);
+    });
+};
 
-function refreshPlansTable(){
-    fetch("/plans/user")
-        .then(response => response.json())
-        .then(data => {
-            plans = data;
-            renderPlansTable(plans);
-        });
-    };
+function refreshPlansTable() {
+  fetch("/plans/user")
+    .then(response => response.json())
+    .then(data => {
+      plans = data;
+      renderPlansTable(plans);
+    });
+};
 
-function refreshPosts(){
-    fetch("/share/refresh")
-        .then(response => response.json())
-        .then(data => {
-          posts = data;
-          renderPosts(posts);
-        });
-    };
+function refreshPosts() {
+  fetch("/share/refresh")
+    .then(response => response.json())
+    .then(data => {
+      posts = data;
+      renderPosts(posts);
+    });
+};

@@ -1,41 +1,49 @@
 from flask import Blueprint, request, jsonify, render_template
 from flask_login import current_user
 from app import db
-from app.models import Unit, UnitPlan, UnitPlanToUnit
+from app.models import Unit, UnitPlan, UnitPlanToUnit, UserFriend, Post
 from app.utils.unit_plan_helper import get_plan_core_info
+from sqlalchemy import or_
 
 plans_bp = Blueprint("plans", __name__)
 
 
 @plans_bp.route("/get", methods=["GET"])
 def get_plan():
-    if not current_user.is_authenticated: return jsonify({"ok": False, "message": "Not logged in"}), 401
+    if not current_user.is_authenticated:
+        return jsonify({"ok": False, "message": "Not logged in"}), 401
 
     plan_id = request.args.get("id", "")
     plan_data = get_plan_core_info(plan_id, current_user.id)
 
-    if not plan_data: return jsonify({"ok": False, "message": "Plan not found"}), 404
+    if not plan_data:
+        return jsonify({"ok": False, "message": "Plan not found"}), 404
 
-    return jsonify({"ok": True, "plan": plan_data}) 
+    return jsonify({"ok": True, "plan": plan_data})
+
 
 @plans_bp.route("/delete", methods=["POST"])
 def delete_plan():
     if not current_user.is_authenticated:
         return jsonify({"ok": False, "message": "Not logged in"}), 401
-    #does not seem safe ?
+    # does not seem safe ?
     plan_id = request.args.get("id", type=int)
     if not plan_id:
         return jsonify({"ok": False, "message": "No plan ID provided"}), 400
 
-    plan_to_delete = UnitPlan.query.filter_by(user_id=current_user.id, is_deleted=False, id=plan_id).first()
+    plan_to_delete = UnitPlan.query.filter_by(
+        user_id=current_user.id, is_deleted=False, id=plan_id).first()
 
     if not plan_to_delete:
-        return jsonify({"ok": False, "message": "Plan not found or already deleted"}), 404
+        return jsonify(
+            {"ok": False, "message": "Plan not found or already deleted"}), 404
 
     plan_to_delete.is_deleted = True
     db.session.commit()
 
-    return jsonify({"ok": True, "message": 'Plan ' + str(plan_id) + ' Deleted'})
+    return jsonify(
+        {"ok": True, "message": 'Plan ' + str(plan_id) + ' Deleted'})
+
 
 @plans_bp.route("/save", methods=["POST"])
 def save_plan():
@@ -58,7 +66,8 @@ def save_plan():
     unit_objs = Unit.query.filter(Unit.unit_code.in_(unit_codes)).all()
     unit_dict = {unit.unit_code: unit.id for unit in unit_objs}
     if len(unit_objs) != len(units):
-        return jsonify({"message": "Some units do not exist?", "ok": False}), 400
+        return jsonify(
+            {"message": "Some units do not exist?", "ok": False}), 400
 
     # Check if the plan name already exists for the user
     existing_plan = UnitPlan.query.filter_by(
@@ -66,7 +75,8 @@ def save_plan():
     ).first()
 
     if existing_plan:
-        return jsonify({"message": "Plan name already exists", "ok": False}), 400
+        return jsonify(
+            {"message": "Plan name already exists", "ok": False}), 400
 
     #  Add Plan to the database to get plan id
     user_id = current_user.id
@@ -85,7 +95,10 @@ def save_plan():
         seen_positions.add(pos)
 
         unit_plan_to_unit = UnitPlanToUnit(
-            unit_plan_id=new_plan.id, unit_id=unit_dict[unit_code], row=row, col=col
+            unit_plan_id=new_plan.id,
+            unit_id=unit_dict[unit_code],
+            row=row,
+            col=col
         )
         db.session.add(unit_plan_to_unit)
 
@@ -99,8 +112,16 @@ def save_plan():
 def get_plans():
     if not current_user.is_authenticated:
         return jsonify({"ok": False, "message": "Not logged in"}), 401
-    plans = UnitPlan.query.filter_by(user_id=current_user.id, is_deleted=False).all()
-    return jsonify([{"id": p.id, "name": p.name} for p in plans])
+    plans = UnitPlan.query.filter_by(
+        user_id=current_user.id, is_deleted=False).all()
+
+    result = []
+    for p in plans:
+        shared = db.session.query(Post).filter_by(
+            unit_plan_id=p.id, is_deleted=False).first() is not None
+        result.append({"id": p.id, "name": p.name, "shared": shared})
+    return jsonify(result)
+
 
 @plans_bp.route("/view", methods=["GET"])
 def view_plan():
@@ -108,10 +129,25 @@ def view_plan():
     if not plan_id:
         return jsonify({"ok": False, "message": "No plan ID provided"}), 400
 
-    plan = UnitPlan.query.filter_by(
-        id=plan_id,
-        user_id=current_user.id,
-        is_deleted=False
+    friend_ids = db.session.query(UserFriend.user_id).filter(
+        UserFriend.friend_id == current_user.id, UserFriend.is_deleted == False
+    ).union(
+        db.session.query(UserFriend.friend_id).filter(
+            UserFriend.user_id == current_user.id, UserFriend.is_deleted == False)
+    ).subquery()
+
+    shared_unit_ids = db.session.query(Post.unit_plan_id).filter(
+        Post.user_id.in_(friend_ids),
+        Post.is_deleted == False
+    )
+
+    plan = UnitPlan.query.filter(
+        UnitPlan.id == plan_id,
+        UnitPlan.is_deleted == False,
+        or_(
+            UnitPlan.user_id == current_user.id,
+            UnitPlan.id.in_(shared_unit_ids)
+        )
     ).first()
     if not plan:
         return jsonify({"ok": False, "message": "Plan not found"}), 404
@@ -142,21 +178,25 @@ def view_plan():
 
     # seperate the semesters into years(might not need later on)
     def get_year(row):
-        if row in (1, 2): return 1
-        if row in (3, 4): return 2
-        if row in (5, 6): return 3
-        if row in (7, 8): return 4
+        if row in (1, 2):
+            return 1
+        if row in (3, 4):
+            return 2
+        if row in (5, 6):
+            return 3
+        if row in (7, 8):
+            return 4
         return None
 
     # populate the dict
-    #there has to be a better way of doing this?
+    # there has to be a better way of doing this?
     for pu in plan_units:
         unit = Unit.query.get(pu.unit_id)
         if not unit:
             continue
         unit_info = {"name": unit.unit_name, "code": unit.unit_code}
         year = get_year(pu.row)
-        col = pu.col 
+        col = pu.col
 
         year_cols[year][col].append(unit_info)
 
