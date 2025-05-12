@@ -68,3 +68,9 @@ def create_page():
 @login_required
 def friends_page():
     return render_template("friends.html")
+
+
+@main_bp.route("/discover")
+@login_required
+def discover():
+    return render_template("discover_unit.html")
