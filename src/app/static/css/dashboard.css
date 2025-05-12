@@ -1,0 +1,6 @@
+#post:hover {
+  border: 1px solid lightblue !important;
+}
+#post {
+  transition: border 0.3s ease;
+}
