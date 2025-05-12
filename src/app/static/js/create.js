@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupSaveHandler() {
         saveButton.addEventListener('click', () => {
             const name = planName.value.trim();
-            if (!name) return alert('Please enter a plan name.');
+            if (!name) return createAlert('Please enter a plan name.', 'error');
             const units = [];
             for (let cell of dropZones) {
                 const div = cell.querySelector('.unit');
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             }
-            if (!units.length) return alert('Please place at least one unit.');
+            if (!units.length) return createAlert('Please place at least one unit.', 'error');
             fetch('/plans/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -370,11 +370,22 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(res => res.json())
             .then(json => {
-                alert(json.message);
+                createAlert(json.message, json.ok ? 'success' : 'error');
                 if (json.ok) setTimeout(()=>location.href='/dashboard', 1000);
             })
-            .catch(() => alert("An error occurred while saving."));
+            .catch(() => createAlert('An error occurred while saving.', 'error'));
         });
+
+        
+        function createAlert(message, category) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${category} fade-out`;
+            alertDiv.innerHTML = `
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            ${message}
+            `;
+            document.querySelector('.absolute-container ul').appendChild(alertDiv);
+        }
     }
 
     // ───── Kickoff ─────
