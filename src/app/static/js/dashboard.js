@@ -39,6 +39,9 @@ function renderPlansTable(plans) {
   plans.forEach(plan => {
     const tr = document.createElement("tr");
     tr.className = "hover:bg-gray-100 dark:hover:bg-dark-secondary";
+    tr.onclick = () => {
+      window.location.href = `/plans/view?id=${plan.id}`;
+    };
     tr.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap">${plan.name}</td>
         `;
