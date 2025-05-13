@@ -44,7 +44,6 @@ class TestSeeds(unittest.TestCase):
         self.assertFalse(u2.exam)
 
     def test_create_users_and_plans(self):
-        # seed one unit so plans can attach
         unit_csv = [
             ['Unit Name','Unit Code','Semesters','Exam','URL','Unit Coordinator','Prerequisites','Description','Contact Hours'],
             ['Solo','SU','Semester 1','No','su','c','none','d','[["Lec",1]]'],
@@ -56,7 +55,6 @@ class TestSeeds(unittest.TestCase):
         users = {u.username for u in User.query.all()}
         self.assertSetEqual(users, {'hugo','joel','prashan','nathan'})
 
-        # hugo/joel/prashan have 2 plans each, nathan has 0
         for name in ('hugo','joel','prashan'):
             plans = UnitPlan.query.filter_by(user_id=User.query.filter_by(username=name).one().id)
             self.assertEqual(plans.count(), 2)

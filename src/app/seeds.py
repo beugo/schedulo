@@ -63,11 +63,9 @@ def import_units(db_session, csv_path):
             }
 
             if unit:
-                # Update existing record
                 for field, value in data.items():
                     setattr(unit, field, value)
             else:
-                # Create new unit
                 unit = Unit(**data)
                 db_session.add(unit)
 
@@ -81,7 +79,6 @@ def create_users_and_plans(db_session):
         joel & prashan’s plans are “shared” via Post entries
       - nathan: no friends, no plans
     """
-    # 1) create/fetch users
     names = ["hugo", "joel", "prashan", "nathan"]
     users = {}
     for name in names:
@@ -95,9 +92,7 @@ def create_users_and_plans(db_session):
 
     db_session.commit()
 
-    # 2) mutual‐friends among hugo, joel, prashan (one record per pair)
     trio = ["hugo", "joel", "prashan"]
-    # clear out any old friendships in test DB
     db_session.query(UserFriend).delete()
     db_session.flush()
 
@@ -106,16 +101,9 @@ def create_users_and_plans(db_session):
             user_id=users[a].id,
             friend_id=users[b].id
         ))
-        # if your model requires the reverse direction too, uncomment:
-        # db_session.add(UserFriend(
-        #     user_id=users[b].id,
-        #     friend_id=users[a].id
-        # ))
     db_session.commit()
 
-    # 3) create 2 plans each, and seed each plan with 3–4 units
     all_units = db_session.query(Unit).all()
-    # wipe old plans/links
     db_session.query(UnitPlanToUnit).delete()
     db_session.query(UnitPlan).delete()
     db_session.flush()
@@ -130,7 +118,6 @@ def create_users_and_plans(db_session):
             db_session.add(plan)
             db_session.flush()
 
-            # pick 3–4 distinct units at random
             sample_units = random.sample(all_units, min(4, len(all_units)))
             for i, unit in enumerate(sample_units):
                 row = (i // 2) + 1    # rows 1,1,2,2
@@ -144,7 +131,6 @@ def create_users_and_plans(db_session):
 
     db_session.commit()
 
-    # 4) “Share” (Post) each of joel’s & prashan’s plans
     db_session.query(Post).delete()
     db_session.flush()
 
