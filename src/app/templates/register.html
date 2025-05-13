@@ -13,6 +13,8 @@
         Organize your semesters, avoid timetable clashes, reclaim your time.
       </p>
       <form action="{{ url_for('auth.register_user') }}" method="post" class="space-y-6">
+        
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
        
         <div>
           <label for="username" class="block font-medium text-gray-700 dark:text-dark-secondary mb-1">
