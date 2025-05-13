@@ -21,17 +21,15 @@ def search_units():
 def all_units():
     units = Unit.query.filter_by(is_deleted=False).all()
     return jsonify(
-        [{"unit_name": u.unit_name,
-          "unit_code": u.unit_code,
-          "exam": u.exam,
-          "url": u.url,
-          "unit_coordinator": u.unit_coordinator,
-          "contact_hours": u.contact_hours,
-          "prerequisites": u.prerequisites,
-          "description": u.description,
-          "semesterOne": u.semester1,
-          "semesterTwo": u.semester2,
-          } for u in units]
+        [{
+            "id": u.id,
+            "unit_name": u.unit_name,
+            "unit_code": u.unit_code,
+            "unit_coordinator": u.unit_coordinator,
+            "contact_hours": u.contact_hours,
+            "prerequisites": u.prerequisites,
+            "description": u.description,
+        } for u in units]
     )
 
 
