@@ -1,10 +1,7 @@
-import os
 import sys
 import time
 import threading
 import unittest
-
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 from app import create_app, db
 from app.config import TestConfig
@@ -33,7 +30,7 @@ if __name__ == "__main__":
     server.start()
     time.sleep(1)   
 
-    # ——— 3) discover & run your tests ———
+    # ——— 3) discover & run tests ———
     loader = unittest.TestLoader()
     suite  = loader.discover("app/tests/selenium", pattern="test_*.py")
     runner = unittest.TextTestRunner(verbosity=2)
