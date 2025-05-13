@@ -1,77 +1,126 @@
 {% extends "base.html" %}
-
 {% block title %}Create Plan{% endblock %}
-
 {% block content %}
-    <!-- This is to let jinja prepopulate the template with the existing plan data if it exists-->
-  <script>
-    window.INIT_PLAN = {
-      name: {{ plan_name|tojson }},
-      units: {{ grid_units|tojson }},
-    };
-  </script>
-
-  <div class="w-full flex flex-row gap-10 h-[80vh]">
-    <!-- Search Bar Side -->
-    <div class="flex flex-col h-full rounded-lg bg-gray-200 border border-gray-600 dark:bg-dark-border w-[30%] p-5 gap-4">
-
-      <!-- Prefill Unit Plan -->
-      <div class="flex items-center gap-2 mb-4">
-        <label for="prefillSelect" class="text-sm font-medium">Prefill template:</label>
-        <select id="prefillSelect"
-                class="px-3 py-2 border rounded bg-white dark:bg-dark-fg text-gray-900 dark:text-dark-primary">
-          <option value="">— Select one —</option>
-          <option value="cs">Computer Science</option>
-          <option value="cyber">Cybersecurity</option>
-          <option value="cs_cyber">Computer Science and Cybersecurity</option>
-        </select>
-      </div>
-
-      <!-- Search Unit -->
-      <div class="w-full flex flex-row gap-4 transition-colors duration-300">
-        <div>
-          <select id="searchType" class="flex w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-fg text-gray-900 dark:text-dark-primary focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition">
-            <option value="name">Name</option>
-            <option value="code">Unit Code</option>
-          </select>
-        </div>
-        <div class="flex flex-col flex-grow" style="position: relative;">
-          <input type="text" id="searchInput" placeholder="Filter units..." autocomplete="off"
-            class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-fg text-gray-900 dark:text-dark-primary focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition">
-          <ul id="results" class="dropdown-list" style="width: 100%;"></ul>
-        </div>
-      </div>
-      <div class="w-full border border-gray-600"></div>
-      <div id="unitList" class="flex-grow overflow-auto"></div>
-      <div class="flex flex-col w-full">
-        <input type="text" id="planName" placeholder="Unit Plan Name" value="{{ plan_name }}"
-          class="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-dark-border bg-gray-50 dark:bg-dark-fg text-gray-900 dark:text-dark-primary focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition">
-      </div>
-      <div class="flex flex-row gap-4">
-        <a href="{{ url_for('main.create_page') }}" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white text-sm transition">Clear</a>
-        <div class="flex-grow"></div>
-        <a id="saveButton" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg text-white text-sm transition">Save</a>
-      </div>
+<script>
+  // change this to be client side js later
+  window.INIT_PLAN = {
+    name: {{ plan_name|tojson }},
+    units: {{ grid_units|tojson }},
+  };
+</script>
+<div class="w-full flex flex-col lg:flex-row gap-8 min-h-[80vh]">
+  <!-- Side Panel -->
+  <aside class="flex flex-col rounded-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[30%] p-6 gap-7">
+    <div>
+      <span class="uppercase text-xs text-gray-400 tracking-widest">Plan Editing</span>
+      <input type="text" id="planName" placeholder="Unit Plan Name" value="{{ plan_name }}"
+        class="mt-2 text-2xl font-bold text-gray-900 dark:text-white bg-transparent outline-none w-full border-b border-gray-200 dark:border-gray-800 focus:border-blue-400 transition px-0 py-1"/>
     </div>
-
-    <!-- turned this into a loop to cut down on some lines of code -->
-    <div class="flex h-full flex-grow grid gap-4" style="grid-template-columns: repeat(5, 20%); grid-template-rows: repeat(8, 10%);">
-      {# Loop to generate year labels and slots dynamically #}
-      {% for r in range(1,9) %}
-        {% if r in [1,3,5,7] %}
-          <div class="flex items-center justify-center border-2 col-start-1 row-start-{{ r }} row-span-2 rounded-lg bg-gray-200 dark:bg-dark-border year {{ ['border-purple-500','border-orange-500','border-pink-400','border-cyan-600'][((r-1)//2)] }}">
-            Year {{ ((r-1)//2) + 1 }}
+    <select
+      id="prefillSelect"
+      class="mb-4 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700
+             bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100
+             focus:ring-2 focus:ring-blue-400 transition"
+    >
+      <option value="">Select Major Prefill…</option>
+      <option value="cs">BSc Computer Science</option>
+      <option value="cyber">BSc Cybersecurity</option>
+      <option value="cs_cyber">BSc CS + Cyber (double)</option>
+    </select>
+    <div>
+      <h3 class="font-semibold text-gray-700 dark:text-gray-100 text-lg mb-2">Search Units</h3>
+      <div class="flex gap-3 mb-3">
+        <select id="searchType" class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 transition">
+          <option value="name">Name</option>
+          <option value="code">Unit Code</option>
+        </select>
+        <input id="searchInput" type="text" placeholder="Filter units..." autocomplete="off"
+          class="flex-grow px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 transition"/>
+      </div>
+      <ul id="unitList" class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 max-h-[60vh] overflow-y-auto shadow-inner border border-gray-100 dark:border-gray-800"></ul>
+    </div>
+    <div class="mb-auto flex flex-row gap-4 pt-2">
+      <a href="{{ url_for('main.create_page') }}" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white text-sm transition font-semibold">Clear</a>
+      <div class="flex-grow"></div>
+      <button id="saveButton" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 rounded-lg text-white text-sm transition font-bold shadow-md">Save</button>
+    </div>
+  </aside>
+  <!-- Main Grid -->
+  <main class="flex-grow w-full">
+    {% set year_titles = ["Year 1","Year 2","Year 3","Year 4"] %}
+    {% set year_bg_colors = [
+      'from-purple-50 dark:from-purple-900/50',
+      'from-orange-50 dark:from-orange-900/50',
+      'from-pink-50 dark:from-pink-900/40',
+      'from-cyan-50 dark:from-cyan-900/40'
+    ] %}
+    <div class="flex flex-col gap-8 w-full">
+      {% for y in range(4) %}
+      <section class="p-5 rounded-2xl bg-gradient-to-br to-white dark:to-gray-950 {{ year_bg_colors[y] }} shadow-inner border border-gray-200 dark:border-gray-800">
+        <!-- Year Header -->
+        <div class="mb-4 flex items-center gap-3">
+          <span class="text-xs text-gray-400 dark:text-gray-500 uppercase font-semibold tracking-widest pl-1">{{ year_titles[y] }}</span>
+          <div class="flex-1 h-px bg-gray-100 dark:bg-gray-800 mt-1"></div>
+        </div>
+        <!-- Semesters -->
+        <div>
+          <!-- Sem 1 -->
+          <span class="text-xs text-gray-400 dark:text-gray-600 font-semibold px-1">Semester 1</span>
+          <div class="grid grid-cols-4 gap-5 relative">
+            {% for slot in range(1,5) %}
+              {% set key = (y*2+1, slot) %}
+              {% set cell = grid_units.get(key) %}
+              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex items-stretch justify-stretch flex-col px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}">
+                {% if cell %}
+                <div class="flex flex-col h-full w-full p-1 rounded-lg border border-gray-300 cursor-move gap-1 bg-white dark:bg-gray-900 shadow-sm unit overflow-hidden" draggable="true" style="min-width:0;">
+                  <span class="flex-grow font-bold text-xs leading-tight truncate" style="min-width:0; word-break:break-word;">{{ cell.name }}</span>
+                  <div class="flex flex-wrap gap-1 items-center mt-0">
+                    {% if cell.semester1 %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-blue-100 text-blue-800">Sem 1</span>
+                    {% endif %}
+                    {% if cell.semester2 %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-green-100 text-green-800">Sem 2</span>
+                    {% endif %}
+                    {% if cell.exam %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-red-100 text-red-700">Exam</span>
+                    {% endif %}
+                    <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-slate-200 text-slate-700">{{ cell.code }}</span>
+                  </div>
+                </div>
+                {% else %}
+                <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+            <!-- Divider & Sem 2 -->
+            <div class="absolute left-0 right-0 mx-2 top-[calc(50%)] h-0.5 bg-gray-100 dark:bg-gray-800 rounded" style="z-index:1;"></div>
+            <span class="mt-8 col-span-4 text-xs text-gray-400 dark:text-gray-600 font-semibold px-1">Semester 2</span>
+            {% for slot in range(1,5) %}
+              {% set key = (y*2+2, slot) %}
+              {% set cell = grid_units.get(key) %}
+              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex items-stretch justify-stretch flex-col px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}" ...>
+                {% if cell %}
+                <div class="flex items-center p-2 rounded-lg border border-gray-300 mb-2 cursor-move gap-2 bg-white dark:bg-gray-900 shadow-sm unit" draggable="true">
+                  <span class="flex-grow font-semibold">{{ cell.name }}</span>
+                  <div class="flex flex-wrap gap-1 items-center ml-2">
+                    <span class="tag px-2 py-1 text-xs rounded font-semibold inline-block bg-green-100 text-green-800">Sem 2</span>
+                    {% if cell.exam %}
+                    <span class="tag px-2 py-1 text-xs rounded font-semibold inline-block bg-red-100 text-red-700">Exam</span>
+                    {% endif %}
+                    <span class="tag px-2 py-1 text-xs rounded font-semibold inline-block bg-slate-200 text-slate-700">{{ cell.code }}</span>
+                  </div>
+                </div>
+                {% else %}
+                <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
+                {% endif %}
+              </div>
+            {% endfor %}
           </div>
-        {% endif %}
-        {% for c in range(2,6) %}
-          <div class="border-2 col-start-{{ c }} row-start-{{ r }} rounded-lg bg-gray-200 dark:bg-dark-border unit-cell" data-key="{{ r }},{{ c-1 }}">
-            {%- set cell = grid_units.get((r, c-1)) -%}
-            {% if cell %}
-              <div class="p-2 rounded text-center cursor-move text-xs unit" draggable="true">{{ cell.name }} ({{ cell.code }})</div>
-            {% endif %}
-          </div>
-        {% endfor %}
+        </div>
+      </section>
       {% endfor %}
     </div>
-    <script src="{{ url_for('static', filename='js/create.js') }}"></script>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/create.js') }}"></script>
 {% endblock %}
