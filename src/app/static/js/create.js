@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveButton  = document.getElementById('saveButton');
     const unitList    = document.getElementById('unitList');
     const planName    = document.getElementById('planName');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const dropZones   = Array
         .from(document.querySelectorAll('.flex-grow > div.border-2'))
         .filter(el => !el.classList.contains('year'));
@@ -273,7 +274,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch('/plans/save', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ plan_name: name, units })
         })
             .then(res => res.json())

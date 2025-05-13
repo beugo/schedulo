@@ -4,6 +4,8 @@ let friend_requests = [];
 let input;
 let debounceTimer;
 
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
 document.addEventListener("DOMContentLoaded", function() {
     tbody = document.getElementById('friendTable');
     input = document.getElementById('searchInput');
@@ -34,7 +36,8 @@ document.addEventListener("DOMContentLoaded", function() {
                                 method: 'POST',
                                 body: JSON.stringify({ q: person.username }),
                                 headers: {
-                                    'Content-Type': 'application/json'
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': csrfToken
                                 } 
                             }).then(response => { response.json().then( res => {
                                     if (res.ok){
@@ -59,7 +62,8 @@ function deleteFriend(username){
         method: 'PATCH',
         body: JSON.stringify({ q: username }),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
         } 
     }).then(response => { response.json().then( res => {
             if (res.ok){
@@ -135,7 +139,8 @@ function acceptFriendRequest(username, req) {
         method: 'POST',
         body: JSON.stringify({ q: username }),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
         } 
     }).then(response => { response.json().then( res => {
             if (res.ok){
@@ -154,7 +159,8 @@ function removeFriendRequest(username, req) {
         method: 'PATCH',
         body: JSON.stringify({ q: username }),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
         } 
     }).then(response => response.json().then(res => {
       if (res.ok) req.closest('div.border').remove();
