@@ -1,6 +1,4 @@
-import unittest
-import tempfile
-import csv
+import unittest, tempfile, csv
 from app import create_app, db
 from app.config import TestConfig
 from app.seeds import import_units, create_users_and_plans
@@ -9,61 +7,59 @@ from app.models import Unit, User, UnitPlan, UnitPlanToUnit
 class TestSeeds(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
+        self.ctx = self.app.app_context()
+        self.ctx.push()
         db.create_all()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        self.app_context.pop()
+        self.ctx.pop()
 
-    def test_import_units_creates_units(self):
-        # Create a temporary CSV file
-        rows = [
-            ['Unit Name','Unit Code','Semesters','Exam','URL','Unit Coordinator','Prerequisites','Description','Contact Hours'],
-            ['Test Unit1','TU1','Semester 1, Semester 2','Yes','http://example.com','Coord','None','Desc','[["Lecture",2]]'],
-            ['Test Unit2','TU2','Semester 2','No','http://example.org','Coord2','TU1','Desc2','[["Lab",1]]']
-        ]
+    def make_tmp_csv(self, rows):
         tmp = tempfile.NamedTemporaryFile(mode='w', newline='', delete=False)
         writer = csv.writer(tmp)
         writer.writerows(rows)
         tmp.close()
+        return tmp.name
 
-        import_units(db.session, tmp.name)
-        units = Unit.query.all()
-        self.assertEqual(len(units), 2)
+    def test_import_units_creates_units(self):
+        rows = [
+            ['Unit Name','Unit Code','Semesters','Exam','URL','Unit Coordinator','Prerequisites','Description','Contact Hours'],
+            ['U1','C001','Semester 1, Semester 2','Yes','u1','coord','none','desc','[["Lec",2]]'],
+            ['U2','C002','Semester 2','No','u2','coord2','C001','desc2','[["Lab",1]]'],
+        ]
+        path = self.make_tmp_csv(rows)
+        import_units(db.session, path)
 
-        u1 = Unit.query.filter_by(unit_code='TU1').first()
-        self.assertTrue(u1.semester1)
-        self.assertTrue(u1.semester2)
-        self.assertTrue(u1.exam)
+        all_units = Unit.query.all()
+        self.assertEqual(len(all_units), 2)
 
-        u2 = Unit.query.filter_by(unit_code='TU2').first()
+        u1 = Unit.query.filter_by(unit_code='C001').one()
+        self.assertTrue(u1.semester1 and u1.semester2 and u1.exam)
+
+        u2 = Unit.query.filter_by(unit_code='C002').one()
         self.assertFalse(u2.semester1)
         self.assertTrue(u2.semester2)
         self.assertFalse(u2.exam)
 
     def test_create_users_and_plans(self):
-        # Import at least one unit so plans can reference units
-        rows = [
+        # seed one unit so plans can attach
+        unit_csv = [
             ['Unit Name','Unit Code','Semesters','Exam','URL','Unit Coordinator','Prerequisites','Description','Contact Hours'],
-            ['Solo Unit','SU','Semester 1','No','http://example.test','Coord','None','Desc','[["Lecture",1]]']
+            ['Solo','SU','Semester 1','No','su','c','none','d','[["Lec",1]]'],
         ]
-        tmp = tempfile.NamedTemporaryFile(mode='w', newline='', delete=False)
-        writer = csv.writer(tmp)
-        writer.writerows(rows)
-        tmp.close()
-
-        import_units(db.session, tmp.name)
+        path = self.make_tmp_csv(unit_csv)
+        import_units(db.session, path)
         create_users_and_plans(db.session)
 
-        users = User.query.all()
-        self.assertEqual(len(users), 8)
+        users = {u.username for u in User.query.all()}
+        self.assertSetEqual(users, {'hugo','joel','prashan','nathan'})
 
-        for u in users:
-            plans = UnitPlan.query.filter_by(user_id=u.id).all()
-            self.assertLessEqual(len(plans), 2)
+        # hugo/joel/prashan have 2 plans each, nathan has 0
+        for name in ('hugo','joel','prashan'):
+            plans = UnitPlan.query.filter_by(user_id=User.query.filter_by(username=name).one().id)
+            self.assertEqual(plans.count(), 2)
             for p in plans:
                 links = UnitPlanToUnit.query.filter_by(unit_plan_id=p.id).all()
                 self.assertGreaterEqual(len(links), 1)

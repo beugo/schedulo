@@ -6,14 +6,14 @@ from app.models import User
 class TestModels(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
+        self.ctx = self.app.app_context()
+        self.ctx.push()
         db.create_all()
 
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        self.app_context.pop()
+        self.ctx.pop()
 
     def test_set_and_check_password(self):
         u = User(username='testuser')
@@ -23,8 +23,8 @@ class TestModels(unittest.TestCase):
 
     def test_password_hash_changes(self):
         u = User(username='hashuser')
-        u.set_password('pass1')
-        first_hash = u.password_hash
-        u.set_password('pass2')
-        second_hash = u.password_hash
-        self.assertNotEqual(first_hash, second_hash)
+        u.set_password('first')
+        h1 = u.password_hash
+        u.set_password('second')
+        h2 = u.password_hash
+        self.assertNotEqual(h1, h2)
