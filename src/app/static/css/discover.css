@@ -1,5 +1,5 @@
 #unit:hover {
-  border: 1px solid lightblue !important;
+  border:  2px solid lightblue !important;
 }
 #unit {
   transition: border 0.3s ease;

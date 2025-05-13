@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 from app.models import Unit, UnitPlan, UnitPlanToUnit
+import json
 
 main_bp = Blueprint("main", __name__)
 
@@ -73,4 +74,40 @@ def friends_page():
 @main_bp.route("/discover")
 @login_required
 def discover():
-    return render_template("discover_unit.html")
+    unit_info = {
+        "unit_name": "",
+        "unit_code": "",
+        "exam": "",
+        "url": "",
+        "unit_coordinator": "",
+        "contact_hours": "",
+        "prerequisites": "",
+        "description": "",
+        "semesterOne": "",
+        "semesterTwo": "",
+    }
+
+    unit_id = request.args.get('id')
+    if unit_id:
+        unit = Unit.query.filter_by(id=unit_id).first()
+        contact_hours_raw = unit.contact_hours
+        try:
+            contact_hours = json.loads(contact_hours_raw)
+        except (TypeError, json.JSONDecodeError):
+            contact_hours = []
+
+        if unit:
+            unit_info = {
+                "unit_name": unit.unit_name,
+                "unit_code": unit.unit_code,
+                "exam": unit.exam,
+                "url": unit.url,
+                "unit_coordinator": unit.unit_coordinator,
+                "contact_hours": contact_hours,
+                "prerequisites": unit.prerequisites,
+                "description": unit.description,
+                "semesterOne": unit.semester1,
+                "semesterTwo": unit.semester2,
+            }
+
+    return render_template("discover_unit.html", **unit_info)

@@ -8,9 +8,12 @@ document.addEventListener("DOMContentLoaded", function() {
     units.forEach(unit => {
       const div = document.createElement("div");
       div.id = "unit"
-      div.className = "p-4 mb-4 rounded-2xl bg-white transition bg-white dark:bg-dark-fg border-4 dark:border-dark-border shadow ext-gray-600 dark:text-dark-secondary";
+      div.className = "p-4 mb-4 rounded-2xl bg-white transition bg-white dark:bg-dark-fg border-2 dark:border-dark-border shadow ext-gray-600 dark:text-dark-secondary";
+      div.onclick = () => {
+        window.location.href = `discover?id=${unit.id}`;
+      }
       div.innerHTML = `
-        <a href="${unit.url}" target="_blank" class="text-xl font-semibold text-blue-600 hover:underline">
+        <a target="_blank" class="text-xl font-semibold text-blue-600">
           ${unit.unit_code}: ${unit.unit_name}
         </a>
         <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">${unit.description}</p>
