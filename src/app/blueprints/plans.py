@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from flask_login import current_user
 from app import db
 from app.models import Unit, UnitPlan, UnitPlanToUnit, UserFriend, Post
@@ -111,7 +111,7 @@ def save_plan():
 @plans_bp.route("/user", methods=["GET"])
 def get_plans():
     if not current_user.is_authenticated:
-        return jsonify({"ok": False, "message": "Not logged in"}), 401
+        redirect(url_for("auth.register_page"))
     plans = UnitPlan.query.filter_by(
         user_id=current_user.id, is_deleted=False).all()
 
