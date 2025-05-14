@@ -409,6 +409,13 @@ document.addEventListener('DOMContentLoaded', () => {
             badge.style.zIndex = 20;
             div.style.position = 'relative';
             div.appendChild(badge);
+
+            // create tooltip
+            const tooltipText = groups
+                .map(group => group.join(' AND '))
+                .join(' OR ');
+
+            div.setAttribute('title', `Requires: ${tooltipText}`);
             }
         });
     }
