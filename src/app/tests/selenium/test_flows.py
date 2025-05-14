@@ -55,3 +55,39 @@ class AuthFlowTests(BaseSeleniumTest):
         self.driver.find_element(By.LINK_TEXT, "Logout").click()
         sleep(2)
         self.assertIn(BASE_URL + "/", self.driver.current_url)
+
+class UnitCreateFlowTests(BaseSeleniumTest):
+    def setUp(self):
+        super().setUp()
+        self.login("hugo", "password")
+        self.driver.get(f"{BASE_URL}/create")
+
+    def test_prefill_template_applies_units(self):
+        select = self.driver.find_element(By.ID, "prefillSelect")
+        select.click()
+        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cs']").click()
+
+        sleep(1) 
+
+        unit_cells_with_units = self.driver.find_elements(By.CSS_SELECTOR, ".unit-cell > .unit")
+
+        self.assertGreater(len(unit_cells_with_units), 5, "Prefill template should populate at least 6 unit cells")
+
+    def test_save_unit_plan_and_redirect(self):
+        select = self.driver.find_element(By.ID, "prefillSelect")
+        select.click()
+        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cs']").click()
+
+        sleep(1)  
+
+        plan_input = self.driver.find_element(By.ID, "planName")
+        plan_input.clear()
+        plan_input.send_keys("My Selenium Plan")
+
+        self.driver.find_element(By.ID, "saveButton").click()
+
+        alert = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".alert.success")))
+        self.assertIn("success", alert.text.lower())
+
+        self.wait.until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)

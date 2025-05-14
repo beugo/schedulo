@@ -53,3 +53,9 @@ class TestFriendRequests(unittest.TestCase):
         pending = resp2.get_json()
         usernames = [r['username'] for r in pending]
         self.assertIn('hugo', usernames)
+    
+    def test_duplicate_friend_request_blocked(self):
+        self.login()
+        self.client.post("/friend_requests/send", json={"q": "nathan"})
+        second = self.client.post("/friend_requests/send", json={"q": "nathan"})
+        self.assertEqual(second.status_code, 400)
