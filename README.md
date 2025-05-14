@@ -65,13 +65,12 @@ This tool helps new UWA Computer Science students plan their degree over three y
 1. **Running Unit Tests**
 ```
 cd src
-python -m unittest app/tests/test_unittests.py
+python run_unit_tests.py
 ```
 
 2. **Running Selenium Tests**
-- Please first ensure that you are not already running the app locally.
 ```
 cd src
-python -m unittest app/tests/test_selenium.py
+python run_selenium_tests.py
 ```
 
