@@ -455,16 +455,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Show error if any
             if (unsatisfied.length > 0) {
-                let msg = "You are missing prerequisites for the following units:\n\n";
-                for (const u of unsatisfied) {
-                    msg += `• ${u.unit}\n   requires one of:\n`;
-                    u.groups.forEach(g => {
-                        msg += `     - ${g.join(' AND ')}\n`;
-                    });
+                let html = `<div>You are missing prerequisites for the following units:</div><ul>`;
+                for (const {unit, groups} of unsatisfied) {
+                    html += `<li><strong>${unit}</strong>: `;
+                    if (groups.length === 1) {
+                    html += groups[0].join(' and ');
+                    } else {
+                    html += `Choose one of:<ul>`;
+                    for (const grp of groups) {
+                        html += `<li>${grp.join(' and ')}</li>`;
+                    }
+                    html += `</ul>`;
+                    }
+                    html += `</li>`;
                 }
-                alert(msg);
-                return;
-            } 
+                html += `</ul>`;
+
+                createAlert(html, 'error');
+            return;
+            }
 
             fetch('/plans/save', {
                 method: 'POST',
