@@ -52,66 +52,70 @@ function renderPlansTable(plans) {
 function renderPosts(posts) {
   const feed = document.getElementById("postFeed");
   feed.innerHTML = "";
-  if (posts.length === 0) {
-    const div = document.createElement("div");
-    div.className = "w-full bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-6 shadow text-center text-gray-600 dark:text-dark-secondary";
-    div.innerHTML = `Your friend feed is empty for now. When friends share unit plans, they’ll appear here!`;
-    feed.appendChild(div);
-  } else {
-    posts.forEach(post => {
-      const div = document.createElement("div");
-      div.id = "post";
-      div.onclick = () => {
-        window.location.href = `/plans/view?id=${post.id}`;
-      };
-      div.className = "bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-4 shadow h-[45vh]";
-      div.innerHTML = `
-              <div class="flex flex-col h-full gap-4">
-                <div class="flex flex-row items-center text-center">
-                  <h3 class="font-bold text-lg">${post.unit_plan.name}</h3>
-                  <div class="flex flex-grow"></div>
-                  <p class="text-sm text-gray-500">${post.user_name} • ${new Date(post.posted_at).toLocaleString()}</p>
-                </div>
-                <div class="grid h-full w-full flex-grow" style="grid-template-columns: repeat(4, 20%); grid-template-rows: repeat(6, 12%); justify-content: center; align-content: space-between; gap: 15px;">
-                  <!-- Year 1 -->
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-1 row-start-1 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 1)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-2 row-start-1 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 1)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-3 row-start-1 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 1)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-4 row-start-1 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 1)}</div>
 
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-1 row-start-2 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 2)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-2 row-start-2 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 2)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-3 row-start-2 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 2)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-purple-500 col-start-4 row-start-2 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 2)}</div>
-
-                  <!-- Year 2 -->
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-1 row-start-3 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 3)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-2 row-start-3 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 3)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-3 row-start-3 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 3)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-4 row-start-3 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 3)}</div>
-
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-1 row-start-4 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 4)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-2 row-start-4 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 4)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-3 row-start-4 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 4)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-orange-500 col-start-4 row-start-4 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 4)}</div>
-
-                  <!-- Year 3 -->
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-1 row-start-5 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 5)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-2 row-start-5 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 5)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-3 row-start-5 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 5)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-4 row-start-5 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 5)}</div>
-
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-1 row-start-6 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 1, 6)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-2 row-start-6 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 2, 6)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-3 row-start-6 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 3, 6)}</div>
-                  <div class="flex justify-center items-center text-xs border-2 border-pink-400 col-start-4 row-start-6 rounded-lg bg-gray-200 border dark:bg-dark-border">${getText(post.unit_plan.units, 4, 6)}</div>
-              </div>
-            </div>
-          `;
-      feed.appendChild(div);
-    });
+  if (!posts.length) {
+    const emptyCard = document.createElement("div");
+    emptyCard.className = "w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow text-center text-gray-600 dark:text-gray-400";
+    emptyCard.innerHTML = `
+      <span class="text-sm font-semibold">Feed Empty</span>
+      <p>Your friend feed is empty for now.</p>
+      <p class="text-xs">When friends share unit plans, they'll appear here!</p>
+    `;
+    feed.appendChild(emptyCard);
+    return;
   }
-};
+  // Made this a loop to reduce some of the lines of code
+  posts.forEach(post => {
+    const card = document.createElement("div");
+    card.className = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow cursor-pointer flex flex-col gap-2";
+    card.onclick = () => window.location.href = `/plans/view?id=${post.id}`;
+
+    // title
+    const header = document.createElement("div");
+    header.className = "flex items-center justify-between text-sm";
+    header.innerHTML = `
+      <strong class="text-base truncate">${post.unit_plan.name}</strong>
+      <span class="text-xs text-gray-500 dark:text-gray-400">${post.user_name} • ${new Date(post.posted_at).toLocaleDateString()}</span>
+    `;
+    card.appendChild(header);
+
+    // unit grid, man i wish this was in typescript
+    const grid = document.createElement("div");
+    grid.className = "grid grid-cols-4 grid-rows-8 gap-1 flex-grow";
+    for (let row = 1; row <= 8; row++) {
+      for (let col = 1; col <= 4; col++) {
+        const cell = document.createElement("div");
+        const bgClass =
+          row <= 2 ? 'bg-purple-50 dark:bg-purple-900/50' :
+          row <= 4 ? 'bg-orange-50 dark:bg-orange-900/50' :
+          row <= 6 ? 'bg-pink-50 dark:bg-pink-900/40' :
+                    'bg-cyan-50 dark:bg-cyan-900/40';
+        cell.className = `border border-gray-300 dark:border-gray-600 rounded ${bgClass} p-1 h-12 flex flex-col items-start justify-start text-xs overflow-hidden`;
+
+        const unit = post.unit_plan.units.find(u => u.col === col && u.row === row);
+        if (unit) {
+          const nameDiv = document.createElement("div");
+          nameDiv.className = "font-semibold text-sm text-gray-800 dark:text-white truncate w-full";
+          nameDiv.title = unit.unitname;
+          nameDiv.textContent = unit.unitname;
+
+          const codeDiv = document.createElement("div");
+          codeDiv.className = "text-xs text-gray-500 dark:text-gray-400 truncate w-full";
+          codeDiv.title = unit.unitcode;
+          codeDiv.textContent = unit.unitcode;
+
+          cell.appendChild(nameDiv);
+          cell.appendChild(codeDiv);
+        }
+        grid.appendChild(cell);
+      }
+    }
+    card.appendChild(grid);
+    feed.appendChild(card);
+  });
+}
+
+
 
 function getText(units, col, row) {
   const unit = units.find(u => u.col === col && u.row === row);
