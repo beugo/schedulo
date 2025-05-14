@@ -140,7 +140,7 @@ def view_plan():
         Post.user_id.in_(friend_ids),
         Post.is_deleted == False
     )
-
+    # find all the units in the unit plan
     plan = UnitPlan.query.filter(
         UnitPlan.id == plan_id,
         UnitPlan.is_deleted == False,
@@ -152,7 +152,6 @@ def view_plan():
     if not plan:
         return jsonify({"ok": False, "message": "Plan not found"}), 404
 
-    # pind all the units in the unit plan
     plan_units = UnitPlanToUnit.query.filter_by(
         unit_plan_id=plan.id,
         is_deleted=False
@@ -168,37 +167,42 @@ def view_plan():
                 "code": unit.unit_code
             })
 
-    # make a ordered dict for the actual plan.
-    year_cols = {
-        1: {1: [], 2: [], 3: [], 4: []},
-        2: {1: [], 2: [], 3: [], 4: []},
-        3: {1: [], 2: [], 3: [], 4: []},
-        4: {1: [], 2: [], 3: [], 4: []}
-    }
+     #make a ordered dict for the actual plan.
+    year_cols = {year: {col: [] for col in range(1, 9)} for year in range(1, 5)}
 
     # seperate the semesters into years(might not need later on)
     def get_year(row):
         if row in (1, 2):
             return 1
-        if row in (3, 4):
+        elif row in (3, 4):
             return 2
-        if row in (5, 6):
+        elif row in (5, 6):
             return 3
-        if row in (7, 8):
+        elif row in (7, 8):
             return 4
         return None
 
     # populate the dict
     # there has to be a better way of doing this?
+    def get_column_index(row, col):
+        if row % 2 == 1:
+            return col
+        else:
+            return col + 4
+
     for pu in plan_units:
         unit = Unit.query.get(pu.unit_id)
         if not unit:
             continue
-        unit_info = {"name": unit.unit_name, "code": unit.unit_code}
         year = get_year(pu.row)
-        col = pu.col
-
-        year_cols[year][col].append(unit_info)
+        if year is None:
+            continue
+        col_index = get_column_index(pu.row, pu.col)
+        if 1 <= col_index <= 8:
+            year_cols[year][col_index].append({
+                "name": unit.unit_name,
+                "code": unit.unit_code
+            })
 
     return render_template(
         "viewonlyplan.html",
