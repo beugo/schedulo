@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const planName     = document.getElementById('planName');
     const cellSelector = '.unit-cell';
     const dropZones    = Array.from(document.querySelectorAll(cellSelector));
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     let allUnits = [];
     let availableUnits = [];
     let placedUnits = {}; // cell key is unit_code
@@ -402,7 +403,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!units.length) return createAlert('Please place at least one unit.', 'error');
             fetch('/plans/save', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
                 body: JSON.stringify({ plan_name: name, units })
             })
             .then(res => res.json())

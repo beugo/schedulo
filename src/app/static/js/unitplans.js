@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
   const input = document.getElementById('searchInput');
   const tbody = document.getElementById('unitTableBody');
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+  
   let allUnits = [];
 
   function renderTable(units) {
@@ -42,7 +44,8 @@ function post_share(id) {
     method: 'POST',
     body: JSON.stringify({ id: id }),
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken
     }
   }).then(response => {
     response.json().then(res => {
@@ -59,7 +62,8 @@ function post_delete(id) {
     method: 'POST',
     body: JSON.stringify({ id: id }),
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-CSRFToken': csrfToken
     }
   }).then(response => {
     response.json().then(res => {

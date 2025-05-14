@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{% endblock %}</title>
+
+  <!-- CSRF Protections -->
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   
   <!-- TailwindCSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
