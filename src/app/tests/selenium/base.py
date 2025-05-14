@@ -4,7 +4,7 @@ import unittest
 from werkzeug.serving import make_server
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.common.by import By
 
 from app import create_app, db
@@ -30,9 +30,9 @@ class BaseSeleniumTest(unittest.TestCase):
         cls.server_thread.start()
 
         time.sleep(1)  
-        chrome_opts = Options()
-        chrome_opts.add_argument("--headless")
-        cls.driver = webdriver.Chrome(options=chrome_opts)
+        firefox_opts = FirefoxOptions()
+        firefox_opts.add_argument("--headless") # comment this out to debug
+        cls.driver = webdriver.Firefox(options=firefox_opts)
 
         cls.wait = WebDriverWait(cls.driver, 2)
 
