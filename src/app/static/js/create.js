@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'w-full', 'h-full',
             'p-2', 'rounded-lg', 'border',
             'border-gray-300','dark:border-gray-700', 'cursor-move', 'gap-1',
-            'bg-white', 'dark:bg-gray-900', 'shadow-sm'
+            'bg-white', 'dark:bg-dark-fg', 'shadow-sm'
           ].join(' ');
         div.setAttribute('data-code', unit.unit_code);
         div.style.minWidth = "0";

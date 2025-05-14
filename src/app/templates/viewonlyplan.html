@@ -3,7 +3,7 @@
 {% block content %}
 <div class="w-full flex flex-col lg:flex-row gap-8 min-h-[80vh]">
   <!-- Side Info Panel -->
-  <aside class="flex flex-col rounded-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[26%] p-6 gap-7">
+  <aside class="flex flex-col rounded-2xl bg-white dark:bg-dark-fg  border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[26%] p-6 gap-7">
     <div>
       <span class="uppercase text-xs text-gray-400 tracking-widest">Plan Overview</span>
       <h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-2 flex items-center gap-2">
@@ -12,7 +12,7 @@
     </div>
     <div>
       <h3 class="font-semibold text-gray-700 dark:text-gray-100 text-lg mb-2 tracking-tight">Units Included</h3>
-      <ul class="divide-y divide-gray-100 dark:divide-gray-800 bg-gray-50 dark:bg-gray-900 rounded-xl p-4 max-h-[50vh] overflow-y-auto shadow-inner scroll-smooth">
+      <ul class="divide-y divide-gray-100 dark:divide-gray-800 bg-gray-50 dark:bg-dark-bg rounded-xl p-4 max-h-[50vh] overflow-y-auto shadow-inner scroll-smooth">
         {% if plan_units_list %}
           {% for unit in plan_units_list %}
             <li class="py-2 flex items-center gap-3 group">
@@ -60,7 +60,7 @@
             {% for col_key in [1, 2, 3, 4] %}
               <div class="flex flex-col gap-5">
                 {% for unit in year_units[col_key] %}
-                  <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-900/80 shadow-sm px-4 py-3 group hover:ring-2 hover:ring-blue-400/40 transition-all h-24 flex flex-col justify-center">
+                  <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-dark-bg  shadow-sm px-4 py-3 group hover:ring-2 hover:ring-blue-400/40 transition-all h-24 flex flex-col justify-center">
                     <div class="text-sm font-semibold text-gray-800 dark:text-white mb-0.5 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
                       {{ unit.name }}
                     </div>

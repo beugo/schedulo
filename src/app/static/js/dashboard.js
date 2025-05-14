@@ -55,7 +55,7 @@ function renderPosts(posts) {
 
   if (!posts.length) {
     const emptyCard = document.createElement("div");
-    emptyCard.className = "w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow text-center text-gray-600 dark:text-gray-400";
+    emptyCard.className = "w-full bg-white dark:bg-dark-fg border border-gray-200 dark:border-dark-border rounded-lg p-4 shadow text-center text-gray-600 dark:text-gray-400";
     emptyCard.innerHTML = `
       <span class="text-sm font-semibold">Feed Empty</span>
       <p>Your friend feed is empty for now.</p>
@@ -67,7 +67,7 @@ function renderPosts(posts) {
   // Made this a loop to reduce some of the lines of code
   posts.forEach(post => {
     const card = document.createElement("div");
-    card.className = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow cursor-pointer flex flex-col gap-2";
+    card.className = "bg-white dark:bg-dark-fg border border-gray-200 dark:border-dark-border rounded-lg p-4 shadow-sm hover:shadow cursor-pointer flex flex-col gap-2";
     card.onclick = () => window.location.href = `/plans/view?id=${post.id}`;
 
     // title
