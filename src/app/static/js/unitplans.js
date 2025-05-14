@@ -1,7 +1,8 @@
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
 document.addEventListener("DOMContentLoaded", function() {
   const input = document.getElementById('searchInput');
   const tbody = document.getElementById('unitTableBody');
-  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
   
   let allUnits = [];
 
