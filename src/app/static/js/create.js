@@ -77,23 +77,60 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ───── Initial render of grid ─────
-    function applyInitialPlan() {
-        const init = window.INIT_PLAN || { name: '', units: {} };
+    async function applyInitialPlan() {
+        // 1) fetch existing plan 
+        let init = { name: '', units: [] };
+        const planId = new URLSearchParams(window.location.search).get('id');
+        if (planId) {
+          try {
+            const resp = await fetch(`/plans/get?id=${planId}`, { credentials: 'include' });
+            const body = await resp.json();
+            if (resp.ok && body.ok) init = body.plan;
+            else console.warn('Could not load plan:', body.message);
+          } catch (err) {
+            console.error('Error fetching plan:', err);
+          }
+        }
+      
+        // 2) clear everything & set the plan‐name
+        clearGrid();
         planName.value = init.name || '';
         placedUnits = {};
-        dropZones.forEach(cell => {
-            cell.innerHTML = getPlaceholderHtml();
-            const key = cell.dataset.key;
-            if (key && init.units[key]) {
-                const um = new UnitModel(init.units[key]);
-                const div = createUnitDiv(um);
-                cell.innerHTML = '';
-                cell.appendChild(div);
-                placedUnits[key] = um.unit_code;
-            }
+      
+        // 3) normalise into an array if it was an object
+        const unitsArray = Array.isArray(init.units)
+          ? init.units
+          : Object.values(init.units);
+      
+        // 4) for each saved entry in the users saved plan, place the corrsponding unit into the grid
+        unitsArray.forEach(u => {
+          const { row, col } = u;
+          const key = `${row},${col}`;
+          const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
+      
+          // Build the unitmodel payload 
+          const dataForModel = {
+            unit_name:  u.unitname,
+            unit_code:  u.unitcode,
+            semester1:  u.semester1,
+            semester2:  u.semester2,
+            exam:       u.exam
+          };
+      
+          const uintm  = new UnitModel(dataForModel);
+          const div = createUnitDiv(uintm);
+      
+          cell.innerHTML = '';
+          cell.appendChild(div);
+          placedUnits[key] = uintm.unit_code;
         });
+      
+        // 5) rebuild sidebar and validate
+        resetAvailableUnits();
+        renderUnitList(availableUnits);
         validateAllCells();
-    }
+      }
+
     // ───── Prefill template logic ─────
     function setupPrefillHandler() {
         const select = document.getElementById('prefillSelect');

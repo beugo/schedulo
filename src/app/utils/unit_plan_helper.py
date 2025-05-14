@@ -16,7 +16,10 @@ def get_plan_core_info(plan_id, user_id):
                 "unitname": unit.unit_name,
                 "unitcode": unit.unit_code,
                 "row": u.row,
-                "col": u.col
+                "col": u.col,
+                "semester1": unit.semester1,
+                "semester2": unit.semester2,
+                "exam": unit.exam
             })
 
     return {

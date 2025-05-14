@@ -1,13 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Create Plan{% endblock %}
 {% block content %}
-<script>
-  // change this to be client side js later
-  window.INIT_PLAN = {
-    name: {{ plan_name|tojson }},
-    units: {{ grid_units|tojson }},
-  };
-</script>
 <div class="w-full flex flex-col lg:flex-row gap-8 min-h-[80vh]">
   <!-- Side Panel -->
   <aside class="flex flex-col rounded-2xl bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[30%] p-6 gap-7">
