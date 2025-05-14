@@ -2,8 +2,12 @@ import csv
 import json
 import ast
 import random
+from itertools import combinations
 
-from .models import Unit, User, UnitPlan, UnitPlanToUnit
+from .models import (
+    Unit, User, UnitPlan, UnitPlanToUnit,
+    UserFriend, Post
+)
 
 
 def import_units(db_session, csv_path):
@@ -59,11 +63,9 @@ def import_units(db_session, csv_path):
             }
 
             if unit:
-                # Update existing record
                 for field, value in data.items():
                     setattr(unit, field, value)
             else:
-                # Create new unit
                 unit = Unit(**data)
                 db_session.add(unit)
 
@@ -72,54 +74,72 @@ def import_units(db_session, csv_path):
 
 def create_users_and_plans(db_session):
     """
-    Create 8 default users (user1..user8) and 0-2 random unit plans per user.
-    Existing users or plans are skipped to avoid duplicates.
+    Seed users & plans for testing:
+      - hugo, joel, prashan: mutual friends, 2 plans each, each plan has 3–4 units
+        joel & prashan’s plans are “shared” via Post entries
+      - nathan: no friends, no plans
     """
-    # Seed users
-    users = []
-    for i in range(1, 9):
-        username = f"user{i}"
-        user = db_session.query(User).filter_by(username=username).first()
-        if not user:
-            user = User(username=username)
-            user.set_password("password")
-            db_session.add(user)
-            db_session.flush() 
-        users.append(user)
+    names = ["hugo", "joel", "prashan", "nathan"]
+    users = {}
+    for name in names:
+        u = db_session.query(User).filter_by(username=name).first()
+        if not u:
+            u = User(username=name)
+            u.set_password("password")
+            db_session.add(u)
+            db_session.flush()
+        users[name] = u
+
     db_session.commit()
 
-    # Fetch all units for plan linking
-    units = db_session.query(Unit).all()
+    trio = ["hugo", "joel", "prashan"]
+    db_session.query(UserFriend).delete()
+    db_session.flush()
 
-    # Seed unit plans and links
-    for user in users:
-        # If user already has plans, skip
-        existing = db_session.query(UnitPlan).filter_by(user_id=user.id).first()
-        if existing:
-            continue
+    for a, b in combinations(trio, 2):
+        db_session.add(UserFriend(
+            user_id=users[a].id,
+            friend_id=users[b].id
+        ))
+    db_session.commit()
 
-        num_plans = random.randint(0, 2)
-        for idx in range(1, num_plans + 1):
-            plan = UnitPlan(user_id=user.id, name=f"{user.username}'s Plan {idx}")
+    all_units = db_session.query(Unit).all()
+    db_session.query(UnitPlanToUnit).delete()
+    db_session.query(UnitPlan).delete()
+    db_session.flush()
+
+    for name in trio:
+        user = users[name]
+        for idx in (1, 2):
+            plan = UnitPlan(
+                user_id=user.id,
+                name=f"{name.title()}'s Plan {idx}"
+            )
             db_session.add(plan)
-            db_session.flush() 
+            db_session.flush()
 
-            # Pick 1-4 random units
-            chosen_units = random.sample(units, k=random.randint(1, min(4, len(units))))
-            used_positions = set()
-            for unit in chosen_units:
-                # Ensure unique grid position
-                while True:
-                    row = random.randint(0, 7)
-                    col = random.randint(0, 3)
-                    if (row, col) not in used_positions:
-                        used_positions.add((row, col))
-                        break
-                link = UnitPlanToUnit(
+            sample_units = random.sample(all_units, min(4, len(all_units)))
+            for i, unit in enumerate(sample_units):
+                row = (i // 2) + 1    # rows 1,1,2,2
+                col = (i % 2) + 1     # cols 1,2,1,2
+                db_session.add(UnitPlanToUnit(
                     unit_plan_id=plan.id,
                     unit_id=unit.id,
                     row=row,
                     col=col
-                )
-                db_session.add(link)
+                ))
+
+    db_session.commit()
+
+    db_session.query(Post).delete()
+    db_session.flush()
+
+    for name in ("joel", "prashan"):
+        user = users[name]
+        for plan in db_session.query(UnitPlan).filter_by(user_id=user.id):
+            db_session.add(Post(
+                user_id=user.id,
+                unit_plan_id=plan.id
+            ))
+
     db_session.commit()
