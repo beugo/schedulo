@@ -1,10 +1,11 @@
 class UnitModel {
-    constructor({ unit_name, unit_code, semester1, semester2, exam }) {
+    constructor({ unit_name, unit_code, semester1, semester2, exam, prerequisites }) {
         this.unit_name = unit_name;
         this.unit_code = unit_code;
         this.semester1 = semester1;
         this.semester2 = semester2;
         this.exam = exam;
+        this.prerequisites = prerequisites || "";
     }
 }
 
@@ -401,6 +402,87 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             if (!units.length) return createAlert('Please place at least one unit.', 'error');
+
+            const placedWithTime = {};
+            for (let cell of dropZones) {
+                const div = cell.querySelector('.unit');
+                if (!div) continue;
+                const key = cell.dataset.key;
+                const [row, col] = key.split(',').map(Number);
+                const timeIndex = (row - 1) * 4 + col; 
+                const code = div.getAttribute('data-code');
+                placedWithTime[code] = timeIndex;
+
+                console.log(`Placed unit: ${code} at timeIndex ${timeIndex} (row ${row}, col ${col})`);
+            }
+
+            console.log("Final placedWithTime map:", placedWithTime);
+
+            // Check each unit's prerequisites
+            const unsatisfied = [];
+
+            for (let cell of dropZones) {
+                const div = cell.querySelector('.unit');
+                if (!div) continue;
+                const code = div.getAttribute('data-code');
+                const unit = allUnits.find(u => u.unit_code === code);
+                if (!unit) {
+                    console.warn(`Could not find unit data for code ${code}`);
+                    continue;
+                }
+
+                if (!unit.prerequisites) {
+                    console.log(`${code} has no prerequisites`);
+                    continue;
+                }
+
+                console.log(`Checking prereqs for ${code} with prereq string: ${unit.prerequisites}`);
+
+                const currentTime = placedWithTime[code];
+
+                const groups = unit.prerequisites
+                    .split('|')
+                    .map(group => group.trim().split('+').map(c => c.trim()));
+
+                console.log(`Parsed groups for ${code}:`, groups);
+
+                const satisfies = groups.some(group =>
+                    group.every(prereq => {
+                        const prereqTime = placedWithTime[prereq];
+                        const status = prereqTime !== undefined && prereqTime < currentTime;
+                        console.log(`Checking if ${prereq} is satisfied for ${code}:`, {
+                            prereqTime,
+                            currentTime,
+                            satisfied: status
+                        });
+                        return status;
+                    })
+                );
+
+                if (!satisfies && groups.length > 0 && groups[0][0] !== "") {
+                    console.warn(`${code} does NOT satisfy any prereq group`);
+                    unsatisfied.push({ unit: code, groups });
+                } else {
+                    console.log(`${code} prerequisites satisfied ✅`);
+                }
+            }
+
+            // Show error if any
+            if (unsatisfied.length > 0) {
+                console.warn("Unsatisfied prerequisites:", unsatisfied);
+                let msg = "You are missing prerequisites for the following units:\n\n";
+                for (const u of unsatisfied) {
+                    msg += `• ${u.unit}\n   requires one of:\n`;
+                    u.groups.forEach(g => {
+                        msg += `     - ${g.join(' AND ')}\n`;
+                    });
+                }
+                alert(msg);
+                return;
+            } else {
+                console.log("✅ All prerequisites satisfied. Proceeding to save.");
+            }
+
             fetch('/plans/save', {
                 method: 'POST',
                 headers: { 

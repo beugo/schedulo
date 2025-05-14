@@ -82,7 +82,8 @@ def recommended_units():
             "value": count,
             "exam": unit.exam,
             "semester1": unit.semester1,
-            "semester2": unit.semester2
+            "semester2": unit.semester2,
+            "prerequisites": unit.prerequisites or ""
         })
 
     return jsonify(recommended)
