@@ -334,7 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (unitDiv) {
                 const code = unitDiv.getAttribute('data-code');
                 const unit = allUnits.find(u => u.unit_code === code);
-                if (unit) validateSemesterPlacement(cell, unit);
+                if (unit) {
+                    validateSemesterPlacement(cell, unit);
+                    validatePrereqs();
+                }
             } else {
                 cell.classList.remove("ring-2", "ring-red-400");
                 const prevBadge = cell.querySelector('.semester-warning');
@@ -366,6 +369,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 unitDiv.appendChild(badge);
             }
         }
+    }
+
+    function validatePrereqs() {
+        const placedWithTime = {};
+        dropZones.forEach(cell => {
+            const div = cell.querySelector('.unit');
+            if (!div) return;
+            const [r, c] = cell.dataset.key.split(',').map(Number);
+            placedWithTime[ div.dataset.code ] = (r - 1) * 4 + c;
+        });
+
+        dropZones.forEach(cell => {
+            cell.classList.remove('ring-2', 'ring-red-400');
+            const old = cell.querySelector('.prereq-warning');
+            if (old) old.remove();
+        });
+
+        dropZones.forEach(cell => {
+            const div = cell.querySelector('.unit');
+            if (!div) return;
+            const code = div.dataset.code;
+            const unit = allUnits.find(u => u.unit_code === code);
+            if (!unit || !unit.prerequisites) return;
+
+            const currentTime = placedWithTime[code];
+            const groups = unit.prerequisites
+            .split('|')
+            .map(g => g.trim().split('+').map(c => c.trim()));
+
+            const ok = groups.some(group =>
+            group.every(pr => placedWithTime[pr] !== undefined && placedWithTime[pr] < currentTime)
+            );
+            if (!ok) {
+            cell.classList.add('ring-2','ring-red-400');
+            const badge = document.createElement('div');
+            badge.className = 'prereq-warning absolute top-1 left-1 text-[10px] bg-red-500 text-white px-1 rounded';
+            badge.textContent = 'PREREQ!';
+            badge.style.zIndex = 20;
+            div.style.position = 'relative';
+            div.appendChild(badge);
+            }
+        });
     }
 
     // ───── Search/filter support ─────
