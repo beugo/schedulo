@@ -192,22 +192,9 @@ def get_unit_info(url):
         return "", True, [], "", "", "", ""
 
 
-def scrape_units(prefixes=None):
-    """
-    Scrape all unit links, filter by the given discipline prefixes (if provided),
-    and collect:
-      - unit name
-      - unit code
-      - exam status (Yes/No)
-      - semesters offered (comma separated)
-      - URL
-      - unit coordinator(s)
-      - contact hours as a list of tuples (string representation)
-      - prerequisites
-      - unit description
+# (keep all the imports the same)
 
-    Returns a list of tuples with the collected data.
-    """
+def scrape_units(prefixes=None, include_codes=None, exclude_codes=None, levels=None):
     unit_links = get_unit_links()
     results = []
 
@@ -217,13 +204,30 @@ def scrape_units(prefixes=None):
         unit_code = parse_qs(parsed_url.query).get("code", [None])[0]
 
         if unit_code is None:
-            continue  # Skip if unit code is missing
+            continue
 
+        unit_code = unit_code.upper()
+
+        # ─── Skip if not in included list ───
+        if include_codes and unit_code not in include_codes:
+            continue
+
+        # ─── Skip if explicitly excluded ───
+        if exclude_codes and unit_code in exclude_codes:
+            continue
+
+        # ─── Skip if level doesn't match ───
+        if levels:
+            match = re.match(r"[A-Z]+(\d)", unit_code)
+            if match:
+                level = int(match.group(1))
+                if level not in levels:
+                    continue
+
+        # ─── Skip if prefix doesn't match ───
         if prefixes:
-            if not any(
-                unit_code.upper().startswith(prefix.upper()) for prefix in prefixes
-            ):
-                continue  # Skip units that don't match the specified prefixes
+            if not any(unit_code.startswith(prefix.upper()) for prefix in prefixes):
+                continue
 
         logging.info(f"Processing unit - {unit_code}")
         (
@@ -235,6 +239,7 @@ def scrape_units(prefixes=None):
             prerequisites,
             description,
         ) = get_unit_info(full_url)
+
         exam_status = "Yes" if has_exam else "No"
         semesters_joined = ", ".join(semesters) if semesters else ""
         results.append(
@@ -256,40 +261,52 @@ def scrape_units(prefixes=None):
 
 
 if __name__ == "__main__":
-    # Ask user for the discipline prefix(es)
-    prefixes_input = input(
-        "Enter the discipline prefix(es) for the units you want to include (separate multiple prefixes with commas): "
-    )
-    prefixes = [
-        prefix.strip().upper() for prefix in prefixes_input.split(",") if prefix.strip()
-    ]
+    # Ask user how they want to input unit codes
+    mode = input("Do you want to enter a list of unit codes directly? [y/N]: ").strip().lower()
 
-    # Ask user for the output CSV file name
-    csv_filename = input(
-        "Enter the name for the CSV file (default: units.csv): "
-    ).strip()
+    include_codes = None
+    if mode == 'y':
+        print("Paste or type unit codes one per line. Enter an empty line to finish:")
+        lines = []
+        while True:
+            line = input().strip()
+            if not line:
+                break
+            lines.append(line.upper())
+        include_codes = lines if lines else None
+        # Skip other filters if specific units are given
+        prefixes = None
+        exclude_codes = None
+        levels = None
+    else:
+        # Input discipline prefixes (optional)
+        prefixes_input = input("Enter discipline prefixes (e.g., CITS, MATH) [optional]: ").strip()
+        prefixes = [p.strip().upper() for p in prefixes_input.split(",") if p.strip()] if prefixes_input else None
+
+        # Input specific unit codes to exclude (optional)
+        exclude_input = input("Enter specific unit codes to EXCLUDE (e.g., CITS4008,CITS5016) [optional]: ").strip()
+        exclude_codes = [c.strip().upper() for c in exclude_input.split(",") if c.strip()] if exclude_input else None
+
+        # Input levels (e.g., 1,2,3) [optional]
+        levels_input = input("Enter unit levels to include (e.g., 1,2,3) [optional]: ").strip()
+        levels = [int(x) for x in levels_input.split(",") if x.strip().isdigit()] if levels_input else None
+
+    # Output filename
+    csv_filename = input("Enter output CSV file name (default: units.csv): ").strip()
     if not csv_filename:
         csv_filename = "units.csv"
 
-    # Scrape unit information for the given discipline(s)
-    units_info = scrape_units(prefixes)
+    # Start scrape
+    units_info = scrape_units(prefixes, include_codes, exclude_codes, levels)
 
-    # Write the gathered information to a CSV file with the new columns
+    # Write output
     with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(
-            [
-                "Unit Name",
-                "Unit Code",
-                "Exam",
-                "Semesters",
-                "URL",
-                "Unit Coordinator",
-                "Contact Hours",
-                "Prerequisites",
-                "Description",
-            ]
-        )
+        writer.writerow([
+            "Unit Name", "Unit Code", "Exam", "Semesters", "URL",
+            "Unit Coordinator", "Contact Hours", "Prerequisites", "Description"
+        ])
         writer.writerows(units_info)
 
     print(f"Data for {len(units_info)} units written to {csv_filename}.")
+
