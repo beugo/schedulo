@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Name
         const nameSpan = document.createElement('span');
-        nameSpan.className = 'flex-grow font-bold text-s leading-tight w-full';
+        nameSpan.className = 'flex-grow font-bold text-sm leading-tight w-full';
         nameSpan.textContent = unit.unit_name;
         nameSpan.style.minWidth = "0";
         nameSpan.style.wordBreak = "break-word";
