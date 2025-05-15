@@ -66,6 +66,20 @@ document.addEventListener('DOMContentLoaded', () => {
             { unit_code: 'CITS3001', row: 6, col: 3 },
             { unit_code: 'CITS3005', row: 6, col: 4 }
             ],
+        data_science: [
+            { unit_code: 'CITS1401', row: 1, col: 1 },
+            { unit_code: 'PHIL1001', row: 1, col: 2 },
+            { unit_code: 'CITS1402', row: 2, col: 1 },
+            { unit_code: 'STAT1400', row: 2, col: 2 },
+            { unit_code: 'STAT2401', row: 3, col: 1 },
+            { unit_code: 'STAT2402', row: 4, col: 1 },
+            { unit_code: 'CITS2402', row: 4, col: 2 },
+            { unit_code: 'CITS3403', row: 5, col: 1 },
+            { unit_code: 'CITS3401', row: 5, col: 2 },
+            { unit_code: 'CITS3200', row: 6, col: 1 },
+            { unit_code: 'STAT3064', row: 6, col: 2 },
+            { unit_code: 'STAT3405', row: 6, col: 3 },
+        ]
     }
 
     // ───── Initialization ─────
