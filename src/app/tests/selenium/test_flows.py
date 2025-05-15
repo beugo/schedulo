@@ -25,12 +25,12 @@ class FriendFlowTests(BaseSeleniumTest):
         nathan_option = self.driver.find_element(By.XPATH, "//ul[@id='results']/li[text()='nathan']")
         nathan_option.click()
 
-        locator = (By.CSS_SELECTOR, ".alert.success")
-        self.wait.until(EC.visibility_of_element_located(locator))
-        alert = self.driver.find_element(*locator)
+        alert = self.wait.until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, '[role="alert"]'))
+        )
         self.assertIn("Sent friend request successfully", alert.text)
 
-    def test_remove_existing_friend(self):  # this test can be a bit flaky
+    def test_remove_existing_friend(self):
         sleep(2)
         btn = self.driver.find_element(
             By.CSS_SELECTOR,
@@ -65,7 +65,7 @@ class UnitCreateFlowTests(BaseSeleniumTest):
     def test_prefill_template_applies_units(self):
         select = self.driver.find_element(By.ID, "prefillSelect")
         select.click()
-        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cs']").click()
+        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cyber']").click()
 
         sleep(1) 
 
@@ -76,9 +76,9 @@ class UnitCreateFlowTests(BaseSeleniumTest):
     def test_save_unit_plan_and_redirect(self):
         select = self.driver.find_element(By.ID, "prefillSelect")
         select.click()
-        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cs']").click()
+        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cyber']").click()
 
-        sleep(1)  
+        sleep(1)
 
         plan_input = self.driver.find_element(By.ID, "planName")
         plan_input.clear()
@@ -86,7 +86,9 @@ class UnitCreateFlowTests(BaseSeleniumTest):
 
         self.driver.find_element(By.ID, "saveButton").click()
 
-        alert = self.wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, ".alert.success")))
+        alert = self.wait.until(
+            EC.visibility_of_element_located((By.CSS_SELECTOR, '[role="alert"]'))
+        )
         self.assertIn("success", alert.text.lower())
 
         self.wait.until(EC.url_contains("/dashboard"))
