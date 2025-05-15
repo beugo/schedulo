@@ -133,7 +133,7 @@ def save_plan():
             for pu in prev_units
             if Unit.query.get(pu.unit_id)
         )
-        current_unit_codes = set(unit_codes.keys())
+        current_unit_codes = set(unit_codes)
 
         only_in_current = current_unit_codes - prev_unit_codes  # to add
         in_both = current_unit_codes & prev_unit_codes          # to edit
@@ -147,7 +147,7 @@ def save_plan():
 
             if unit_code in only_in_current:  # Add Unit
                 unit_plan_to_unit = UnitPlanToUnit(
-                    unit_plan_id=new_plan.id,
+                    unit_plan_id=edit_plan_id,
                     unit_id=unit_dict[unit_code].id,
                     row=row,
                     col=col
@@ -156,7 +156,6 @@ def save_plan():
 
             elif unit_code in in_both:   # Edit Unit
                 unit = UnitPlanToUnit.query.filter_by(
-                    user_id=current_user.id,
                     unit_plan_id=edit_plan_id,
                     unit_id=unit_dict[unit_code].id,
                     is_deleted=False
@@ -166,7 +165,6 @@ def save_plan():
 
             elif unit_code in only_in_prev:  # Delete unit from unit plan
                 unit = UnitPlanToUnit.query.filter_by(
-                    user_id=current_user.id,
                     unit_plan_id=edit_plan_id,
                     unit_id=unit_dict[unit_code].id,
                     is_deleted=False
