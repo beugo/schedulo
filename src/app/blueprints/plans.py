@@ -167,8 +167,9 @@ def view_plan():
                 "code": unit.unit_code
             })
 
-     #make a ordered dict for the actual plan.
-    year_cols = {year: {col: [] for col in range(1, 9)} for year in range(1, 5)}
+     # make a ordered dict for the actual plan.
+    year_cols = {year: {col: []
+                        for col in range(1, 9)} for year in range(1, 5)}
 
     # seperate the semesters into years(might not need later on)
     def get_year(row):

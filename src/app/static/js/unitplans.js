@@ -3,7 +3,7 @@ const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 document.addEventListener("DOMContentLoaded", function() {
   const input = document.getElementById('searchInput');
   const tbody = document.getElementById('unitTableBody');
-  
+
   let allUnits = [];
 
   function renderTable(units) {
@@ -59,23 +59,25 @@ function post_share(id) {
   })
 }
 function post_delete(id) {
-  fetch(`/plans/delete?id=${encodeURIComponent(id)}`, {
-    method: 'POST',
-    body: JSON.stringify({ id: id }),
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': csrfToken
-    }
-  }).then(response => {
-    response.json().then(res => {
-      if (res.ok) {
-        createAlert(res.message, 'success');
-      } else {
-        createAlert(res.message, 'error');
+  if (confirm("Are you sure you want to delete this plan? This action cannot be undone")) {
+    fetch(`/plans/delete?id=${encodeURIComponent(id)}`, {
+      method: 'POST',
+      body: JSON.stringify({ id: id }),
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
       }
+    }).then(response => {
+      response.json().then(res => {
+        if (res.ok) {
+          createAlert(res.message, 'success');
+        } else {
+          createAlert(res.message, 'error');
+        }
+      })
+      location.reload();
     })
-    location.reload();
-  })
+  }
 }
 
 function createAlert(message, category) {
