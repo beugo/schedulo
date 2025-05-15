@@ -47,6 +47,7 @@ def delete_plan():
 
 @plans_bp.route("/save", methods=["POST"])
 def save_plan():
+    edit_plan_id = request.json.get("plan_id", 0)
     plan_name = request.json.get("plan_name", "")
     units = request.json.get("units", [])
     unit_codes = [unit["unit_code"] for unit in units]
@@ -64,48 +65,117 @@ def save_plan():
     # I think this is safe and better than before
     # Then into a dict for easy access
     unit_objs = Unit.query.filter(Unit.unit_code.in_(unit_codes)).all()
-    unit_dict = {unit.unit_code: unit.id for unit in unit_objs}
+    unit_dict = {unit.unit_code: unit for unit in unit_objs}
     if len(unit_objs) != len(units):
         return jsonify(
             {"message": "Some units do not exist?", "ok": False}), 400
 
-    # Check if the plan name already exists for the user
-    existing_plan = UnitPlan.query.filter_by(
-        user_id=current_user.id, name=plan_name
-    ).first()
+    # Create Unit Plan
+    if edit_plan_id == 0:
+        # Check if the plan name already exists for the user
+        existing_plan = UnitPlan.query.filter_by(
+            user_id=current_user.id, name=plan_name
+        ).first()
 
-    if existing_plan:
-        return jsonify(
-            {"message": "Plan name already exists", "ok": False}), 400
+        if existing_plan:
+            return jsonify(
+                {"message": "Plan name already exists", "ok": False}), 400
 
-    #  Add Plan to the database to get plan id
-    user_id = current_user.id
-    new_plan = UnitPlan(user_id=user_id, name=plan_name)
-    db.session.add(new_plan)
-    db.session.commit()
+        #  Add Plan to the database to get plan id
+        user_id = current_user.id
+        new_plan = UnitPlan(user_id=user_id, name=plan_name)
+        db.session.add(new_plan)
+        db.session.commit()
 
-    # Add Unit Links to the database
-    for unit in units:
-        unit_code = unit["unit_code"]
-        row = unit["row"]
-        col = unit["column"]
-        pos = (row, col)
-        if pos in seen_positions:
-            raise ValueError("Duplicate position detected")
-        seen_positions.add(pos)
+        # Add Unit Links to the database
+        for unit in units:
+            unit_code = unit["unit_code"]
+            row = unit["row"]
+            col = unit["column"]
+            pos = (row, col)
+            if pos in seen_positions:
+                raise ValueError("Duplicate position detected")
+            seen_positions.add(pos)
 
-        unit_plan_to_unit = UnitPlanToUnit(
-            unit_plan_id=new_plan.id,
-            unit_id=unit_dict[unit_code],
-            row=row,
-            col=col
+            unit_plan_to_unit = UnitPlanToUnit(
+                unit_plan_id=new_plan.id,
+                unit_id=unit_dict[unit_code].id,
+                row=row,
+                col=col
+            )
+            db.session.add(unit_plan_to_unit)
+
+        db.session.commit()
+
+        # Should be safe hopefully
+        return jsonify({"message": "Units saved successfully", "ok": True}), 200
+
+    else:   # Edit Unit Plan as plan_id != 0
+        # Find plan to edit
+        existing_plan = UnitPlan.query.filter_by(
+            user_id=current_user.id, id=edit_plan_id
+        ).first()
+
+        if not existing_plan:
+            return jsonify(
+                {"message": "Trying to edit plan that does not exist?", "ok": False}), 400
+
+        # edit name
+        existing_plan.name == plan_name
+
+        prev_units = (UnitPlanToUnit.query.filter_by(
+            is_deleted=False,
+            unit_plan_id=edit_plan_id,
+        ).all())
+
+        prev_unit_codes = set(
+            Unit.query.get(pu.unit_id).unit_code
+            for pu in prev_units
+            if Unit.query.get(pu.unit_id)
         )
-        db.session.add(unit_plan_to_unit)
+        current_unit_codes = set(unit_codes.keys())
 
-    db.session.commit()
+        only_in_current = current_unit_codes - prev_unit_codes  # to add
+        in_both = current_unit_codes & prev_unit_codes          # to edit
+        only_in_prev = prev_unit_codes - current_unit_codes     # to delete
 
-    # Should be safe hopefully
-    return jsonify({"message": "Units saved successfully", "ok": True}), 200
+        for unit in units:
+            unit_code = unit["unit_code"]
+            row = unit["row"]
+            col = unit["column"]
+            pos = (row, col)
+
+            if unit_code in only_in_current:  # Add Unit
+                unit_plan_to_unit = UnitPlanToUnit(
+                    unit_plan_id=new_plan.id,
+                    unit_id=unit_dict[unit_code].id,
+                    row=row,
+                    col=col
+                )
+                db.session.add(unit_plan_to_unit)
+
+            elif unit_code in in_both:   # Edit Unit
+                unit = UnitPlanToUnit.query.filter_by(
+                    user_id=current_user.id,
+                    unit_plan_id=edit_plan_id,
+                    unit_id=unit_dict[unit_code].id,
+                    is_deleted=False
+                ).first()
+                unit.row = row
+                unit.col = col
+
+            elif unit_code in only_in_prev:  # Delete unit from unit plan
+                unit = UnitPlanToUnit.query.filter_by(
+                    user_id=current_user.id,
+                    unit_plan_id=edit_plan_id,
+                    unit_id=unit_dict[unit_code].id,
+                    is_deleted=False
+                ).first()
+
+        db.session.commit()
+
+        # Should be safe hopefully
+        return jsonify({"message": "Units saved successfully", "ok": True}), 200
 
 
 @plans_bp.route("/user", methods=["GET"])
