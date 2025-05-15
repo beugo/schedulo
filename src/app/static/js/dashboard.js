@@ -68,7 +68,7 @@ function renderPosts(posts) {
   posts.forEach(post => {
     const card = document.createElement("div");
     card.className = "bg-white dark:bg-dark-fg border border-gray-200 dark:border-dark-border rounded-lg p-4 shadow-sm hover:shadow cursor-pointer flex flex-col gap-2";
-    card.onclick = () => window.location.href = `/plans/view?id=${post.id}`;
+    card.onclick = () => window.location.href = `/plans/view?id=${post.unit_plan.unitplanid}`;
 
     // title
     const header = document.createElement("div");
@@ -87,9 +87,9 @@ function renderPosts(posts) {
         const cell = document.createElement("div");
         const bgClass =
           row <= 2 ? 'bg-purple-50 dark:bg-purple-900/50' :
-          row <= 4 ? 'bg-orange-50 dark:bg-orange-900/50' :
-          row <= 6 ? 'bg-pink-50 dark:bg-pink-900/40' :
-                    'bg-cyan-50 dark:bg-cyan-900/40';
+            row <= 4 ? 'bg-orange-50 dark:bg-orange-900/50' :
+              row <= 6 ? 'bg-pink-50 dark:bg-pink-900/40' :
+                'bg-cyan-50 dark:bg-cyan-900/40';
         cell.className = `border border-gray-300 dark:border-gray-600 rounded ${bgClass} p-1 h-12 flex flex-col items-start justify-start text-xs overflow-hidden`;
 
         const unit = post.unit_plan.units.find(u => u.col === col && u.row === row);
