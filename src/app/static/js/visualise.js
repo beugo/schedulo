@@ -10,12 +10,12 @@ document.addEventListener("DOMContentLoaded", function() {
             {
               label: 'Friend Picks',
               data: data.friend_count,
-              backgroundColor: 'rgba(75, 192, 192, 0.6)'
+              backgroundColor: 'rgba(29, 71, 225, 1)'
             },
             {
               label: 'Total Picks',
               data: data.total_count,
-              backgroundColor: 'rgba(192, 75, 75, 0.6)'
+              backgroundColor: 'rgba(192, 75, 75, 1)'
             }
           ]
         },

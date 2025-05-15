@@ -81,15 +81,14 @@ function renderPosts(posts) {
 
     // unit grid, man i wish this was in typescript
     const grid = document.createElement("div");
-    grid.className = "grid grid-cols-4 grid-rows-8 gap-1 flex-grow";
-    for (let row = 1; row <= 8; row++) {
+    grid.className = "grid grid-cols-4 grid-rows-6 gap-1 flex-grow";
+    for (let row = 1; row <= 6; row++) {
       for (let col = 1; col <= 4; col++) {
         const cell = document.createElement("div");
         const bgClass =
           row <= 2 ? 'bg-purple-50 dark:bg-purple-900/50' :
             row <= 4 ? 'bg-orange-50 dark:bg-orange-900/50' :
-              row <= 6 ? 'bg-pink-50 dark:bg-pink-900/40' :
-                'bg-cyan-50 dark:bg-cyan-900/40';
+              'bg-pink-50 dark:bg-pink-900/40';
         cell.className = `border border-gray-300 dark:border-gray-600 rounded ${bgClass} p-1 h-12 flex flex-col items-start justify-start text-xs overflow-hidden`;
 
         const unit = post.unit_plan.units.find(u => u.col === col && u.row === row);
