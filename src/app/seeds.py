@@ -144,12 +144,6 @@ def create_users_and_plans(db_session):
     }
 
     remaining_spots = {
-        'cs': [2, 3, 2, 2, 2, 2],
-        'cyber': [2, 3, 3, 3, 1, 2],
-        'data_science': [2, 2, 3, 2, 2, 1]
-    }
-
-    remaining_spots = {
         'cs': [
             (1, 3), (1, 4), 
             (2, 2), (2, 3), (2, 4),
@@ -163,7 +157,7 @@ def create_users_and_plans(db_session):
             (2, 2), (2, 3), (2, 4),
             (3, 2), (3, 3), (3, 4),
             (4, 2), (4, 3), (4, 4),
-            (5, 1),
+            (5, 4),
             (6, 3), (6, 4),
         ],
         'data_science': [
