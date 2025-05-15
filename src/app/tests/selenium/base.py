@@ -12,6 +12,8 @@ from app.config import TestConfig
 from app.seeds import import_units, create_users_and_plans
 
 BASE_URL = "http://127.0.0.1:5001"
+CSV_PATH = "../data-scraping/units.csv"
+
 class BaseSeleniumTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -21,7 +23,7 @@ class BaseSeleniumTest(unittest.TestCase):
         cls.ctx.push()
 
         db.create_all()
-        import_units(db.session, "../data-scraping/cits.csv")
+        import_units(db.session, CSV_PATH)
         create_users_and_plans(db.session)
 
         cls.server = make_server("127.0.0.1", 5001, cls.app)

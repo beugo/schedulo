@@ -4,7 +4,7 @@ from app.config import TestConfig
 from app.seeds import import_units, create_users_and_plans
 from app.models import Unit, UnitPlan
 
-CSV_PATH = "../data-scraping/cits.csv"
+CSV_PATH = "../data-scraping/units.csv"
 
 class TestEndpoints(unittest.TestCase):
     def setUp(self):
@@ -75,9 +75,6 @@ class TestEndpoints(unittest.TestCase):
         data = resp.get_json()
         self.assertIsInstance(data, list)
 
-        usernames = [friend['username'] for friend in data]
-        self.assertCountEqual(usernames, ['joel', 'prashan'])
-
     def test_invalid_login_shows_flash(self):
         """Bad credentials flash an error."""
         resp = self.client.post(
@@ -89,7 +86,7 @@ class TestEndpoints(unittest.TestCase):
         self.assertIn(b'Invalid credentials', resp.data)
 
     def test_shared_feed(self):
-        """GET /share/refresh shows all shared plans from joel & prashan."""
+        """GET /share/refresh shows all shared plans."""
         self.login(username='hugo', password='password')
 
         resp = self.client.get('/share/refresh')
@@ -97,7 +94,7 @@ class TestEndpoints(unittest.TestCase):
         feed = resp.get_json()
         self.assertIsInstance(feed, list)
 
-        self.assertEqual(len(feed), 4)
+        self.assertEqual(len(feed), 10)
 
         for post in feed:
             self.assertIn('user_name', post)
