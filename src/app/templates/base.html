@@ -9,6 +9,7 @@
   
   <!-- TailwindCSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="{{ url_for('static', filename='js/tailwindconfig.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/darkmode.js') }}" defer></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwindglobals.css') }}">
@@ -46,6 +47,10 @@
       <a href="{{ url_for('main.discover') }}"
          class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
          Discover Units
+      </a>
+      <a href="{{ url_for('main.visualise_page') }}"
+         class="font-semibold text-gray-800 hover:text-black transition dark:text-dark-secondary dark:hover:text-dark-primary">
+         Visualise
       </a>
       {% endif %}
     </div>

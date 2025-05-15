@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Visualise{% endblock %}
+
+{% block content %}
+<div class="flex w-full gap-8 items-start" style="max-height: 80vh;">
+  <canvas id="unit_data"></canvas>
+</div>
+<script src="{{ url_for('static', filename='js/visualise.js') }}"></script>
+{% endblock %}

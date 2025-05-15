@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -36,14 +35,16 @@ def create_app(config_class=DeploymentConfig):
     from app.blueprints.friends import friends_bp
     from app.blueprints.posts import post_bp
     from app.blueprints.friendrequests import friend_req_bp
+    from app.blueprints.visualise import chart
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(main_bp) 
+    app.register_blueprint(main_bp)
     app.register_blueprint(units_bp, url_prefix="/units")
     app.register_blueprint(plans_bp, url_prefix="/plans")
     app.register_blueprint(friends_bp, url_prefix="/friend")
     app.register_blueprint(post_bp, url_prefix="/share")
     app.register_blueprint(friend_req_bp, url_prefix="/friend_requests")
+    app.register_blueprint(chart, url_prefix="/chart")
 
     return app
 

@@ -71,6 +71,12 @@ def friends_page():
     return render_template("friends.html")
 
 
+@main_bp.route("/visualise")
+@login_required
+def visualise_page():
+    return render_template("visualise.html")
+
+
 @main_bp.route("/discover")
 @login_required
 def discover():
