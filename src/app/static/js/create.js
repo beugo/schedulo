@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
       { unit_code: 'CITS2211', row: 4, col: 2 },
       { unit_code: 'CITS3403', row: 5, col: 1 },
       { unit_code: 'CITS3002', row: 5, col: 2 },
-      { unit_code: 'CITS3007', row: 5, col: 3 },
       { unit_code: 'CITS3200', row: 6, col: 1 },
       { unit_code: 'CITS3001', row: 6, col: 2 }
     ],
@@ -47,24 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
       { unit_code: 'CITS3007', row: 5, col: 3 },
       { unit_code: 'CITS3200', row: 6, col: 1 },
       { unit_code: 'CITS3006', row: 6, col: 2 },
-    ],
-    cs_cyber: [
-      { unit_code: 'CITS1401', row: 1, col: 1 },
-      { unit_code: 'PHIL1001', row: 1, col: 2 },
-      { unit_code: 'CITS1402', row: 1, col: 3 },
-      { unit_code: 'CITS1003', row: 2, col: 1 },
-      { unit_code: 'CITS2006', row: 3, col: 1 },
-      { unit_code: 'CITS2200', row: 3, col: 2 },
-      { unit_code: 'CITS2005', row: 3, col: 3 },
-      { unit_code: 'CITS2002', row: 4, col: 1 },
-      { unit_code: 'CITS2211', row: 4, col: 2 },
-      { unit_code: 'CITS3002', row: 5, col: 1 },
-      { unit_code: 'CITS3403', row: 5, col: 2 },
-      { unit_code: 'CITS3007', row: 5, col: 3 },
-      { unit_code: 'CITS3200', row: 6, col: 1 },
-      { unit_code: 'CITS3006', row: 6, col: 2 },
-      { unit_code: 'CITS3001', row: 6, col: 3 },
-      { unit_code: 'CITS3005', row: 6, col: 4 }
     ],
     data_science: [
       { unit_code: 'CITS1401', row: 1, col: 1 },
@@ -81,6 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
       { unit_code: 'STAT3405', row: 6, col: 3 },
     ]
   }
+
+  const csFinalCoreOptions = [
+    { code: "CITS3003", name: "Graphics and Animation", semester: 1 },
+    { code: "CITS3007", name: "Secure Coding",            semester: 1 },
+    { code: "CITS3009", name: "WIL Internship",           semester: 1 },
+    { code: "CITS3005", name: "Knowledge Representation", semester: 2 },
+    { code: "CITS3011", name: "Intelligent Agents",       semester: 2 },
+    { code: "CITS3402", name: "High Performance Computing", semester: 2 }
+  ];
 
   // ───── Initialization ─────
   function init() {
@@ -147,16 +137,66 @@ document.addEventListener('DOMContentLoaded', () => {
     validateAllCells();
   }
 
-  // ───── Prefill template logic ─────
-  function setupPrefillHandler() {
-    const select = document.getElementById('prefillSelect');
-    if (!select) return;
-    select.addEventListener('change', () => {
-      const key = select.value;
-      if (!key) return clearGrid();
-      applyTemplate(prefillTemplates[key]);
-    });
-  }
+    // ───── Prefill template logic ─────
+    function setupPrefillHandler() {
+        const select            = document.getElementById('prefillSelect');
+        const coreSelectWrapper = document.getElementById('csCoreSelectWrapper');
+        const coreSelect        = document.getElementById('csCoreSelect');
+
+        if (!select) return;
+
+        // When you pick a major…
+        select.addEventListener('change', () => {
+            const key = select.value;
+            clearGrid();
+
+            if (key === 'cs') {
+                // 1) apply all the *fixed* CS units (minus the final core)
+                applyTemplate(prefillTemplates['cs']);
+
+                // 2) show + populate the dropdown
+                coreSelectWrapper.classList.remove('hidden');
+                coreSelect.innerHTML = '<option value="">— Select one —</option>';
+                csFinalCoreOptions.forEach(u => {
+                    const o = document.createElement('option');
+                    o.value       = u.code;
+                    o.textContent = `${u.code} – ${u.name} (Sem ${u.semester})`;
+                    coreSelect.appendChild(o);
+                });
+            } else {
+                applyTemplate(prefillTemplates[key] || []);
+                coreSelectWrapper.classList.add('hidden');
+                coreSelect.innerHTML = '';
+            }
+        });
+
+        // When you choose your final core…
+        coreSelect.addEventListener('change', () => {
+            const code = coreSelect.value;
+            const u    = csFinalCoreOptions.find(x => x.code === code);
+            if (!u) return;
+
+            const row = u.semester === 1 ? 5 : 6;
+            const col = 3;    
+            const key = `${row},${col}`;
+            const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
+            if (!cell) return;
+
+            // clear + drop in the chosen unit
+            cell.innerHTML = '';
+            const unitModel = allUnits.find(x => x.unit_code === code);
+            if (unitModel) {
+            cell.appendChild(createUnitDiv(unitModel));
+            placedUnits[key] = code;
+            }
+
+            // refresh sidebar & validation
+            resetAvailableUnits();
+            renderUnitList(availableUnits);
+            validateAllCells();
+        });
+        }
+
 
   function applyTemplate(template) {
     clearGrid();
@@ -169,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!cell) return;
 
       const div = createUnitDiv(unit);
-      cell.innerHTML = "";            // clear cell before adding, in case of remnant
+      cell.innerHTML = "";          
       cell.appendChild(div);
 
       // Remove from available
@@ -452,6 +492,14 @@ document.addEventListener('DOMContentLoaded', () => {
     saveButton.addEventListener('click', () => {
       const name = planName.value.trim();
       if (!name) return createAlert('Please enter a plan name.', 'error');
+
+      const major = document.getElementById('prefillSelect').value;
+
+      if (major === 'cs' && !document.getElementById('csCoreSelect').value) {
+          console.log("I can see that this user is doing cs");
+          createAlert('Please select your final core unit before saving.', 'error');
+          return;
+      }
       const units = [];
       for (let cell of dropZones) {
         const div = cell.querySelector('.unit');
@@ -542,72 +590,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
         
-        function createAlert(message, category) {
-            const map = {
-              success: {
-                bar: 'bg-green-300 dark:bg-green-800',
-                bg: 'bg-green-50 dark:bg-gray-800',
-                text: 'text-green-800 dark:text-green-400',
-                icon: '<path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 111.414 1.414z"/>'
-              },
-              error: {
-                bar: 'bg-red-300 dark:bg-red-800',
-                bg: 'bg-red-50 dark:bg-gray-800',
-                text: 'text-red-800 dark:text-red-400',
-                icon: '<path fill-rule="evenodd" d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" clip-rule="evenodd"/>'
-              }
-            };
-          
-            const cfg = map[category]
-          
-            const container = document.getElementById('flash-container');
-            if (!container) return;
-          
-            const nextId = container.querySelectorAll('[data-flash-id]').length + 1;
-          
-            const alert = document.createElement('div');
-            alert.setAttribute('id', `flash-${nextId}`);
-            alert.setAttribute('data-flash-id', nextId);
-            alert.setAttribute('role', 'alert');
-            alert.className = `
-              relative overflow-hidden flex items-center p-4 mb-4 text-sm font-medium
-              ${cfg.text} ${cfg.bg} animate-flash-in
-            `
-          
-            //same html as in base.html
-            alert.innerHTML = `
-              <div class="absolute top-0 left-0 h-1 ${cfg.bar}"
-                   style="animation: progress-bar 5s linear forwards;"></div>
-          
-              <svg class="shrink-0 w-4 h-4" aria-hidden="true"
-                   xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                ${cfg.icon}
+      function createAlert(message, category) {
+          const map = {
+            success: {
+              bar: 'bg-green-300 dark:bg-green-800',
+              bg: 'bg-green-50 dark:bg-gray-800',
+              text: 'text-green-800 dark:text-green-400',
+              icon: '<path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 111.414 1.414z"/>'
+            },
+            error: {
+              bar: 'bg-red-300 dark:bg-red-800',
+              bg: 'bg-red-50 dark:bg-gray-800',
+              text: 'text-red-800 dark:text-red-400',
+              icon: '<path fill-rule="evenodd" d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" clip-rule="evenodd"/>'
+            }
+          };
+        
+          const cfg = map[category]
+        
+          const container = document.getElementById('flash-container');
+          if (!container) return;
+        
+          const nextId = container.querySelectorAll('[data-flash-id]').length + 1;
+        
+          const alert = document.createElement('div');
+          alert.setAttribute('id', `flash-${nextId}`);
+          alert.setAttribute('data-flash-id', nextId);
+          alert.setAttribute('role', 'alert');
+          alert.className = `
+            relative overflow-hidden flex items-center p-4 mb-4 text-sm font-medium
+            ${cfg.text} ${cfg.bg} animate-flash-in
+          `
+        
+          //same html as in base.html
+          alert.innerHTML = `
+            <div class="absolute top-0 left-0 h-1 ${cfg.bar}"
+                  style="animation: progress-bar 5s linear forwards;"></div>
+        
+            <svg class="shrink-0 w-4 h-4" aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              ${cfg.icon}
+            </svg>
+        
+            <div class="ms-3">${message}</div>
+        
+            <button type="button"
+              class="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-offset-2 p-1.5
+                      inline-flex items-center justify-center h-8 w-8"
+              data-flash-close="${nextId}">
+              <svg class="w-3 h-3"
+                    xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 14 14">
+                  <path stroke="currentColor" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
               </svg>
-          
-              <div class="ms-3">${message}</div>
-          
-              <button type="button"
-                class="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-offset-2 p-1.5
-                       inline-flex items-center justify-center h-8 w-8"
-                data-flash-close="${nextId}">
-                <svg class="w-3 h-3"
-                     xmlns="http://www.w3.org/2000/svg" fill="none"
-                     viewBox="0 0 14 14">
-                   <path stroke="currentColor" stroke-linecap="round"
-                         stroke-linejoin="round" stroke-width="2"
-                         d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                </svg>
-              </button>
-            `.trim();
-          
-            container.appendChild(alert);
-          
-            // auto dismiss(the dismiss function is defined in alert.js)
-            container.querySelectorAll('[data-flash-id]').forEach(el => {
-                setTimeout(() => dismiss(el), 5000);
-              });
-          }
-    }
+            </button>
+          `.trim();
+        
+          container.appendChild(alert);
+        
+          // auto dismiss(the dismiss function is defined in alert.js)
+          container.querySelectorAll('[data-flash-id]').forEach(el => {
+              setTimeout(() => dismiss(el), 5000);
+            });
+        }
+  }
 
   // ───── Kickoff ─────
   init();

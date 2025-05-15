@@ -43,10 +43,3 @@ document.addEventListener("DOMContentLoaded", function() {
     renderTable(filtered);
   });
 });
-
-function createAlert(message, category) {
-  const alertDiv = document.createElement('div');
-  alertDiv.classList.add('alert', category, 'fade-out');
-  alertDiv.innerHTML = `<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>${message}`;
-  document.querySelector('.absolute-container ul').appendChild(alertDiv);
-}
