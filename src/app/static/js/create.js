@@ -1,10 +1,11 @@
 class UnitModel {
-    constructor({ unit_name, unit_code, semester1, semester2, exam }) {
+    constructor({ unit_name, unit_code, semester1, semester2, exam, prerequisites }) {
         this.unit_name = unit_name;
         this.unit_code = unit_code;
         this.semester1 = semester1;
         this.semester2 = semester2;
         this.exam = exam;
+        this.prerequisites = prerequisites || "";
     }
 }
 
@@ -333,7 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (unitDiv) {
                 const code = unitDiv.getAttribute('data-code');
                 const unit = allUnits.find(u => u.unit_code === code);
-                if (unit) validateSemesterPlacement(cell, unit);
+                if (unit) {
+                    validateSemesterPlacement(cell, unit);
+                    validatePrereqs();
+                }
             } else {
                 cell.classList.remove("ring-2", "ring-red-400");
                 const prevBadge = cell.querySelector('.semester-warning');
@@ -365,6 +369,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 unitDiv.appendChild(badge);
             }
         }
+    }
+
+    function validatePrereqs() {
+        const placedWithTime = {};
+        dropZones.forEach(cell => {
+            const div = cell.querySelector('.unit');
+            if (!div) return;
+            const [r, c] = cell.dataset.key.split(',').map(Number);
+            placedWithTime[ div.dataset.code ] = (r - 1) * 4 + c;
+        });
+
+        dropZones.forEach(cell => {
+            cell.classList.remove('ring-2', 'ring-red-400');
+            const old = cell.querySelector('.prereq-warning');
+            if (old) old.remove();
+        });
+
+        dropZones.forEach(cell => {
+            const div = cell.querySelector('.unit');
+            if (!div) return;
+            const code = div.dataset.code;
+            const unit = allUnits.find(u => u.unit_code === code);
+            if (!unit || !unit.prerequisites) return;
+
+            const currentTime = placedWithTime[code];
+            const groups = unit.prerequisites
+            .split('|')
+            .map(g => g.trim().split('+').map(c => c.trim()));
+
+            const ok = groups.some(group =>
+            group.every(pr => placedWithTime[pr] !== undefined && placedWithTime[pr] < currentTime)
+            );
+            if (!ok) {
+            cell.classList.add('ring-2','ring-red-400');
+            const badge = document.createElement('div');
+            badge.className = 'prereq-warning absolute top-1 left-1 text-[10px] bg-red-500 text-white px-1 rounded';
+            badge.textContent = 'PREREQ!';
+            badge.style.zIndex = 20;
+            div.style.position = 'relative';
+            div.appendChild(badge);
+
+            // create tooltip
+            const tooltipText = groups
+                .map(group => group.join(' AND '))
+                .join(' OR ');
+
+            div.setAttribute('title', `Requires: ${tooltipText}`);
+            }
+        });
     }
 
     // ───── Search/filter support ─────
@@ -401,6 +454,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             if (!units.length) return createAlert('Please place at least one unit.', 'error');
+
+            const placedWithTime = {};
+            for (let cell of dropZones) {
+                const div = cell.querySelector('.unit');
+                if (!div) continue;
+                const key = cell.dataset.key;
+                const [row, col] = key.split(',').map(Number);
+                const timeIndex = (row - 1) * 4 + col; 
+                const code = div.getAttribute('data-code');
+                placedWithTime[code] = timeIndex;
+
+            }
+
+
+            // Check each unit's prerequisites
+            const unsatisfied = [];
+
+            for (let cell of dropZones) {
+                const div = cell.querySelector('.unit');
+                if (!div) continue;
+                const code = div.getAttribute('data-code');
+                const unit = allUnits.find(u => u.unit_code === code);
+                if (!unit) {
+                    continue;
+                }
+
+                if (!unit.prerequisites) {
+                    continue;
+                }
+
+
+                const currentTime = placedWithTime[code];
+
+                const groups = unit.prerequisites
+                    .split('|')
+                    .map(group => group.trim().split('+').map(c => c.trim()));
+
+
+                const satisfies = groups.some(group =>
+                    group.every(prereq => {
+                        const prereqTime = placedWithTime[prereq];
+                        const status = prereqTime !== undefined && prereqTime < currentTime;
+                        return status;
+                    })
+                );
+
+                if (!satisfies && groups.length > 0 && groups[0][0] !== "") {
+                    unsatisfied.push({ unit: code, groups });
+                } 
+            }
+
+            // Show error if any
+            if (unsatisfied.length > 0) {
+                createAlert("Please make sure all units have their prerequisites satisfied.", 'error');
+            return;
+            }
+
             fetch('/plans/save', {
                 method: 'POST',
                 headers: { 
