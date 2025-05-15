@@ -16,14 +16,14 @@ class FriendFlowTests(BaseSeleniumTest):
         self.wait.until(EC.presence_of_element_located((By.ID, "friendTable")))
 
         box = self.driver.find_element(By.ID, "searchInput")
-        box.send_keys("na")
+        box.send_keys("alice")
 
         self.wait.until(
-            EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'nathan')]"))
+            EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'alice')]"))
         )
 
-        nathan_option = self.driver.find_element(By.XPATH, "//ul[@id='results']/li[text()='nathan']")
-        nathan_option.click()
+        alice = self.driver.find_element(By.XPATH, "//ul[@id='results']/li[text()='alice']")
+        alice.click()
 
         alert = self.wait.until(
             EC.visibility_of_element_located((By.CSS_SELECTOR, '[role="alert"]'))
@@ -42,7 +42,7 @@ class FriendFlowTests(BaseSeleniumTest):
         self.driver.get(f"{BASE_URL}/friends")
         sleep(2)
         rows = self.driver.find_elements(By.CSS_SELECTOR, "tbody tr")
-        self.assertEqual(1, len(rows), "Joel's row should have been removed")
+        self.assertEqual(8, len(rows), "Joel's row should have been removed")
 
 
 class AuthFlowTests(BaseSeleniumTest):

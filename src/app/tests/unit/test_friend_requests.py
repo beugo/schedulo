@@ -4,6 +4,8 @@ from app.config import TestConfig
 from app.seeds import import_units, create_users_and_plans
 from app.models import User, UserFriend
 
+CSV_PATH = "../data-scraping/units.csv"
+
 class TestFriendRequests(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
@@ -12,7 +14,7 @@ class TestFriendRequests(unittest.TestCase):
         self.ctx.push()
 
         db.create_all()
-        import_units(db.session, "../data-scraping/cits.csv")
+        import_units(db.session, CSV_PATH)
         create_users_and_plans(db.session)
 
     def tearDown(self):
@@ -31,22 +33,22 @@ class TestFriendRequests(unittest.TestCase):
         self.login('hugo', 'password')
         resp = self.client.post(
             '/friend_requests/send',
-            json={'q': 'nathan'}
+            json={'q': 'alice'}
         )
         self.assertEqual(resp.status_code, 200)
 
         from app.models import FriendRequests, User
         hugo = User.query.filter_by(username='hugo').one()
-        nathan = User.query.filter_by(username='nathan').one()
+        alice = User.query.filter_by(username='alice').one()
 
         fr = FriendRequests.query.filter_by(
             user_id=hugo.id,
-            friend_id=nathan.id,
+            friend_id=alice.id,
             is_deleted=False
         ).first()
         self.assertIsNotNone(fr)
 
-        self.login('nathan', 'password')
+        self.login('alice', 'password')
         resp2 = self.client.get('/friend_requests/get')
         self.assertEqual(resp2.status_code, 200)
 
@@ -56,6 +58,6 @@ class TestFriendRequests(unittest.TestCase):
     
     def test_duplicate_friend_request_blocked(self):
         self.login()
-        self.client.post("/friend_requests/send", json={"q": "nathan"})
-        second = self.client.post("/friend_requests/send", json={"q": "nathan"})
+        self.client.post("/friend_requests/send", json={"q": "alice"})
+        second = self.client.post("/friend_requests/send", json={"q": "alice"})
         self.assertEqual(second.status_code, 400)
