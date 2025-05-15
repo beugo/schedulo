@@ -26,7 +26,7 @@
 
 <body class="bg-white text-gray-900 dark:bg-dark-bg dark:text-dark-primary min-h-screen flex flex-col">
 
-  <nav class="sticky top-0 z-50 flex items-center px-6 py-2 shadow-sm">
+  <nav class="sticky top-0 z-50 flex items-center px-6 py-2 shadow-sm backdrop-blur-sm">
     
     <div class="flex space-x-4 items-center">
       <a href="{% if current_user.is_authenticated %}{{ url_for('main.dashboard') }}{% else %}{{ url_for('main.landing') }}{% endif %}" 
@@ -86,7 +86,7 @@
 
 <!-- pop up messages  -->
   {% with messages = get_flashed_messages(with_categories=true) %}
-    <div class="absolute top-12 right-4 w-80 z-50" id="flash-container">
+    <div class="fixed top-14 right-4 w-80 z-50" id="flash-container">
       {% for category, message in messages %}
         {% set cfg = {
             'success': {
