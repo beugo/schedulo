@@ -33,6 +33,7 @@ def unitplans_page():
 def create_page():
     plan_id = request.args.get('id')
     context = {
+        'plan_id': 0,
         'plan_name': '',
         'grid_units': {},
     }
@@ -62,6 +63,8 @@ def create_page():
                 "code": unit.unit_code
             }
         context["grid_units"] = grid
+        context["plan_id"] = plan_id
+
     return render_template('create.html', **context)
 
 

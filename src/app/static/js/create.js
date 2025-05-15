@@ -1,141 +1,141 @@
 class UnitModel {
-    constructor({ unit_name, unit_code, semester1, semester2, exam, prerequisites }) {
-        this.unit_name = unit_name;
-        this.unit_code = unit_code;
-        this.semester1 = semester1;
-        this.semester2 = semester2;
-        this.exam = exam;
-        this.prerequisites = prerequisites || "";
-    }
+  constructor({ unit_name, unit_code, semester1, semester2, exam, prerequisites }) {
+    this.unit_name = unit_name;
+    this.unit_code = unit_code;
+    this.semester1 = semester1;
+    this.semester2 = semester2;
+    this.exam = exam;
+    this.prerequisites = prerequisites || "";
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ───── Constants & State ─────
-    const searchInput  = document.getElementById('searchInput');
-    const saveButton   = document.getElementById('saveButton');
-    const unitList     = document.getElementById('unitList');
-    const planName     = document.getElementById('planName');
-    const cellSelector = '.unit-cell';
-    const dropZones    = Array.from(document.querySelectorAll(cellSelector));
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-    let allUnits = [];
-    let availableUnits = [];
-    let placedUnits = {}; // cell key is unit_code
-    const prefillTemplates = {
-        cs: [
-            { unit_code: 'CITS1401', row: 1, col: 1 },
-            { unit_code: 'CITS1402', row: 1, col: 2 },
-            { unit_code: 'CITS1003', row: 2, col: 1 },
-            { unit_code: 'CITS2005', row: 3, col: 1 },
-            { unit_code: 'CITS2200', row: 3, col: 2 },
-            { unit_code: 'CITS2002', row: 4, col: 1 },
-            { unit_code: 'CITS2211', row: 4, col: 2 },
-            { unit_code: 'CITS3403', row: 5, col: 1 },
-            { unit_code: 'CITS3002', row: 5, col: 2 },
-            { unit_code: 'CITS3200', row: 6, col: 1 },
-            { unit_code: 'CITS3001', row: 6, col: 2 }
-            ],
-        cyber: [
-            { unit_code: 'CITS1401', row: 1, col: 1 },
-            { unit_code: 'PHIL1001', row: 1, col: 2 },
-            { unit_code: 'CITS1003', row: 2, col: 1 },
-            { unit_code: 'CITS2006', row: 3, col: 1 },
-            { unit_code: 'CITS2002', row: 4, col: 1 },
-            { unit_code: 'CITS3002', row: 5, col: 1 },
-            { unit_code: 'CITS3403', row: 5, col: 2 },
-            { unit_code: 'CITS3007', row: 5, col: 3 },
-            { unit_code: 'CITS3200', row: 6, col: 1 },
-            { unit_code: 'CITS3006', row: 6, col: 2 },
-            ],
-        data_science: [
-            { unit_code: 'CITS1401', row: 1, col: 1 },
-            { unit_code: 'PHIL1001', row: 1, col: 2 },
-            { unit_code: 'CITS1402', row: 2, col: 1 },
-            { unit_code: 'STAT1400', row: 2, col: 2 },
-            { unit_code: 'STAT2401', row: 3, col: 1 },
-            { unit_code: 'STAT2402', row: 4, col: 1 },
-            { unit_code: 'CITS2402', row: 4, col: 2 },
-            { unit_code: 'CITS3403', row: 5, col: 1 },
-            { unit_code: 'CITS3401', row: 5, col: 2 },
-            { unit_code: 'CITS3200', row: 6, col: 1 },
-            { unit_code: 'STAT3064', row: 6, col: 2 },
-            { unit_code: 'STAT3405', row: 6, col: 3 },
-        ]
-    }
+  // ───── Constants & State ─────
+  const searchInput = document.getElementById('searchInput');
+  const saveButton = document.getElementById('saveButton');
+  const unitList = document.getElementById('unitList');
+  const planName = document.getElementById('planName');
+  const cellSelector = '.unit-cell';
+  const dropZones = Array.from(document.querySelectorAll(cellSelector));
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+  let allUnits = [];
+  let availableUnits = [];
+  let placedUnits = {}; // cell key is unit_code
+  const prefillTemplates = {
+    cs: [
+      { unit_code: 'CITS1401', row: 1, col: 1 },
+      { unit_code: 'CITS1402', row: 1, col: 2 },
+      { unit_code: 'CITS1003', row: 2, col: 1 },
+      { unit_code: 'CITS2005', row: 3, col: 1 },
+      { unit_code: 'CITS2200', row: 3, col: 2 },
+      { unit_code: 'CITS2002', row: 4, col: 1 },
+      { unit_code: 'CITS2211', row: 4, col: 2 },
+      { unit_code: 'CITS3403', row: 5, col: 1 },
+      { unit_code: 'CITS3002', row: 5, col: 2 },
+      { unit_code: 'CITS3200', row: 6, col: 1 },
+      { unit_code: 'CITS3001', row: 6, col: 2 }
+    ],
+    cyber: [
+      { unit_code: 'CITS1401', row: 1, col: 1 },
+      { unit_code: 'PHIL1001', row: 1, col: 2 },
+      { unit_code: 'CITS1003', row: 2, col: 1 },
+      { unit_code: 'CITS2006', row: 3, col: 1 },
+      { unit_code: 'CITS2002', row: 4, col: 1 },
+      { unit_code: 'CITS3002', row: 5, col: 1 },
+      { unit_code: 'CITS3403', row: 5, col: 2 },
+      { unit_code: 'CITS3007', row: 5, col: 3 },
+      { unit_code: 'CITS3200', row: 6, col: 1 },
+      { unit_code: 'CITS3006', row: 6, col: 2 },
+    ],
+    data_science: [
+      { unit_code: 'CITS1401', row: 1, col: 1 },
+      { unit_code: 'PHIL1001', row: 1, col: 2 },
+      { unit_code: 'CITS1402', row: 2, col: 1 },
+      { unit_code: 'STAT1400', row: 2, col: 2 },
+      { unit_code: 'STAT2401', row: 3, col: 1 },
+      { unit_code: 'STAT2402', row: 4, col: 1 },
+      { unit_code: 'CITS2402', row: 4, col: 2 },
+      { unit_code: 'CITS3403', row: 5, col: 1 },
+      { unit_code: 'CITS3401', row: 5, col: 2 },
+      { unit_code: 'CITS3200', row: 6, col: 1 },
+      { unit_code: 'STAT3064', row: 6, col: 2 },
+      { unit_code: 'STAT3405', row: 6, col: 3 },
+    ]
+  }
 
-    const csFinalCoreOptions = [
-        { code: "CITS3003", name: "Graphics and Animation", semester: 1 },
-        { code: "CITS3007", name: "Secure Coding",            semester: 1 },
-        { code: "CITS3005", name: "Knowledge Representation", semester: 1 },
-        { code: "CITS3009", name: "WIL Internship",           semester: 2 },
-        { code: "CITS3011", name: "Intelligent Agents",       semester: 2 },
-        { code: "CITS3402", name: "High Performance Computing", semester: 2 }
-    ];
+  const csFinalCoreOptions = [
+    { code: "CITS3003", name: "Graphics and Animation", semester: 1 },
+    { code: "CITS3007", name: "Secure Coding",            semester: 1 },
+    { code: "CITS3005", name: "Knowledge Representation", semester: 1 },
+    { code: "CITS3009", name: "WIL Internship",           semester: 2 },
+    { code: "CITS3011", name: "Intelligent Agents",       semester: 2 },
+    { code: "CITS3402", name: "High Performance Computing", semester: 2 }
+  ];
 
-    // ───── Initialization ─────
-    function init() {
-        applyInitialPlan();
-        loadUnits();
-        setupPrefillHandler();
-        setupSearchFilter();
-        setupSaveHandler();
-        setupDragAndDrop();
-    }
+  // ───── Initialization ─────
+  function init() {
+    applyInitialPlan();
+    loadUnits();
+    setupPrefillHandler();
+    setupSearchFilter();
+    setupSaveHandler();
+    setupDragAndDrop();
+  }
 
-    // ───── Initial render of grid ─────
-    async function applyInitialPlan() {
-        // 1) fetch existing plan 
-        let init = { name: '', units: [] };
-        const planId = new URLSearchParams(window.location.search).get('id');
-        if (planId) {
-          try {
-            const resp = await fetch(`/plans/get?id=${planId}`, { credentials: 'include' });
-            const body = await resp.json();
-            if (resp.ok && body.ok) init = body.plan;
-            else console.warn('Could not load plan:', body.message);
-          } catch (err) {
-            console.error('Error fetching plan:', err);
-          }
-        }
-      
-        // 2) clear everything & set the plan‐name
-        clearGrid();
-        planName.value = init.name || '';
-        placedUnits = {};
-      
-        // 3) normalise into an array if it was an object
-        const unitsArray = Array.isArray(init.units)
-          ? init.units
-          : Object.values(init.units);
-      
-        // 4) for each saved entry in the users saved plan, place the corrsponding unit into the grid
-        unitsArray.forEach(u => {
-          const { row, col } = u;
-          const key = `${row},${col}`;
-          const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
-      
-          // Build the unitmodel payload 
-          const dataForModel = {
-            unit_name:  u.unitname,
-            unit_code:  u.unitcode,
-            semester1:  u.semester1,
-            semester2:  u.semester2,
-            exam:       u.exam
-          };
-      
-          const uintm  = new UnitModel(dataForModel);
-          const div = createUnitDiv(uintm);
-      
-          cell.innerHTML = '';
-          cell.appendChild(div);
-          placedUnits[key] = uintm.unit_code;
-        });
-      
-        // 5) rebuild sidebar and validate
-        resetAvailableUnits();
-        renderUnitList(availableUnits);
-        validateAllCells();
+  // ───── Initial render of grid ─────
+  async function applyInitialPlan() {
+    // 1) fetch existing plan 
+    let init = { name: '', units: [] };
+    const planId = new URLSearchParams(window.location.search).get('id');
+    if (planId) {
+      try {
+        const resp = await fetch(`/plans/get?id=${planId}`, { credentials: 'include' });
+        const body = await resp.json();
+        if (resp.ok && body.ok) init = body.plan;
+        else console.warn('Could not load plan:', body.message);
+      } catch (err) {
+        console.error('Error fetching plan:', err);
       }
+    }
+
+    // 2) clear everything & set the plan‐name
+    clearGrid();
+    planName.value = init.name || '';
+    placedUnits = {};
+
+    // 3) normalise into an array if it was an object
+    const unitsArray = Array.isArray(init.units)
+      ? init.units
+      : Object.values(init.units);
+
+    // 4) for each saved entry in the users saved plan, place the corrsponding unit into the grid
+    unitsArray.forEach(u => {
+      const { row, col } = u;
+      const key = `${row},${col}`;
+      const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
+
+      // Build the unitmodel payload 
+      const dataForModel = {
+        unit_name: u.unitname,
+        unit_code: u.unitcode,
+        semester1: u.semester1,
+        semester2: u.semester2,
+        exam: u.exam
+      };
+
+      const uintm = new UnitModel(dataForModel);
+      const div = createUnitDiv(uintm);
+
+      cell.innerHTML = '';
+      cell.appendChild(div);
+      placedUnits[key] = uintm.unit_code;
+    });
+
+    // 5) rebuild sidebar and validate
+    resetAvailableUnits();
+    renderUnitList(availableUnits);
+    validateAllCells();
+  }
 
     // ───── Prefill template logic ─────
     function setupPrefillHandler() {
@@ -198,409 +198,465 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-    function applyTemplate(template) {
-        clearGrid();
-        template.forEach(({ unit_code, row, col }) => {
-            const unit = allUnits.find(u => u.unit_code === unit_code);
-            if (!unit) return console.warn(`Unit ${unit_code} not found`);
-    
-            // Locate cell by data-key!
-            const cell = document.querySelector(`.unit-cell[data-key="${row},${col}"]`);
-            if (!cell) return;
-    
-            const div = createUnitDiv(unit);
-            cell.innerHTML = "";            
-            cell.appendChild(div);
-    
-            // Remove from available
-            availableUnits = availableUnits.filter(u => u.unit_code !== unit_code);
-        });
+  function applyTemplate(template) {
+    clearGrid();
+    template.forEach(({ unit_code, row, col }) => {
+      const unit = allUnits.find(u => u.unit_code === unit_code);
+      if (!unit) return console.warn(`Unit ${unit_code} not found`);
+
+      // Locate cell by data-key!
+      const cell = document.querySelector(`.unit-cell[data-key="${row},${col}"]`);
+      if (!cell) return;
+
+      const div = createUnitDiv(unit);
+      cell.innerHTML = "";          
+      cell.appendChild(div);
+
+      // Remove from available
+      availableUnits = availableUnits.filter(u => u.unit_code !== unit_code);
+    });
+    renderUnitList(availableUnits);
+  }
+
+  function clearGrid() {
+    dropZones.forEach(zone => {
+      // Remove any .unit divs
+      const oldUnits = Array.from(zone.querySelectorAll('.unit'));
+      oldUnits.forEach(div => div.remove());
+    });
+    availableUnits = [...allUnits];
+    renderUnitList(availableUnits);
+  }
+
+  // ───── Fetch all units for the list ─────
+  function loadUnits() {
+    fetch('/units/recommended')
+      .then(res => res.json())
+      .then(data => {
+        allUnits = data.map(u => new UnitModel(u));
+        resetAvailableUnits();
         renderUnitList(availableUnits);
-    }
+        validateAllCells();
+      })
+      .catch(() => console.error('Failed to load units'));
+  }
+  function resetAvailableUnits() {
+    const placedCodes = Object.values(placedUnits);
+    availableUnits = allUnits.filter(u => !placedCodes.includes(u.unit_code));
+  }
 
-    function clearGrid() {
-        dropZones.forEach(zone => {
-            // Remove any .unit divs
-            const oldUnits = Array.from(zone.querySelectorAll('.unit'));
-            oldUnits.forEach(div => div.remove());
-        });
-        availableUnits = [...allUnits];
-        renderUnitList(availableUnits);
-    }
+  // ───── DOM rendering ─────
+  function renderUnitList(units) {
+    unitList.innerHTML = '';
+    units.forEach(u => {
+      let div = createUnitDiv(u);
+      div.setAttribute('data-code', u.unit_code);
+      unitList.appendChild(div);
+    });
+    setDragHandlers(unitList);
+  }
+  function createUnitDiv(unit) {
+    const div = document.createElement('div');
+    div.className = [   //changed these classes to fill the parent container (cell)
+      'unit',
+      'flex', 'flex-col',
+      'justify-center', 'items-stretch',
+      'w-full', 'h-full',
+      'p-2', 'rounded-lg', 'border',
+      'border-gray-300', 'dark:border-gray-700', 'cursor-move', 'gap-1',
+      'bg-white', 'dark:bg-dark-fg', 'shadow-sm'
+    ].join(' ');
+    div.setAttribute('data-code', unit.unit_code);
+    div.style.minWidth = "0";
 
-    // ───── Fetch all units for the list ─────
-    function loadUnits() {
-        fetch('/units/recommended')
-        .then(res => res.json())
-        .then(data => {
-            allUnits = data.map(u => new UnitModel(u));
-            resetAvailableUnits();
-            renderUnitList(availableUnits);
-            validateAllCells();
-        })
-        .catch(() => console.error('Failed to load units'));
-    }
-    function resetAvailableUnits() {
-        const placedCodes = Object.values(placedUnits);
-        availableUnits = allUnits.filter(u => !placedCodes.includes(u.unit_code));
-    }
+    // Name
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'flex-grow font-bold text-sm leading-tight w-full';
+    nameSpan.textContent = unit.unit_name;
+    nameSpan.style.minWidth = "0";
+    nameSpan.style.wordBreak = "break-word";
+    div.appendChild(nameSpan);
 
-    // ───── DOM rendering ─────
-    function renderUnitList(units) {
-        unitList.innerHTML = '';
-        units.forEach(u => {
-            let div = createUnitDiv(u);
-            div.setAttribute('data-code', u.unit_code);
-            unitList.appendChild(div);
-        });
-        setDragHandlers(unitList);
-    }
-    function createUnitDiv(unit) {
-        const div = document.createElement('div');
-        div.className = [   //changed these classes to fill the parent container (cell)
-            'unit',               
-            'flex', 'flex-col', 
-            'justify-center', 'items-stretch', 
-            'w-full', 'h-full',
-            'p-2', 'rounded-lg', 'border',
-            'border-gray-300','dark:border-gray-700', 'cursor-move', 'gap-1',
-            'bg-white', 'dark:bg-dark-fg', 'shadow-sm'
-          ].join(' ');
-        div.setAttribute('data-code', unit.unit_code);
-        div.style.minWidth = "0";
+    // tags, I think this looks nice than just listing them
+    const tags = document.createElement('div');
+    tags.className = 'flex flex-wrap gap-1 items-center mt-0';
+    if (unit.semester1) tags.appendChild(tag('Sem 1', 'bg-blue-100 text-blue-800'));
+    if (unit.semester2) tags.appendChild(tag('Sem 2', 'bg-green-100 text-green-800'));
+    if (unit.exam) tags.appendChild(tag('Exam', 'bg-red-100 text-red-700'));
+    tags.appendChild(tag(unit.unit_code, 'bg-slate-200 text-slate-700'));
+    div.appendChild(tags);
 
-        // Name
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'flex-grow font-bold text-sm leading-tight w-full';
-        nameSpan.textContent = unit.unit_name;
-        nameSpan.style.minWidth = "0";
-        nameSpan.style.wordBreak = "break-word";
-        div.appendChild(nameSpan);
+    // drag attributes
+    div.setAttribute('draggable', 'true');
+    div.addEventListener('dragstart', dragStartHandler);
+    div.addEventListener('dragend', dragEndHandler);
 
-        // tags, I think this looks nice than just listing them
-        const tags = document.createElement('div');
-        tags.className = 'flex flex-wrap gap-1 items-center mt-0';
-        if (unit.semester1) tags.appendChild(tag('Sem 1', 'bg-blue-100 text-blue-800'));
-        if (unit.semester2) tags.appendChild(tag('Sem 2', 'bg-green-100 text-green-800'));
-        if (unit.exam)      tags.appendChild(tag('Exam',  'bg-red-100 text-red-700'));
-        tags.appendChild(tag(unit.unit_code, 'bg-slate-200 text-slate-700'));
-        div.appendChild(tags);
+    return div;
+  }
+  function tag(text, classes) {
+    const span = document.createElement('span');
+    span.className = `tag px-1 py-[1.5px] text-[10px] rounded font-semibold inline-block ${classes}`;
+    span.textContent = text;
+    return span;
+  }
+  function getPlaceholderHtml() {
+    return '<div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>';
+  }
 
-        // drag attributes
-        div.setAttribute('draggable', 'true');
-        div.addEventListener('dragstart', dragStartHandler);
-        div.addEventListener('dragend', dragEndHandler);
+  // ───── Drag/drop support ─────
+  function setupDragAndDrop() {
+    //  allow drop to return unit to list
+    unitList.addEventListener('dragover', e => e.preventDefault());
+    unitList.addEventListener('drop', e => {
+      e.preventDefault();
+      const code = e.dataTransfer.getData('text/plain');
+      if (!code) return;
+      let gridUnit = document.querySelector(`.unit-cell .unit[data-code="${code}"]`);
+      if (gridUnit) {
+        let cell = gridUnit.closest('.unit-cell');
+        gridUnit.remove();
+        cell.innerHTML = getPlaceholderHtml();
+        delete placedUnits[cell.dataset.key];
+      }
+      if (!unitList.querySelector(`.unit[data-code="${code}"]`)) {
+        const unit = allUnits.find(u => u.unit_code === code);
+        if (unit) {
+          const div = createUnitDiv(unit);
+          unitList.appendChild(div);
+        }
+      }
+      resetAvailableUnits();
+      validateAllCells();
+    });
 
-        return div;
-    }
-    function tag(text, classes) {
-        const span = document.createElement('span');
-        span.className = `tag px-1 py-[1.5px] text-[10px] rounded font-semibold inline-block ${classes}`;
-        span.textContent = text;
-        return span;
-    }
-    function getPlaceholderHtml() {
-        return '<div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>';
-    }
+    // Grid cells
+    dropZones.forEach(cell => {
+      cell.addEventListener('dragover', e => e.preventDefault());
+      cell.addEventListener('drop', function(e) {
+        e.preventDefault();
+        const code = e.dataTransfer.getData('text/plain');
+        if (!code) return;
 
-    // ───── Drag/drop support ─────
-    function setupDragAndDrop() {
-        //  allow drop to return unit to list
-        unitList.addEventListener('dragover', e => e.preventDefault());
-        unitList.addEventListener('drop', e => {
-            e.preventDefault();
-            const code = e.dataTransfer.getData('text/plain');
-            if (!code) return;
-            let gridUnit = document.querySelector(`.unit-cell .unit[data-code="${code}"]`);
-            if (gridUnit) {
-                let cell = gridUnit.closest('.unit-cell');
-                gridUnit.remove();
-                cell.innerHTML = getPlaceholderHtml();
-                delete placedUnits[cell.dataset.key];
-            }
-            if (!unitList.querySelector(`.unit[data-code="${code}"]`)) {
-                const unit = allUnits.find(u => u.unit_code === code);
-                if (unit) {
-                    const div = createUnitDiv(unit);
-                    unitList.appendChild(div);
-                }
-            }
-            resetAvailableUnits();
-            validateAllCells();
-        });
+        // Remove duplicates
+        let existing = document.querySelector(`.unit-cell .unit[data-code="${code}"]`);
+        if (existing) {
+          let oldCell = existing.closest('.unit-cell');
+          existing.remove();
+          oldCell.innerHTML = getPlaceholderHtml();
+          delete placedUnits[oldCell.dataset.key];
+        }
 
-        // Grid cells
-        dropZones.forEach(cell => {
-            cell.addEventListener('dragover', e => e.preventDefault());
-            cell.addEventListener('drop', function(e) {
-                e.preventDefault();
-                const code = e.dataTransfer.getData('text/plain');
-                if (!code) return;
+        let fromList = unitList.querySelector(`.unit[data-code="${code}"]`);
+        if (fromList) fromList.remove();
 
-                // Remove duplicates
-                let existing = document.querySelector(`.unit-cell .unit[data-code="${code}"]`);
-                if (existing) {
-                    let oldCell = existing.closest('.unit-cell');
-                    existing.remove();
-                    oldCell.innerHTML = getPlaceholderHtml();
-                    delete placedUnits[oldCell.dataset.key];
-                }
+        cell.innerHTML = '';
+        const unit = allUnits.find(u => u.unit_code === code);
+        if (!unit) return;
+        const div = createUnitDiv(unit);
+        cell.appendChild(div);
+        placedUnits[cell.dataset.key] = code;
 
-                let fromList = unitList.querySelector(`.unit[data-code="${code}"]`);
-                if (fromList) fromList.remove();
+        resetAvailableUnits();
+        renderUnitList(availableUnits); // updates the sidebar
+        validateAllCells(); // updates all warnings
+      });
+    });
+  }
+  function setDragHandlers(ctx) {
+    (ctx || document).querySelectorAll('.unit').forEach(div => {
+      div.setAttribute('draggable', 'true');
+      div.removeEventListener('dragstart', dragStartHandler);
+      div.removeEventListener('dragend', dragEndHandler);
+      div.addEventListener('dragstart', dragStartHandler);
+      div.addEventListener('dragend', dragEndHandler);
+    });
+  }
+  function dragStartHandler(e) {
+    const code = this.getAttribute('data-code');
+    e.dataTransfer.setData('text/plain', code);
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => this.classList.add('opacity-50'), 0);
+  }
+  function dragEndHandler() {
+    this.classList.remove('opacity-50');
+  }
 
-                cell.innerHTML = '';
-                const unit = allUnits.find(u => u.unit_code === code);
-                if (!unit) return;
-                const div = createUnitDiv(unit);
-                cell.appendChild(div);
-                placedUnits[cell.dataset.key] = code;
-
-                resetAvailableUnits();
-                renderUnitList(availableUnits); // updates the sidebar
-                validateAllCells(); // updates all warnings
-            });
-        });
-    }
-    function setDragHandlers(ctx) {
-        (ctx || document).querySelectorAll('.unit').forEach(div => {
-            div.setAttribute('draggable', 'true');
-            div.removeEventListener('dragstart', dragStartHandler);
-            div.removeEventListener('dragend', dragEndHandler);
-            div.addEventListener('dragstart', dragStartHandler);
-            div.addEventListener('dragend', dragEndHandler);
-        });
-    }
-    function dragStartHandler(e) {
-        const code = this.getAttribute('data-code');
-        e.dataTransfer.setData('text/plain', code);
-        e.dataTransfer.effectAllowed = 'move';
-        setTimeout(()=>this.classList.add('opacity-50'), 0);
-    }
-    function dragEndHandler() {
-        this.classList.remove('opacity-50');
-    }
-
-    // ───── Semester-check support ─────
-    function validateAllCells() {
-        dropZones.forEach(cell => {
-            const unitDiv = cell.querySelector('.unit');
-            if (unitDiv) {
-                const code = unitDiv.getAttribute('data-code');
-                const unit = allUnits.find(u => u.unit_code === code);
-                if (unit) {
-                    validateSemesterPlacement(cell, unit);
-                    validatePrereqs();
-                }
-            } else {
-                cell.classList.remove("ring-2", "ring-red-400");
-                const prevBadge = cell.querySelector('.semester-warning');
-                if (prevBadge) prevBadge.remove();
-            }
-        });
-    }
-    function validateSemesterPlacement(cell, unit) {
-        const key = cell.dataset.key.split(',');
-        const semIdx = parseInt(key[0]);
-        // in the jinja template we can know for sure that a key of 1 is semester 1 and a key of 2 is semsester 2
-        const targetSemester = (semIdx % 2 === 1) ? 1 : 2;
-        const ok = (targetSemester === 1 && unit.semester1) ||
-                   (targetSemester === 2 && unit.semester2);
-
+  // ───── Semester-check support ─────
+  function validateAllCells() {
+    dropZones.forEach(cell => {
+      const unitDiv = cell.querySelector('.unit');
+      if (unitDiv) {
+        const code = unitDiv.getAttribute('data-code');
+        const unit = allUnits.find(u => u.unit_code === code);
+        if (unit) {
+          validateSemesterPlacement(cell, unit);
+          validatePrereqs();
+        }
+      } else {
         cell.classList.remove("ring-2", "ring-red-400");
         const prevBadge = cell.querySelector('.semester-warning');
         if (prevBadge) prevBadge.remove();
+      }
+    });
+  }
+  function validateSemesterPlacement(cell, unit) {
+    const key = cell.dataset.key.split(',');
+    const semIdx = parseInt(key[0]);
+    // in the jinja template we can know for sure that a key of 1 is semester 1 and a key of 2 is semsester 2
+    const targetSemester = (semIdx % 2 === 1) ? 1 : 2;
+    const ok = (targetSemester === 1 && unit.semester1) ||
+      (targetSemester === 2 && unit.semester2);
 
-        if (!ok) {
-            cell.classList.add("ring-2", "ring-red-400");
-            const unitDiv = cell.querySelector('.unit');
-            if (unitDiv) {
-                unitDiv.style.position = "relative";
-                const badge = document.createElement('div');
-                badge.className = "semester-warning absolute top-1 right-1 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded shadow";
-                badge.innerText = "Wrong Semester";
-                badge.style.zIndex = 20;
-                unitDiv.appendChild(badge);
-            }
+    cell.classList.remove("ring-2", "ring-red-400");
+    const prevBadge = cell.querySelector('.semester-warning');
+    if (prevBadge) prevBadge.remove();
+
+    if (!ok) {
+      cell.classList.add("ring-2", "ring-red-400");
+      const unitDiv = cell.querySelector('.unit');
+      if (unitDiv) {
+        unitDiv.style.position = "relative";
+        const badge = document.createElement('div');
+        badge.className = "semester-warning absolute top-1 right-1 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded shadow";
+        badge.innerText = "Wrong Semester";
+        badge.style.zIndex = 20;
+        unitDiv.appendChild(badge);
+      }
+    }
+  }
+
+  function validatePrereqs() {
+    const placedWithTime = {};
+    dropZones.forEach(cell => {
+      const div = cell.querySelector('.unit');
+      if (!div) return;
+      const [r, c] = cell.dataset.key.split(',').map(Number);
+      placedWithTime[div.dataset.code] = (r - 1) * 4 + c;
+    });
+
+    dropZones.forEach(cell => {
+      cell.classList.remove('ring-2', 'ring-red-400');
+      const old = cell.querySelector('.prereq-warning');
+      if (old) old.remove();
+    });
+
+    dropZones.forEach(cell => {
+      const div = cell.querySelector('.unit');
+      if (!div) return;
+      const code = div.dataset.code;
+      const unit = allUnits.find(u => u.unit_code === code);
+      if (!unit || !unit.prerequisites) return;
+
+      const currentTime = placedWithTime[code];
+      const groups = unit.prerequisites
+        .split('|')
+        .map(g => g.trim().split('+').map(c => c.trim()));
+
+      const ok = groups.some(group =>
+        group.every(pr => placedWithTime[pr] !== undefined && placedWithTime[pr] < currentTime)
+      );
+      if (!ok) {
+        cell.classList.add('ring-2', 'ring-red-400');
+        const badge = document.createElement('div');
+        badge.className = 'prereq-warning absolute top-1 left-1 text-[10px] bg-red-500 text-white px-1 rounded';
+        badge.textContent = 'PREREQ!';
+        badge.style.zIndex = 20;
+        div.style.position = 'relative';
+        div.appendChild(badge);
+
+        // create tooltip
+        const tooltipText = groups
+          .map(group => group.join(' AND '))
+          .join(' OR ');
+
+        div.setAttribute('title', `Requires: ${tooltipText}`);
+      }
+    });
+  }
+
+  // ───── Search/filter support ─────
+  function setupSearchFilter() {
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      let filtered = availableUnits;
+      if (q)
+        filtered = availableUnits.filter(u =>
+          u.unit_name.toLowerCase().includes(q) || u.unit_code.toLowerCase().includes(q)
+        );
+      renderUnitList(filtered);
+    });
+  }
+
+  // ───── Save logic ─────
+  function setupSaveHandler() {
+    saveButton.addEventListener('click', () => {
+      const name = planName.value.trim();
+      if (!name) return createAlert('Please enter a plan name.', 'error');
+
+      const major = document.getElementById('prefillSelect').value;
+
+      if (major === 'cs' && !document.getElementById('csCoreSelect').value) {
+          console.log("I can see that this user is doing cs");
+          createAlert('Please select your final core unit before saving.', 'error');
+          return;
+      }
+      const units = [];
+      for (let cell of dropZones) {
+        const div = cell.querySelector('.unit');
+        if (!div) continue;
+        const code = div.getAttribute('data-code');
+        const unit = allUnits.find(u => u.unit_code === code);
+        if (unit) {
+          units.push({
+            unit_name: unit.unit_name,
+            unit_code: unit.unit_code,
+            column: +cell.dataset.key.split(',')[1],
+            row: +cell.dataset.key.split(',')[0]
+          });
         }
-    }
+      }
+      if (!units.length) return createAlert('Please place at least one unit.', 'error');
 
-    function validatePrereqs() {
-        const placedWithTime = {};
-        dropZones.forEach(cell => {
-            const div = cell.querySelector('.unit');
-            if (!div) return;
-            const [r, c] = cell.dataset.key.split(',').map(Number);
-            placedWithTime[ div.dataset.code ] = (r - 1) * 4 + c;
-        });
+      const placedWithTime = {};
+      for (let cell of dropZones) {
+        const div = cell.querySelector('.unit');
+        if (!div) continue;
+        const key = cell.dataset.key;
+        const [row, col] = key.split(',').map(Number);
+        const timeIndex = (row - 1) * 4 + col;
+        const code = div.getAttribute('data-code');
+        placedWithTime[code] = timeIndex;
 
-        dropZones.forEach(cell => {
-            cell.classList.remove('ring-2', 'ring-red-400');
-            const old = cell.querySelector('.prereq-warning');
-            if (old) old.remove();
-        });
-
-        dropZones.forEach(cell => {
-            const div = cell.querySelector('.unit');
-            if (!div) return;
-            const code = div.dataset.code;
-            const unit = allUnits.find(u => u.unit_code === code);
-            if (!unit || !unit.prerequisites) return;
-
-            const currentTime = placedWithTime[code];
-            const groups = unit.prerequisites
-            .split('|')
-            .map(g => g.trim().split('+').map(c => c.trim()));
-
-            const ok = groups.some(group =>
-            group.every(pr => placedWithTime[pr] !== undefined && placedWithTime[pr] < currentTime)
-            );
-            if (!ok) {
-            cell.classList.add('ring-2','ring-red-400');
-            const badge = document.createElement('div');
-            badge.className = 'prereq-warning absolute top-1 left-1 text-[10px] bg-red-500 text-white px-1 rounded';
-            badge.textContent = 'PREREQ!';
-            badge.style.zIndex = 20;
-            div.style.position = 'relative';
-            div.appendChild(badge);
-
-            // create tooltip
-            const tooltipText = groups
-                .map(group => group.join(' AND '))
-                .join(' OR ');
-
-            div.setAttribute('title', `Requires: ${tooltipText}`);
-            }
-        });
-    }
-
-    // ───── Search/filter support ─────
-    function setupSearchFilter() {
-        searchInput.addEventListener('input', () => {
-            const q = searchInput.value.trim().toLowerCase();
-            let filtered = availableUnits;
-            if (q)
-                filtered = availableUnits.filter(u =>
-                    u.unit_name.toLowerCase().includes(q) || u.unit_code.toLowerCase().includes(q)
-                );
-            renderUnitList(filtered);
-        });
-    }
-
-    // ───── Save logic ─────
-    function setupSaveHandler() {
-        saveButton.addEventListener('click', () => {
-            const name = planName.value.trim();
-            if (!name) return createAlert('Please enter a plan name.', 'error');
-
-            const major = document.getElementById('prefillSelect').value;
-
-            if (major === 'cs' && !document.getElementById('csCoreSelect').value) {
-                console.log("I can see that this user is doing cs");
-                createAlert('Please select your final core unit before saving.', 'error');
-                return;
-            }
-            const units = [];
-            for (let cell of dropZones) {
-                const div = cell.querySelector('.unit');
-                if (!div) continue;
-                const code = div.getAttribute('data-code');
-                const unit = allUnits.find(u => u.unit_code === code);
-                if (unit) {
-                    units.push({
-                        unit_name: unit.unit_name,
-                        unit_code: unit.unit_code,
-                        column: +cell.dataset.key.split(',')[1],
-                        row: +cell.dataset.key.split(',')[0]
-                    });
-                }
-            }
-            if (!units.length) return createAlert('Please place at least one unit.', 'error');
-
-            const placedWithTime = {};
-            for (let cell of dropZones) {
-                const div = cell.querySelector('.unit');
-                if (!div) continue;
-                const key = cell.dataset.key;
-                const [row, col] = key.split(',').map(Number);
-                const timeIndex = (row - 1) * 4 + col; 
-                const code = div.getAttribute('data-code');
-                placedWithTime[code] = timeIndex;
-
-            }
+      }
 
 
-            // Check each unit's prerequisites
-            const unsatisfied = [];
+      // Check each unit's prerequisites
+      const unsatisfied = [];
 
-            for (let cell of dropZones) {
-                const div = cell.querySelector('.unit');
-                if (!div) continue;
-                const code = div.getAttribute('data-code');
-                const unit = allUnits.find(u => u.unit_code === code);
-                if (!unit) {
-                    continue;
-                }
+      for (let cell of dropZones) {
+        const div = cell.querySelector('.unit');
+        if (!div) continue;
+        const code = div.getAttribute('data-code');
+        const unit = allUnits.find(u => u.unit_code === code);
+        if (!unit) {
+          continue;
+        }
 
-                if (!unit.prerequisites) {
-                    continue;
-                }
-
-
-                const currentTime = placedWithTime[code];
-
-                const groups = unit.prerequisites
-                    .split('|')
-                    .map(group => group.trim().split('+').map(c => c.trim()));
+        if (!unit.prerequisites) {
+          continue;
+        }
 
 
-                const satisfies = groups.some(group =>
-                    group.every(prereq => {
-                        const prereqTime = placedWithTime[prereq];
-                        const status = prereqTime !== undefined && prereqTime < currentTime;
-                        return status;
-                    })
-                );
+        const currentTime = placedWithTime[code];
 
-                if (!satisfies && groups.length > 0 && groups[0][0] !== "") {
-                    unsatisfied.push({ unit: code, groups });
-                } 
-            }
+        const groups = unit.prerequisites
+          .split('|')
+          .map(group => group.trim().split('+').map(c => c.trim()));
 
-            // Show error if any
-            if (unsatisfied.length > 0) {
-                createAlert("Please make sure all units have their prerequisites satisfied.", 'error');
-            return;
-            }
 
-            fetch('/plans/save', {
-                method: 'POST',
-                headers: { 
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-                body: JSON.stringify({ plan_name: name, units })
-            })
-            .then(res => res.json())
-            .then(json => {
-                createAlert(json.message, json.ok ? 'success' : 'error');
-                if (json.ok) setTimeout(()=>location.href='/dashboard', 1000);
-            })
-            .catch(() => createAlert('An error occurred while saving.', 'error'));
-        });
+        const satisfies = groups.some(group =>
+          group.every(prereq => {
+            const prereqTime = placedWithTime[prereq];
+            const status = prereqTime !== undefined && prereqTime < currentTime;
+            return status;
+          })
+        );
+
+        if (!satisfies && groups.length > 0 && groups[0][0] !== "") {
+          unsatisfied.push({ unit: code, groups });
+        }
+      }
+
+      // Show error if any
+      if (unsatisfied.length > 0) {
+        createAlert("Please make sure all units have their prerequisites satisfied.", 'error');
+        return;
+      }
+
+      fetch('/plans/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ plan_name: name, units, plan_id: edit_plan_id })
+      })
+        .then(res => res.json())
+        .then(json => {
+          createAlert(json.message, json.ok ? 'success' : 'error');
+          if (json.ok) setTimeout(() => location.href = '/dashboard', 1000);
+        })
+        .catch(() => createAlert('An error occurred while saving.', 'error'));
+    });
 
         
         function createAlert(message, category) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert ${category} fade-out`;
-            alertDiv.innerHTML = `
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-            ${message}
-            `;
-            document.querySelector('.absolute-container ul').appendChild(alertDiv);
-        }
+            const map = {
+              success: {
+                bar: 'bg-green-300 dark:bg-green-800',
+                bg: 'bg-green-50 dark:bg-gray-800',
+                text: 'text-green-800 dark:text-green-400',
+                icon: '<path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 111.414 1.414z"/>'
+              },
+              error: {
+                bar: 'bg-red-300 dark:bg-red-800',
+                bg: 'bg-red-50 dark:bg-gray-800',
+                text: 'text-red-800 dark:text-red-400',
+                icon: '<path fill-rule="evenodd" d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" clip-rule="evenodd"/>'
+              }
+            };
+          
+            const cfg = map[category]
+          
+            const container = document.getElementById('flash-container');
+            if (!container) return;
+          
+            const nextId = container.querySelectorAll('[data-flash-id]').length + 1;
+          
+            const alert = document.createElement('div');
+            alert.setAttribute('id', `flash-${nextId}`);
+            alert.setAttribute('data-flash-id', nextId);
+            alert.setAttribute('role', 'alert');
+            alert.className = `
+              relative overflow-hidden flex items-center p-4 mb-4 text-sm font-medium
+              ${cfg.text} ${cfg.bg} animate-flash-in
+            `
+          
+            //same html as in base.html
+            alert.innerHTML = `
+              <div class="absolute top-0 left-0 h-1 ${cfg.bar}"
+                   style="animation: progress-bar 5s linear forwards;"></div>
+          
+              <svg class="shrink-0 w-4 h-4" aria-hidden="true"
+                   xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                ${cfg.icon}
+              </svg>
+          
+              <div class="ms-3">${message}</div>
+          
+              <button type="button"
+                class="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-offset-2 p-1.5
+                       inline-flex items-center justify-center h-8 w-8"
+                data-flash-close="${nextId}">
+                <svg class="w-3 h-3"
+                     xmlns="http://www.w3.org/2000/svg" fill="none"
+                     viewBox="0 0 14 14">
+                   <path stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="2"
+                         d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+              </button>
+            `.trim();
+          
+            container.appendChild(alert);
+          
+            // auto dismiss(the dismiss function is defined in alert.js)
+            container.querySelectorAll('[data-flash-id]').forEach(el => {
+                setTimeout(() => dismiss(el), 5000);
+              });
+          }
     }
 
-    // ───── Kickoff ─────
-    init();
+  // ───── Kickoff ─────
+  init();
 });

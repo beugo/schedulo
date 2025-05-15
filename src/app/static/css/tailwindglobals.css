@@ -1,7 +1,25 @@
 body {
-    font-family: 'Inter', sans-serif;
-  }
+  font-family: 'Inter', sans-serif;
+}
 
 body.transitions-enabled {
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+/* animation for alert progress bar */
+@keyframes progress-bar {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+@keyframes flash-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-flash-in {
+  animation: flash-in 300ms ease-out forwards;
 }
