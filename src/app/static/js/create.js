@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
             { unit_code: 'CITS2211', row: 4, col: 2 },
             { unit_code: 'CITS3403', row: 5, col: 1 },
             { unit_code: 'CITS3002', row: 5, col: 2 },
-            { unit_code: 'CITS3007', row: 5, col: 3 },
             { unit_code: 'CITS3200', row: 6, col: 1 },
             { unit_code: 'CITS3001', row: 6, col: 2 }
             ],
@@ -47,24 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
             { unit_code: 'CITS3007', row: 5, col: 3 },
             { unit_code: 'CITS3200', row: 6, col: 1 },
             { unit_code: 'CITS3006', row: 6, col: 2 },
-            ],
-        cs_cyber: [
-            { unit_code: 'CITS1401', row: 1, col: 1 },
-            { unit_code: 'PHIL1001', row: 1, col: 2 },
-            { unit_code: 'CITS1402', row: 1, col: 3 },
-            { unit_code: 'CITS1003', row: 2, col: 1 },
-            { unit_code: 'CITS2006', row: 3, col: 1 },
-            { unit_code: 'CITS2200', row: 3, col: 2 },
-            { unit_code: 'CITS2005', row: 3, col: 3 },
-            { unit_code: 'CITS2002', row: 4, col: 1 },
-            { unit_code: 'CITS2211', row: 4, col: 2 },
-            { unit_code: 'CITS3002', row: 5, col: 1 },
-            { unit_code: 'CITS3403', row: 5, col: 2 },
-            { unit_code: 'CITS3007', row: 5, col: 3 },
-            { unit_code: 'CITS3200', row: 6, col: 1 },
-            { unit_code: 'CITS3006', row: 6, col: 2 },
-            { unit_code: 'CITS3001', row: 6, col: 3 },
-            { unit_code: 'CITS3005', row: 6, col: 4 }
             ],
         data_science: [
             { unit_code: 'CITS1401', row: 1, col: 1 },
@@ -81,6 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
             { unit_code: 'STAT3405', row: 6, col: 3 },
         ]
     }
+
+    const csFinalCoreOptions = [
+        { code: "CITS3003", name: "Graphics and Animation", semester: 1 },
+        { code: "CITS3007", name: "Secure Coding",            semester: 1 },
+        { code: "CITS3005", name: "Knowledge Representation", semester: 1 },
+        { code: "CITS3009", name: "WIL Internship",           semester: 2 },
+        { code: "CITS3011", name: "Intelligent Agents",       semester: 2 },
+        { code: "CITS3402", name: "High Performance Computing", semester: 2 }
+    ];
 
     // ───── Initialization ─────
     function init() {
@@ -149,14 +139,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ───── Prefill template logic ─────
     function setupPrefillHandler() {
-        const select = document.getElementById('prefillSelect');
+        const select            = document.getElementById('prefillSelect');
+        const coreSelectWrapper = document.getElementById('csCoreSelectWrapper');
+        const coreSelect        = document.getElementById('csCoreSelect');
+
         if (!select) return;
+
+        // When you pick a major…
         select.addEventListener('change', () => {
             const key = select.value;
-            if (!key) return clearGrid();
-            applyTemplate(prefillTemplates[key]);
+            clearGrid();
+
+            if (key === 'cs') {
+                // 1) apply all the *fixed* CS units (minus the final core)
+                applyTemplate(prefillTemplates['cs']);
+
+                // 2) show + populate the dropdown
+                coreSelectWrapper.classList.remove('hidden');
+                coreSelect.innerHTML = '<option value="">— Select one —</option>';
+                csFinalCoreOptions.forEach(u => {
+                    const o = document.createElement('option');
+                    o.value       = u.code;
+                    o.textContent = `${u.code} – ${u.name} (Sem ${u.semester})`;
+                    coreSelect.appendChild(o);
+                });
+            } else {
+                applyTemplate(prefillTemplates[key] || []);
+                coreSelectWrapper.classList.add('hidden');
+                coreSelect.innerHTML = '';
+            }
         });
-    }
+
+        // When you choose your final core…
+        coreSelect.addEventListener('change', () => {
+            const code = coreSelect.value;
+            const u    = csFinalCoreOptions.find(x => x.code === code);
+            if (!u) return;
+
+            const row = u.semester === 1 ? 5 : 6;
+            const col = 3;    
+            const key = `${row},${col}`;
+            const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
+            if (!cell) return;
+
+            // clear + drop in the chosen unit
+            cell.innerHTML = '';
+            const unitModel = allUnits.find(x => x.unit_code === code);
+            if (unitModel) {
+            cell.appendChild(createUnitDiv(unitModel));
+            placedUnits[key] = code;
+            }
+
+            // refresh sidebar & validation
+            resetAvailableUnits();
+            renderUnitList(availableUnits);
+            validateAllCells();
+        });
+        }
+
 
     function applyTemplate(template) {
         clearGrid();
@@ -169,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!cell) return;
     
             const div = createUnitDiv(unit);
-            cell.innerHTML = "";            // clear cell before adding, in case of remnant
+            cell.innerHTML = "";            
             cell.appendChild(div);
     
             // Remove from available
@@ -452,6 +492,14 @@ document.addEventListener('DOMContentLoaded', () => {
         saveButton.addEventListener('click', () => {
             const name = planName.value.trim();
             if (!name) return createAlert('Please enter a plan name.', 'error');
+
+            const major = document.getElementById('prefillSelect').value;
+
+            if (major === 'cs' && !document.getElementById('csCoreSelect').value) {
+                console.log("I can see that this user is doing cs");
+                createAlert('Please select your final core unit before saving.', 'error');
+                return;
+            }
             const units = [];
             for (let cell of dropZones) {
                 const div = cell.querySelector('.unit');
