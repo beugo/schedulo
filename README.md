@@ -81,15 +81,13 @@ Schedulo includes both unit tests and Selenium-based end-to-end tests to ensure 
 1. **Running Unit Tests**
    To execute the unit tests, run:
    ```bash
-   cd src
-   python run_unit_tests.py
+   python src/unit_tests.py
    ```
 
 2. **Running Selenium Tests**
    To run the Selenium browser-based tests, use:
    ```bash
-   cd src
-   python run_selenium_tests.py
+   python src/selenium_tests.py
    ```
 
 These tests will help you verify that the application is working as expected and that all major features are functioning correctly.
