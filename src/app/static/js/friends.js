@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   input = document.getElementById("searchInput");
 
   refreshTable();
+  getFriendRequests();
 
   input.addEventListener("input", function () {
     clearTimeout(debounceTimer);
@@ -202,7 +203,6 @@ function getFriendRequests() {
       });
     });
 }
-getFriendRequests();
 
 function acceptFriendRequest(username, req) {
   fetch(`/friend/add?q=${encodeURIComponent(username)}`, {
