@@ -231,6 +231,7 @@ def view_plan():
         unit = Unit.query.get(pu.unit_id)
         if unit:
             sidebar_units.append({
+                "id": unit.id,
                 "name": unit.unit_name,
                 "code": unit.unit_code
             })
@@ -269,6 +270,7 @@ def view_plan():
         col_index = get_column_index(pu.row, pu.col)
         if 1 <= col_index <= 8:
             year_cols[year][col_index].append({
+                "id": unit.id,
                 "name": unit.unit_name,
                 "code": unit.unit_code
             })

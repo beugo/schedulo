@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
     units.forEach(unit => {
       const div = document.createElement("div");
       div.id = "unit"
-      div.className = "p-4 mb-4 rounded-2xl bg-white transition bg-white dark:bg-dark-fg border-2 dark:border-dark-border shadow ext-gray-600 dark:text-dark-secondary";
+      div.className = "p-4 mb-4 rounded-2xl bg-white transition bg-white dark:bg-dark-fg border-2 dark:border-dark-border shadow ext-gray-600 dark:text-dark-secondary cursor-pointer";
       div.onclick = () => {
         window.location.href = `discover?id=${unit.id}`;
       }

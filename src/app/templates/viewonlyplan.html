@@ -17,7 +17,9 @@
       <ul class="divide-y divide-gray-100 dark:divide-gray-800 bg-gray-50 dark:bg-dark-bg rounded-xl p-4 max-h-[50vh] overflow-y-auto shadow-inner scroll-smooth">
         {% if plan_units_list %}
           {% for unit in plan_units_list %}
-            <li class="py-2 flex items-center gap-3 group">
+            <li 
+              class="py-2 flex items-center gap-3 group cursor-pointer transition"
+              onclick="window.open('/discover?id={{ unit.id }}', '_blank')">
               <span class="font-semibold text-gray-900 dark:text-white transition group-hover:text-primary-600">
                 {{ unit.name }}
               </span>
@@ -67,7 +69,8 @@
                   {% set units = year_units.get((row - 1) * 4 + col_key) %}
                   {% if units %}
                     {% for unit in units %}
-                      <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-dark-bg shadow-sm px-4 py-3 group hover:ring-2 hover:ring-blue-400/40 transition-all h-24 flex flex-col justify-center">
+                      <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-dark-bg shadow-sm px-4 py-3 group hover:ring-2 hover:ring-blue-400/40 transition-all h-24 flex flex-col justify-center cursor-pointer transition"
+                      onclick="window.open('/discover?id={{ unit.id }}', '_blank')">
                         <div class="text-sm font-semibold text-gray-800 dark:text-white mb-0.5 group-hover:text-blue-700 dark:group-hover:text-blue-400 transition">
                           {{ unit.name }}
                         </div>

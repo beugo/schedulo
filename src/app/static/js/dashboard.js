@@ -33,7 +33,7 @@ function renderPlansTable(plans) {
   plansTable.innerHTML = "";
   plans.forEach(plan => {
     const tr = document.createElement("tr");
-    tr.className = "hover:bg-gray-100 dark:hover:bg-dark-secondary";
+    tr.className = "hover:bg-gray-100 dark:hover:bg-dark-secondary cursor-pointer";
     tr.onclick = () => {
       window.location.href = `/plans/view?id=${plan.id}`;
     };
