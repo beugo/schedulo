@@ -1,13 +1,20 @@
 # Schedulo
 
 
-## Design and Use
+## What is Schedulo?
 
-This tool helps new UWA Computer Science students plan their degree over three years by generating a personalized unit plan based on their major. It simplifies handbook requirements, prerequisites, and credit tracking through a clear, guided interface that maps out each semester from start to finish.
+Schedulo is a web-based planning tool designed specifically for new Computer Science students at the University of Western Australia (UWA). Its main purpose is to help students map out their three-year degree by generating a personalized unit plan based on their chosen major. Schedulo streamlines the process of understanding handbook requirements, checking prerequisites, and tracking credit points, all through an intuitive and guided interface. The application visually lays out each semester, making it easy for students to see their academic journey from start to finish and make informed decisions about their studies.
 
-### Tech Stack
-- Frontend: HTML, CSS, JavaScript, Tailwind
-- Backend: Flask, jQuery, AJAX/Websockets, SQLite (via SQLAlchemy)
+### Key Features
+- **Personalized Unit Planning:** Enter your major and Schedulo will generate a recommended sequence of units for all three years, taking into account prerequisites and degree requirements.
+- **Handbook Simplification:** Schedulo interprets the official UWA handbook rules and presents them in a clear, actionable format.
+- **Prerequisite Awareness:** Schedulo automatically checks for prerequisite chains, ensuring you don’t miss any required units.
+- **Interactive Interface:** The guided interface allows you to explore, adjust, and visualize your plan semester by semester.
+- **Collaboration:** You can share your plan with friends, compare unit choices, and even send or receive friend requests within the platform.
+
+### Technology Stack
+- **Frontend:** Built with HTML, JavaScript, and Tailwind CSS for a modern, responsive user experience.
+- **Backend:** Powered by Flask (Python), with real-time features enabled by AJAX. Data is stored in SQLite using SQLAlchemy ORM for reliability and simplicity.
 
 ## Group Members
 | Name               | Student Number | GitHub Username   |
@@ -18,59 +25,72 @@ This tool helps new UWA Computer Science students plan their degree over three y
 | Nathan Kim         | 23364749       | nathanbkim         |
 
 
-## Instructions to Launch Application
+## How to Launch the Application
+
 ### Requirements
 
-- Python 3.8 or newer
-- `pip`
-- `virtualenv`
+- Python 3.8 or newer (make sure it is installed on your system)
+- `pip` (Python package manager)
+- `virtualenv` (for creating isolated Python environments)
 
 ### Setup Instructions
 
 1. **Clone the repository**
+   Clone the Schedulo repository from GitHub and navigate into the project directory:
    ```bash
    git clone git@github.com:beugo/schedulo.git
    cd schedulo
    ```
 
 2. **Create and activate a virtual environment**
+   Set up a Python virtual environment to keep dependencies isolated:
    ```bash
    python -m venv .venv
    source .venv/bin/activate
    ```
 
 3. **Install project dependencies**
+   Install all required Python packages using pip:
    ```bash
+   cd src
    pip install -r requirements.txt
    ```
 
 4. **Run the Flask app**
+   Start the Flask development server:
    ```bash
-   cd src
    python run.py
    ```
 
-5. **Visit the app**  
-   Visit the app at this address --> [http://localhost:5000](http://localhost:5000)
+5. **Access the application**  
+   Open your web browser and go to [http://localhost:5000](http://localhost:5000) to use Schedulo.
 
 6. **Import Existing Units (Optional)**
-   To import existing units run the import_units.py script from the project directory
+   If you want to pre-populate the database with existing units and users, run the following commands from the project directory:
    ```bash
-   cd schedulo
-   python seed.py
+   flask db upgrade
+   python seed_units.py
+   python seed_users.py
    ```
+   This will apply any database migrations and seed the database with sample data.
 
-## Instructions for how to run the tests for the application
+## How to Run the Tests for the Application
+
+Schedulo includes both unit tests and Selenium-based end-to-end tests to ensure reliability.
 
 1. **Running Unit Tests**
-```
-cd src
-python run_unit_tests.py
-```
+   To execute the unit tests, run:
+   ```bash
+   cd src
+   python run_unit_tests.py
+   ```
 
 2. **Running Selenium Tests**
-```
-cd src
-python run_selenium_tests.py
-```
+   To run the Selenium browser-based tests, use:
+   ```bash
+   cd src
+   python run_selenium_tests.py
+   ```
+
+These tests will help you verify that the application is working as expected and that all major features are functioning correctly.
 
