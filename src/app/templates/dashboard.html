@@ -4,40 +4,54 @@
 
 {% block content %}
 <div class="flex w-full gap-8 items-start" style="max-height: 80vh;">
-  <!-- Left Sidebar -->
+
+  <!-- LEFT SIDEBAR: Unit Plans -->
   <div class="w-1/5 flex flex-col gap-4 bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-2 overflow-auto" style="max-height: inherit">
+    
     <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow">
       <a href="{{ url_for('main.create_page') }}">Create New Unit Plan</a>
     </button>
-    <h3 class="font-bold text-lg mb-2" style="margin: auto;">Your Unit Plans</h3>
+
+    <h3 class="font-bold text-lg mb-2 text-center">Your Unit Plans</h3>
+
     <div class="overflow-x-auto">
       <table class="min-w-full bg-white dark:bg-dark-fg rounded-lg shadow-md">
-          <tbody id="plansTable">
-          </tbody>
+        <tbody id="plansTable">
+          <!-- Plans will be populated by JS -->
+        </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Center Feed -->
+  <!-- CENTER FEED: Posts -->
   <div class="w-3/5 flex flex-col items-center overflow-auto" style="max-height: inherit">
     <div id="postFeed" class="w-full flex flex-col gap-4"></div>
   </div>
 
-  <!-- Right Sidebar -->
+  <!-- RIGHT SIDEBAR: Friends -->
   <div class="w-1/5 flex flex-col gap-4 bg-white dark:bg-dark-fg border dark:border-dark-border rounded-lg p-2 overflow-auto" style="max-height: inherit">
+    
     <div class="flex flex-row items-center justify-between p-2">
-      <h3 class="font-bold text-lg mb-2" style="margin: auto;">Your Friends</h3>
+      <h3 class="font-bold text-lg mb-2 text-center">Your Friends</h3>
       <div class="flex-grow"></div>
-      <a href="{{ url_for('main.friends_page') }}" class="p-2 rounded-lg hover:bg-gray-200 transition flex items-center justify-center dark:text-dark-accent dark:hover:bg-dark-border">
+      <a
+        href="{{ url_for('main.friends_page') }}"
+        class="p-2 rounded-lg hover:bg-gray-200 transition flex items-center justify-center dark:text-dark-accent dark:hover:bg-dark-border"
+        aria-label="Add Friend"
+      >
         <span class="material-icons-outlined">add</span>
       </a>
     </div>
+
     <div class="overflow-x-auto">
       <table class="min-w-full bg-white dark:bg-dark-fg rounded-lg shadow-md">
-          <tbody id="friendTable">
-          </tbody>
+        <tbody id="friendTable">
+          <!-- Friends will be populated by JS -->
+        </tbody>
       </table>
+    </div>
   </div>
 </div>
+
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}

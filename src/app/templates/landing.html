@@ -4,71 +4,75 @@
 
 {% block content %}
 <section class="relative bg-white dark:bg-dark-bg transition-colors duration-300">
-    
-    <div class="absolute -top-16 -right-32 w-96 h-96 rounded-full bg-[#FFFFFF]/60 dark:bg-dark-accent/30 blur-3xl pointer-events-none"></div>
 
-    <div class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-10">
-      
-      <div class="flex-1 text-center md:text-left">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-gray-900 dark:text-dark-primary">
-          No More Uni Headaches
-        </h1>
-        <p class="mb-8 text-lg md:text-xl text-gray-700 dark:text-dark-secondary max-w-2xl">
-          Plan, organize, and visualize your unit plan effortlessly.<br>
-          <span class="text-blue-700 dark:text-blue-400 font-medium">Avoid missing important units, boost productivity, reduce stress.</span><br>
-          Schedulo is designed by students, for students.
-        </p>
-        <div class="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-          <a href="{{ url_for('auth.register_page') }}" class="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white text-lg font-semibold shadow-lg">
-            Get Started
-          </a>
-          <a href="{{ url_for('main.info')}}" class="px-8 py-3 rounded-lg border border-dark-border text-dark-border
-                             dark:text-dark-primary dark:border-dark-border hover:bg-dark-accent/20 
-                              dark:hover:bg-dark-accent/10 transition font-semibold"
-            >
-            Learn More
-          </a>
-        </div>
+  <!-- Background Glow -->
+  <div class="absolute -top-16 -right-32 w-96 h-96 rounded-full bg-[#FFFFFF]/60 dark:bg-dark-accent/30 blur-3xl pointer-events-none"></div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-6 py-20 flex flex-col md:flex-row items-center gap-10">
+    
+    <!-- Text Content -->
+    <div class="flex-1 text-center md:text-left">
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-gray-900 dark:text-dark-primary">
+        No More Uni Headaches
+      </h1>
+      <p class="mb-8 text-lg md:text-xl text-gray-700 dark:text-dark-secondary max-w-2xl">
+        Plan, organize, and visualize your unit plan effortlessly.<br>
+        <span class="text-blue-700 dark:text-blue-400 font-medium">
+          Avoid missing important units, boost productivity, reduce stress.
+        </span><br>
+        Schedulo is designed by students, for students.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
+        <a
+          href="{{ url_for('auth.register_page') }}"
+          class="px-8 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 transition text-white text-lg font-semibold shadow-lg"
+        >
+          Get Started
+        </a>
+        <a
+          href="{{ url_for('main.info') }}"
+          class="px-8 py-3 rounded-lg border border-dark-border text-dark-border
+                 dark:text-dark-primary dark:border-dark-border hover:bg-dark-accent/20
+                 dark:hover:bg-dark-accent/10 transition font-semibold"
+        >
+          Learn More
+        </a>
       </div>
-      
-      <div class="flex-1 flex justify-center md:justify-end items-center">
-        <div class="ml-0 md:ml-40 min-w-[25vw] bg-gray-500/10 dark:bg-dark-fg rounded-2xl p-4 md:p-8 shadow-xl max-w-md w-full relative"> 
-          <div class="w-full max-w-3xl mx-auto p-8 bg-gray-100 dark:bg-[#121212] rounded-2xl shadow-lg flex flex-col gap-6">
-            <div class="grid grid-cols-4 grid-rows-6 gap-3">
-              <!-- Rows 1 & 2: Purple -->
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
-              <!-- Rows 3 & 4: Brown/Orange -->
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
-              <!-- Rows 5 & 6: Maroon/Pink -->
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-              <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
-            </div>
+    </div>
+
+    <!-- Grid Visualisation -->
+    <div class="flex-1 flex justify-center md:justify-end items-center">
+      <div class="ml-0 md:ml-40 min-w-[25vw] max-w-md w-full bg-gray-500/10 dark:bg-dark-fg rounded-2xl p-4 md:p-8 shadow-xl relative">
+        
+        <!-- Unit Plan Grid -->
+        <div class="w-full max-w-3xl mx-auto p-8 bg-gray-100 dark:bg-[#121212] rounded-2xl shadow-lg flex flex-col gap-6">
+          <div class="grid grid-cols-4 grid-rows-6 gap-3">
+
+            <!-- Rows 1 & 2: Purple -->
+            {% for _ in range(8) %}
+            <div class="h-10 rounded-xl bg-[#7B2FF2] shadow-[0_0_32px_10px_rgba(123,47,242,0.22)]"></div>
+            {% endfor %}
+
+            <!-- Rows 3 & 4: Brown/Orange -->
+            {% for _ in range(8) %}
+            <div class="h-10 rounded-xl bg-[#914833] shadow-[0_0_32px_10px_rgba(145,72,51,0.20)]"></div>
+            {% endfor %}
+
+            <!-- Rows 5 & 6: Maroon/Pink -->
+            {% for _ in range(8) %}
+            <div class="h-10 rounded-xl bg-[#843353] shadow-[0_0_32px_10px_rgba(132,51,83,0.19)]"></div>
+            {% endfor %}
+
           </div>
-          <div class="mt-4 text-center text-sm text-dark-secondary ">
-            Visualize your unit plan with ease!
-          </div>
+        </div>
+
+        <!-- Footer Caption -->
+        <div class="mt-4 text-center text-sm text-dark-secondary">
+          Visualize your unit plan with ease!
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 {% endblock %}
