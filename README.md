@@ -62,17 +62,21 @@ Schedulo is a web-based planning tool designed specifically for new Computer Sci
    python run.py
    ```
 
-5. **Access the application**  
-   Open your web browser and go to [http://localhost:5000](http://localhost:5000) to use Schedulo.
-
-6. **Import Existing Units (Optional)**
-   If you want to pre-populate the database with existing units and users, run the following commands from the project directory:
+5. **Seed Unit Data**
+   Seed the unit data:
    ```bash
    flask db upgrade
    python seed_units.py
+   ```
+   
+6. **Access the application**  
+   Open your web browser and go to [http://localhost:5000](http://localhost:5000) to use Schedulo.
+
+7. **Import Existing Users (Optional)**
+   If you want to pre-populate the database with existing users, run the following commands from the project directory:
+   ```bash
    python seed_users.py
    ```
-   This will apply any database migrations and seed the database with sample data.
 
 ## How to Run the Tests for the Application
 
@@ -81,13 +85,13 @@ Schedulo includes both unit tests and Selenium-based end-to-end tests to ensure 
 1. **Running Unit Tests**
    To execute the unit tests, run:
    ```bash
-   python src/unit_tests.py
+   python src/test_runner.py -u
    ```
 
 2. **Running Selenium Tests**
    To run the Selenium browser-based tests, use:
    ```bash
-   python src/selenium_tests.py
+   python src/test_runner.py -s
    ```
 
 These tests will help you verify that the application is working as expected and that all major features are functioning correctly.
