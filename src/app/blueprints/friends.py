@@ -9,17 +9,32 @@ friends_bp = Blueprint("friends", __name__)
 
 @friends_bp.route("/get", methods=["GET"])
 def get_friends():
-    if not current_user.is_authenticated: return jsonify({"ok": False}), 401
+    if not current_user.is_authenticated:
+        return jsonify({"ok": False}), 401
 
-    links = (db.session.query(User, UserFriend.created_at)
-            .join(UserFriend, or_( User.id == UserFriend.friend_id, User.id == UserFriend.user_id))
-            .filter( or_( UserFriend.user_id == current_user.id, UserFriend.friend_id == current_user.id), UserFriend.is_deleted == False)
-            .filter(User.id != current_user.id)
-            .all())
+    links = (
+        db.session.query(User, UserFriend.created_at)
+        .join(
+            UserFriend,
+            or_(User.id == UserFriend.friend_id, User.id == UserFriend.user_id),
+        )
+        .filter(
+            or_(
+                UserFriend.user_id == current_user.id,
+                UserFriend.friend_id == current_user.id,
+            ),
+            UserFriend.is_deleted == False,
+        )
+        .filter(User.id != current_user.id)
+        .all()
+    )
 
-    return jsonify([
-        {"username": user.username, "created_at": created_at or "Not Found?"} for user, created_at in links
-    ])
+    return jsonify(
+        [
+            {"username": user.username, "created_at": created_at or "Not Found?"}
+            for user, created_at in links
+        ]
+    )
 
 
 @friends_bp.route("/search", methods=["GET"])
@@ -28,12 +43,23 @@ def search_friends():
     query = request.args.get("q", "")
 
     # Get friends in either direction user_id or friend_id
-    current_f_id = db.session.query(UserFriend.user_id).filter( UserFriend.friend_id == current_user.id, UserFriend.is_deleted == False).union(db.session.query(UserFriend.friend_id).filter( UserFriend.user_id == current_user.id, UserFriend.is_deleted == False)).subquery()
+    current_f_id = (
+        db.session.query(UserFriend.user_id)
+        .filter(UserFriend.friend_id == current_user.id, UserFriend.is_deleted == False)
+        .union(
+            db.session.query(UserFriend.friend_id).filter(
+                UserFriend.user_id == current_user.id, UserFriend.is_deleted == False
+            )
+        )
+        .subquery()
+    )
 
-    results = ( User.query.filter(
+    results = (
+        User.query.filter(
             User.username.ilike(f"%{query}%"),
             User.id != current_user.id,
-            ~User.id.in_(current_f_id))
+            ~User.id.in_(current_f_id),
+        )
         .limit(5)
         .all()
     )
@@ -52,11 +78,11 @@ def add_friend():
     if not friend:
         return jsonify({"message": "Friend not found", "ok": False}), 404
 
-    existing_friendship = UserFriend.query.filter_by(
-            user_id=current_user.id, friend_id=friend.id
-        ).union(UserFriend.query.filter_by(
-            user_id=current_user.id, friend_id=friend.id
-        )).first()
+    existing_friendship = (
+        UserFriend.query.filter_by(user_id=current_user.id, friend_id=friend.id)
+        .union(UserFriend.query.filter_by(user_id=current_user.id, friend_id=friend.id))
+        .first()
+    )
 
     if existing_friendship:
         if existing_friendship.is_deleted:
@@ -81,11 +107,11 @@ def remove_friend():
     friend = User.query.filter_by(username=friend_username).first()
     if not friend:
         return jsonify({"message": "Friend not found", "ok": False}), 404
-    existing_friendship = UserFriend.query.filter_by(
-        user_id=current_user.id, friend_id=friend.id
-    ).union(UserFriend.query.filter_by(
-        user_id=friend.id, friend_id=current_user.id
-    )).first()
+    existing_friendship = (
+        UserFriend.query.filter_by(user_id=current_user.id, friend_id=friend.id)
+        .union(UserFriend.query.filter_by(user_id=friend.id, friend_id=current_user.id))
+        .first()
+    )
     if not existing_friendship:
         return jsonify({"message": "You are not friends?", "ok": False}), 404
 

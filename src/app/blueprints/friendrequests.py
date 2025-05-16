@@ -14,10 +14,19 @@ def get_friend_requests():
     links = (
         db.session.query(User, FriendRequests.created_at)
         .join(FriendRequests, User.id == FriendRequests.user_id)
-        .filter(FriendRequests.friend_id == current_user.id, FriendRequests.is_deleted == False)
+        .filter(
+            FriendRequests.friend_id == current_user.id,
+            FriendRequests.is_deleted == False,
+        )
         .all()
     )
-    return jsonify([ {"username": user.username, "created_at": created_at or "Not Found?"} for user, created_at in links ])
+    return jsonify(
+        [
+            {"username": user.username, "created_at": created_at or "Not Found?"}
+            for user, created_at in links
+        ]
+    )
+
 
 @friend_req_bp.route("/send", methods=["POST"])
 def send_friend_request():
@@ -30,11 +39,11 @@ def send_friend_request():
     if not friend:
         return jsonify({"message": "Friend not found", "ok": False}), 404
 
-    existing_friendship = UserFriend.query.filter_by(
-        user_id=current_user.id, friend_id=friend.id
-    ).union(UserFriend.query.filter_by(
-        user_id=friend.id, friend_id=current_user.id
-    )).first()
+    existing_friendship = (
+        UserFriend.query.filter_by(user_id=current_user.id, friend_id=friend.id)
+        .union(UserFriend.query.filter_by(user_id=friend.id, friend_id=current_user.id))
+        .first()
+    )
     if existing_friendship:
         return jsonify({"message": "Already previously friends", "ok": False}), 400
 
@@ -45,12 +54,12 @@ def send_friend_request():
     if pending_request:
         return jsonify({"message": "Already has pending request.", "ok": False}), 400
 
-
     send_request = FriendRequests(user_id=current_user.id, friend_id=friend.id)
     db.session.add(send_request)
     db.session.commit()
 
     return jsonify({"message": "Sent friend request successfully", "ok": True}), 200
+
 
 @friend_req_bp.route("/remove", methods=["PATCH"])
 def remove_friend_request():

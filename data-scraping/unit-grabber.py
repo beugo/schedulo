@@ -194,6 +194,7 @@ def get_unit_info(url):
 
 # (keep all the imports the same)
 
+
 def scrape_units(prefixes=None, include_codes=None, exclude_codes=None, levels=None):
     unit_links = get_unit_links()
     results = []
@@ -262,10 +263,14 @@ def scrape_units(prefixes=None, include_codes=None, exclude_codes=None, levels=N
 
 if __name__ == "__main__":
     # Ask user how they want to input unit codes
-    mode = input("Do you want to enter a list of unit codes directly? [y/N]: ").strip().lower()
+    mode = (
+        input("Do you want to enter a list of unit codes directly? [y/N]: ")
+        .strip()
+        .lower()
+    )
 
     include_codes = None
-    if mode == 'y':
+    if mode == "y":
         print("Paste or type unit codes one per line. Enter an empty line to finish:")
         lines = []
         while True:
@@ -280,16 +285,34 @@ if __name__ == "__main__":
         levels = None
     else:
         # Input discipline prefixes (optional)
-        prefixes_input = input("Enter discipline prefixes (e.g., CITS, MATH) [optional]: ").strip()
-        prefixes = [p.strip().upper() for p in prefixes_input.split(",") if p.strip()] if prefixes_input else None
+        prefixes_input = input(
+            "Enter discipline prefixes (e.g., CITS, MATH) [optional]: "
+        ).strip()
+        prefixes = (
+            [p.strip().upper() for p in prefixes_input.split(",") if p.strip()]
+            if prefixes_input
+            else None
+        )
 
         # Input specific unit codes to exclude (optional)
-        exclude_input = input("Enter specific unit codes to EXCLUDE (e.g., CITS4008,CITS5016) [optional]: ").strip()
-        exclude_codes = [c.strip().upper() for c in exclude_input.split(",") if c.strip()] if exclude_input else None
+        exclude_input = input(
+            "Enter specific unit codes to EXCLUDE (e.g., CITS4008,CITS5016) [optional]: "
+        ).strip()
+        exclude_codes = (
+            [c.strip().upper() for c in exclude_input.split(",") if c.strip()]
+            if exclude_input
+            else None
+        )
 
         # Input levels (e.g., 1,2,3) [optional]
-        levels_input = input("Enter unit levels to include (e.g., 1,2,3) [optional]: ").strip()
-        levels = [int(x) for x in levels_input.split(",") if x.strip().isdigit()] if levels_input else None
+        levels_input = input(
+            "Enter unit levels to include (e.g., 1,2,3) [optional]: "
+        ).strip()
+        levels = (
+            [int(x) for x in levels_input.split(",") if x.strip().isdigit()]
+            if levels_input
+            else None
+        )
 
     # Output filename
     csv_filename = input("Enter output CSV file name (default: units.csv): ").strip()
@@ -302,11 +325,19 @@ if __name__ == "__main__":
     # Write output
     with open(csv_filename, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow([
-            "Unit Name", "Unit Code", "Exam", "Semesters", "URL",
-            "Unit Coordinator", "Contact Hours", "Prerequisites", "Description"
-        ])
+        writer.writerow(
+            [
+                "Unit Name",
+                "Unit Code",
+                "Exam",
+                "Semesters",
+                "URL",
+                "Unit Coordinator",
+                "Contact Hours",
+                "Prerequisites",
+                "Description",
+            ]
+        )
         writer.writerows(units_info)
 
     print(f"Data for {len(units_info)} units written to {csv_filename}.")
-

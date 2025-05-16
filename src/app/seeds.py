@@ -4,10 +4,8 @@ import ast
 import random
 from itertools import combinations
 
-from .models import (
-    Unit, User, UnitPlan, UnitPlanToUnit,
-    UserFriend, Post
-)
+from .models import Unit, User, UnitPlan, UnitPlanToUnit, UserFriend, Post
+
 
 def import_units(db_session, csv_path):
     """
@@ -70,8 +68,21 @@ def import_units(db_session, csv_path):
 
         db_session.commit()
 
+
 def create_users_and_plans(db_session):
-    names = ["alice", "bob", "charlie", "dave", "eve", "frank", "grace", "hugo", "joel", "prashan", "nathan"]
+    names = [
+        "alice",
+        "bob",
+        "charlie",
+        "dave",
+        "eve",
+        "frank",
+        "grace",
+        "hugo",
+        "joel",
+        "prashan",
+        "nathan",
+    ]
     users = {}
 
     for name in names:
@@ -90,121 +101,146 @@ def create_users_and_plans(db_session):
 
     names_excluding_alice = names[1:]
     for a, b in combinations(names_excluding_alice, 2):
-        db_session.add(UserFriend(
-            user_id=users[a].id,
-            friend_id=users[b].id
-        ))
+        db_session.add(UserFriend(user_id=users[a].id, friend_id=users[b].id))
     db_session.commit()
 
     all_units = db_session.query(Unit).all()
     db_session.query(UnitPlanToUnit).delete()
     db_session.query(UnitPlan).delete()
     db_session.flush()
-    
+
     prefillTemplates = {
-        'cs': [
-            { 'unit_code': 'CITS1401', 'row': 1, 'col': 1 },
-            { 'unit_code': 'CITS1402', 'row': 1, 'col': 2 },
-            { 'unit_code': 'CITS1003', 'row': 2, 'col': 1 },
-            { 'unit_code': 'CITS2005', 'row': 3, 'col': 1 },
-            { 'unit_code': 'CITS2200', 'row': 3, 'col': 2 },
-            { 'unit_code': 'CITS2002', 'row': 4, 'col': 1 },
-            { 'unit_code': 'CITS2211', 'row': 4, 'col': 2 },
-            { 'unit_code': 'CITS3403', 'row': 5, 'col': 1 },
-            { 'unit_code': 'CITS3002', 'row': 5, 'col': 2 },
-            { 'unit_code': 'CITS3200', 'row': 6, 'col': 1 },
-            { 'unit_code': 'CITS3001', 'row': 6, 'col': 2 }
+        "cs": [
+            {"unit_code": "CITS1401", "row": 1, "col": 1},
+            {"unit_code": "CITS1402", "row": 1, "col": 2},
+            {"unit_code": "CITS1003", "row": 2, "col": 1},
+            {"unit_code": "CITS2005", "row": 3, "col": 1},
+            {"unit_code": "CITS2200", "row": 3, "col": 2},
+            {"unit_code": "CITS2002", "row": 4, "col": 1},
+            {"unit_code": "CITS2211", "row": 4, "col": 2},
+            {"unit_code": "CITS3403", "row": 5, "col": 1},
+            {"unit_code": "CITS3002", "row": 5, "col": 2},
+            {"unit_code": "CITS3200", "row": 6, "col": 1},
+            {"unit_code": "CITS3001", "row": 6, "col": 2},
         ],
-        'cyber': [
-            { 'unit_code': 'CITS1401', 'row': 1, 'col': 1 },
-            { 'unit_code': 'PHIL1001', 'row': 1, 'col': 2 },
-            { 'unit_code': 'CITS1003', 'row': 2, 'col': 1 },
-            { 'unit_code': 'CITS2006', 'row': 3, 'col': 1 },
-            { 'unit_code': 'CITS2002', 'row': 4, 'col': 1 },
-            { 'unit_code': 'CITS3002', 'row': 5, 'col': 1 },
-            { 'unit_code': 'CITS3403', 'row': 5, 'col': 2 },
-            { 'unit_code': 'CITS3007', 'row': 5, 'col': 3 },
-            { 'unit_code': 'CITS3200', 'row': 6, 'col': 1 },
-            { 'unit_code': 'CITS3006', 'row': 6, 'col': 2 }
+        "cyber": [
+            {"unit_code": "CITS1401", "row": 1, "col": 1},
+            {"unit_code": "PHIL1001", "row": 1, "col": 2},
+            {"unit_code": "CITS1003", "row": 2, "col": 1},
+            {"unit_code": "CITS2006", "row": 3, "col": 1},
+            {"unit_code": "CITS2002", "row": 4, "col": 1},
+            {"unit_code": "CITS3002", "row": 5, "col": 1},
+            {"unit_code": "CITS3403", "row": 5, "col": 2},
+            {"unit_code": "CITS3007", "row": 5, "col": 3},
+            {"unit_code": "CITS3200", "row": 6, "col": 1},
+            {"unit_code": "CITS3006", "row": 6, "col": 2},
         ],
-        'data_science': [
-            { 'unit_code': 'CITS1401', 'row': 1, 'col': 1 },
-            { 'unit_code': 'PHIL1001', 'row': 1, 'col': 2 },
-            { 'unit_code': 'CITS1402', 'row': 2, 'col': 1 },
-            { 'unit_code': 'STAT1400', 'row': 2, 'col': 2 },
-            { 'unit_code': 'STAT2401', 'row': 3, 'col': 1 },
-            { 'unit_code': 'STAT2402', 'row': 4, 'col': 1 },
-            { 'unit_code': 'CITS2402', 'row': 4, 'col': 2 },
-            { 'unit_code': 'CITS3403', 'row': 5, 'col': 1 },
-            { 'unit_code': 'CITS3401', 'row': 5, 'col': 2 },
-            { 'unit_code': 'CITS3200', 'row': 6, 'col': 1 },
-            { 'unit_code': 'STAT3064', 'row': 6, 'col': 2 },
-            { 'unit_code': 'STAT3405', 'row': 6, 'col': 3 }
-        ]
+        "data_science": [
+            {"unit_code": "CITS1401", "row": 1, "col": 1},
+            {"unit_code": "PHIL1001", "row": 1, "col": 2},
+            {"unit_code": "CITS1402", "row": 2, "col": 1},
+            {"unit_code": "STAT1400", "row": 2, "col": 2},
+            {"unit_code": "STAT2401", "row": 3, "col": 1},
+            {"unit_code": "STAT2402", "row": 4, "col": 1},
+            {"unit_code": "CITS2402", "row": 4, "col": 2},
+            {"unit_code": "CITS3403", "row": 5, "col": 1},
+            {"unit_code": "CITS3401", "row": 5, "col": 2},
+            {"unit_code": "CITS3200", "row": 6, "col": 1},
+            {"unit_code": "STAT3064", "row": 6, "col": 2},
+            {"unit_code": "STAT3405", "row": 6, "col": 3},
+        ],
     }
 
     remaining_spots = {
-        'cs': [
-            (1, 3), (1, 4), 
-            (2, 2), (2, 3), (2, 4),
-            (3, 3), (3, 4),
-            (4, 3), (4, 4),
-            (5, 3), (5, 4),
-            (6, 3), (6, 4),
-        ],
-        'cyber': [
-            (1, 3), (1, 4),
-            (2, 2), (2, 3), (2, 4),
-            (3, 2), (3, 3), (3, 4),
-            (4, 2), (4, 3), (4, 4),
+        "cs": [
+            (1, 3),
+            (1, 4),
+            (2, 2),
+            (2, 3),
+            (2, 4),
+            (3, 3),
+            (3, 4),
+            (4, 3),
+            (4, 4),
+            (5, 3),
             (5, 4),
-            (6, 3), (6, 4),
-        ],
-        'data_science': [
-            (1, 3), (1, 4),
-            (2, 3), (2, 4),
-            (3, 2), (3, 3), (3, 4),
-            (4, 3), (4, 4),
-            (5, 3), (5, 4),
+            (6, 3),
             (6, 4),
-        ]
+        ],
+        "cyber": [
+            (1, 3),
+            (1, 4),
+            (2, 2),
+            (2, 3),
+            (2, 4),
+            (3, 2),
+            (3, 3),
+            (3, 4),
+            (4, 2),
+            (4, 3),
+            (4, 4),
+            (5, 4),
+            (6, 3),
+            (6, 4),
+        ],
+        "data_science": [
+            (1, 3),
+            (1, 4),
+            (2, 3),
+            (2, 4),
+            (3, 2),
+            (3, 3),
+            (3, 4),
+            (4, 3),
+            (4, 4),
+            (5, 3),
+            (5, 4),
+            (6, 4),
+        ],
     }
-
 
     for name in names:
         user = users[name]
 
-        chosen_template_key = random.choice(['cs', 'cyber', 'data_science'])
+        chosen_template_key = random.choice(["cs", "cyber", "data_science"])
         chosen_template = prefillTemplates[chosen_template_key]
 
         for idx in (1, 2):
-            plan = UnitPlan(
-                user_id=user.id,
-                name=f"{name.title()}'s Plan {idx}"
-            )
+            plan = UnitPlan(user_id=user.id, name=f"{name.title()}'s Plan {idx}")
             db_session.add(plan)
             db_session.flush()
 
             for unit in chosen_template:
-                db_session.add(UnitPlanToUnit(
-                    unit_plan_id=plan.id,
-                    unit_id=db_session.query(Unit).filter_by(unit_code=unit['unit_code']).first().id,
-                    row=unit['row'],
-                    col=unit['col']
-                ))
+                db_session.add(
+                    UnitPlanToUnit(
+                        unit_plan_id=plan.id,
+                        unit_id=db_session.query(Unit)
+                        .filter_by(unit_code=unit["unit_code"])
+                        .first()
+                        .id,
+                        row=unit["row"],
+                        col=unit["col"],
+                    )
+                )
 
             total_remaining_spots = len(remaining_spots[chosen_template_key])
-            
-            electives = [unit for unit in all_units if not any(x in unit.unit_code for x in ["CITS", "PHIL", "STAT"])]
-            sample_electives = random.sample(electives, total_remaining_spots)  
-            
+
+            electives = [
+                unit
+                for unit in all_units
+                if not any(x in unit.unit_code for x in ["CITS", "PHIL", "STAT"])
+            ]
+            sample_electives = random.sample(electives, total_remaining_spots)
+
             for r, c in remaining_spots[chosen_template_key]:
-                db_session.add(UnitPlanToUnit(
-                    unit_plan_id=plan.id,
-                    unit_id=sample_electives.pop().id,
-                    row=r,
-                    col=c
-                ))
+                db_session.add(
+                    UnitPlanToUnit(
+                        unit_plan_id=plan.id,
+                        unit_id=sample_electives.pop().id,
+                        row=r,
+                        col=c,
+                    )
+                )
 
     db_session.commit()
 
@@ -213,10 +249,6 @@ def create_users_and_plans(db_session):
     for name in names:
         user = users[name]
         for plan in db_session.query(UnitPlan).filter_by(user_id=user.id):
-            db_session.add(Post(
-                user_id=user.id,
-                unit_plan_id=plan.id
-            ))
+            db_session.add(Post(user_id=user.id, unit_plan_id=plan.id))
 
     db_session.commit()
-

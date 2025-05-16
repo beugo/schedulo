@@ -32,17 +32,19 @@ def delete_plan():
         return jsonify({"ok": False, "message": "No plan ID provided"}), 400
 
     plan_to_delete = UnitPlan.query.filter_by(
-        user_id=current_user.id, is_deleted=False, id=plan_id).first()
+        user_id=current_user.id, is_deleted=False, id=plan_id
+    ).first()
 
     if not plan_to_delete:
-        return jsonify(
-            {"ok": False, "message": "Plan not found or already deleted"}), 404
+        return (
+            jsonify({"ok": False, "message": "Plan not found or already deleted"}),
+            404,
+        )
 
     plan_to_delete.is_deleted = True
     db.session.commit()
 
-    return jsonify(
-        {"ok": True, "message": 'Plan ' + str(plan_id) + ' Deleted'})
+    return jsonify({"ok": True, "message": "Plan " + str(plan_id) + " Deleted"})
 
 
 @plans_bp.route("/save", methods=["POST"])
@@ -67,8 +69,7 @@ def save_plan():
     unit_objs = Unit.query.filter(Unit.unit_code.in_(unit_codes)).all()
     unit_dict = {unit.unit_code: unit for unit in unit_objs}
     if len(unit_objs) != len(units):
-        return jsonify(
-            {"message": "Some units do not exist?", "ok": False}), 400
+        return jsonify({"message": "Some units do not exist?", "ok": False}), 400
 
     # Create Unit Plan
     if edit_plan_id == 0:
@@ -78,8 +79,7 @@ def save_plan():
         ).first()
 
         if existing_plan:
-            return jsonify(
-                {"message": "Plan name already exists", "ok": False}), 400
+            return jsonify({"message": "Plan name already exists", "ok": False}), 400
 
         #  Add Plan to the database to get plan id
         user_id = current_user.id
@@ -101,7 +101,7 @@ def save_plan():
                 unit_plan_id=new_plan.id,
                 unit_id=unit_dict[unit_code].id,
                 row=row,
-                col=col
+                col=col,
             )
             db.session.add(unit_plan_to_unit)
 
@@ -110,23 +110,27 @@ def save_plan():
         # Should be safe hopefully
         return jsonify({"message": "Units saved successfully", "ok": True}), 200
 
-    else:   # Edit Unit Plan as plan_id != 0
+    else:  # Edit Unit Plan as plan_id != 0
         # Find plan to edit
         existing_plan = UnitPlan.query.filter_by(
             user_id=current_user.id, id=edit_plan_id
         ).first()
 
         if not existing_plan:
-            return jsonify(
-                {"message": "Trying to edit plan that does not exist?", "ok": False}), 400
+            return (
+                jsonify(
+                    {"message": "Trying to edit plan that does not exist?", "ok": False}
+                ),
+                400,
+            )
 
         # edit name
         existing_plan.name = plan_name
 
-        prev_units = (UnitPlanToUnit.query.filter_by(
+        prev_units = UnitPlanToUnit.query.filter_by(
             is_deleted=False,
             unit_plan_id=edit_plan_id,
-        ).all())
+        ).all()
 
         prev_unit_codes = set(
             Unit.query.get(pu.unit_id).unit_code
@@ -136,8 +140,8 @@ def save_plan():
         current_unit_codes = set(unit_codes)
 
         only_in_current = current_unit_codes - prev_unit_codes  # to add
-        in_both = current_unit_codes & prev_unit_codes          # to edit
-        only_in_prev = prev_unit_codes - current_unit_codes     # to delete
+        in_both = current_unit_codes & prev_unit_codes  # to edit
+        only_in_prev = prev_unit_codes - current_unit_codes  # to delete
 
         for unit in units:
             unit_code = unit["unit_code"]
@@ -150,15 +154,15 @@ def save_plan():
                     unit_plan_id=edit_plan_id,
                     unit_id=unit_dict[unit_code].id,
                     row=row,
-                    col=col
+                    col=col,
                 )
                 db.session.add(unit_plan_to_unit)
 
-            elif unit_code in in_both:   # Edit Unit
+            elif unit_code in in_both:  # Edit Unit
                 unit = UnitPlanToUnit.query.filter_by(
                     unit_plan_id=edit_plan_id,
                     unit_id=unit_dict[unit_code].id,
-                    is_deleted=False
+                    is_deleted=False,
                 ).first()
                 unit.row = row
                 unit.col = col
@@ -166,8 +170,7 @@ def save_plan():
         if only_in_prev:
             for code in only_in_prev:
                 link = (
-                    UnitPlanToUnit.query
-                    .join(Unit, Unit.id == UnitPlanToUnit.unit_id)
+                    UnitPlanToUnit.query.join(Unit, Unit.id == UnitPlanToUnit.unit_id)
                     .filter(
                         UnitPlanToUnit.unit_plan_id == edit_plan_id,
                         Unit.unit_code == code,
@@ -188,13 +191,16 @@ def save_plan():
 def get_plans():
     if not current_user.is_authenticated:
         return jsonify({"ok": False, "message": "Not logged in"}), 401
-    plans = UnitPlan.query.filter_by(
-        user_id=current_user.id, is_deleted=False).all()
+    plans = UnitPlan.query.filter_by(user_id=current_user.id, is_deleted=False).all()
 
     result = []
     for p in plans:
-        shared = db.session.query(Post).filter_by(
-            unit_plan_id=p.id, is_deleted=False).first() is not None
+        shared = (
+            db.session.query(Post)
+            .filter_by(unit_plan_id=p.id, is_deleted=False)
+            .first()
+            is not None
+        )
         result.append({"id": p.id, "name": p.name, "shared": shared})
     return jsonify(result)
 
@@ -205,32 +211,31 @@ def view_plan():
     if not plan_id:
         return jsonify({"ok": False, "message": "No plan ID provided"}), 400
 
-    friend_ids = db.session.query(UserFriend.user_id).filter(
-        UserFriend.friend_id == current_user.id, UserFriend.is_deleted == False
-    ).union(
-        db.session.query(UserFriend.friend_id).filter(
-            UserFriend.user_id == current_user.id, UserFriend.is_deleted == False)
-    ).subquery()
+    friend_ids = (
+        db.session.query(UserFriend.user_id)
+        .filter(UserFriend.friend_id == current_user.id, UserFriend.is_deleted == False)
+        .union(
+            db.session.query(UserFriend.friend_id).filter(
+                UserFriend.user_id == current_user.id, UserFriend.is_deleted == False
+            )
+        )
+        .subquery()
+    )
 
     shared_unit_ids = db.session.query(Post.unit_plan_id).filter(
-        Post.user_id.in_(friend_ids),
-        Post.is_deleted == False
+        Post.user_id.in_(friend_ids), Post.is_deleted == False
     )
     # find all the units in the unit plan
     plan = UnitPlan.query.filter(
         UnitPlan.id == plan_id,
         UnitPlan.is_deleted == False,
-        or_(
-            UnitPlan.user_id == current_user.id,
-            UnitPlan.id.in_(shared_unit_ids)
-        )
+        or_(UnitPlan.user_id == current_user.id, UnitPlan.id.in_(shared_unit_ids)),
     ).first()
     if not plan:
         return jsonify({"ok": False, "message": "Plan not found"}), 404
 
     plan_units = UnitPlanToUnit.query.filter_by(
-        unit_plan_id=plan.id,
-        is_deleted=False
+        unit_plan_id=plan.id, is_deleted=False
     ).all()
 
     # make just a regular list for the side bar
@@ -238,15 +243,12 @@ def view_plan():
     for pu in plan_units:
         unit = Unit.query.get(pu.unit_id)
         if unit:
-            sidebar_units.append({
-                "id": unit.id,
-                "name": unit.unit_name,
-                "code": unit.unit_code
-            })
+            sidebar_units.append(
+                {"id": unit.id, "name": unit.unit_name, "code": unit.unit_code}
+            )
 
-     # make a ordered dict for the actual plan.
-    year_cols = {year: {col: []
-                        for col in range(1, 9)} for year in range(1, 5)}
+    # make a ordered dict for the actual plan.
+    year_cols = {year: {col: [] for col in range(1, 9)} for year in range(1, 5)}
 
     # seperate the semesters into years(might not need later on)
     def get_year(row):
@@ -277,11 +279,9 @@ def view_plan():
             continue
         col_index = get_column_index(pu.row, pu.col)
         if 1 <= col_index <= 8:
-            year_cols[year][col_index].append({
-                "id": unit.id,
-                "name": unit.unit_name,
-                "code": unit.unit_code
-            })
+            year_cols[year][col_index].append(
+                {"id": unit.id, "name": unit.unit_name, "code": unit.unit_code}
+            )
 
     return render_template(
         "viewonlyplan.html",

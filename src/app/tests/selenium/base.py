@@ -14,6 +14,7 @@ from app.seeds import import_units, create_users_and_plans
 BASE_URL = "http://127.0.0.1:5001"
 CSV_PATH = "../data-scraping/units.csv"
 
+
 class BaseSeleniumTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -31,9 +32,9 @@ class BaseSeleniumTest(unittest.TestCase):
         cls.server_thread.setDaemon(True)
         cls.server_thread.start()
 
-        time.sleep(1)  
+        time.sleep(1)
         firefox_opts = FirefoxOptions()
-        firefox_opts.add_argument("--headless") # comment this out to debug
+        firefox_opts.add_argument("--headless")  # comment this out to debug
         cls.driver = webdriver.Firefox(options=firefox_opts)
 
         cls.wait = WebDriverWait(cls.driver, 2)
@@ -46,7 +47,7 @@ class BaseSeleniumTest(unittest.TestCase):
         db.session.remove()
         db.drop_all()
         cls.ctx.pop()
-    
+
     def login(self, username, password):
         self.driver.get(BASE_URL + "/auth/login")
 
@@ -56,5 +57,3 @@ class BaseSeleniumTest(unittest.TestCase):
         self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
 
         time.sleep(1)
-
-        
