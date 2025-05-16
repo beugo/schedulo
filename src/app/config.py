@@ -10,7 +10,7 @@ class Config:
 
 class DeploymentConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = "sqlite:///site.db"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///site.db")
 
 
 class TestConfig(Config):

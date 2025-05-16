@@ -5,10 +5,10 @@ from app.models import Unit, UnitPlan, UnitPlanToUnit, UserFriend, Post
 from app.utils.unit_plan_helper import get_plan_core_info
 from sqlalchemy import or_
 
-chart = Blueprint("chart", __name__)
+chart_bp = Blueprint("chart", __name__)
 
 
-@chart.route("/unit_data")
+@chart_bp.route("/unit_data")
 def unit_data():
     if not current_user.is_authenticated:
         return jsonify({"ok": False}), 401
