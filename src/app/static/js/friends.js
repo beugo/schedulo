@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     results.innerHTML = '';
                     data.forEach(person => {
                         const li = document.createElement('li');
+                        li.classList.add("px-3", "py-2", "cursor-pointer", "text-white", "hover:bg-[#333]");
                         li.textContent = `${person.username}`;
                         li.addEventListener('click', () => {
                             input.value = '';
