@@ -62,7 +62,7 @@ function renderPosts(posts) {
   // Made this a loop to reduce some of the lines of code
   posts.forEach(post => {
     const card = document.createElement("div");
-    card.className = "bg-white dark:bg-dark-fg border border-gray-200 dark:border-dark-border rounded-lg p-4 shadow-sm hover:shadow cursor-pointer flex flex-col gap-2";
+    card.className = "bg-white dark:bg-dark-fg border border-gray-200 dark:border-dark-fg rounded-lg p-4 shadow-sm hover:shadow cursor-pointer flex flex-col gap-2";
     card.onclick = () => window.location.href = `/plans/view?id=${post.unit_plan.unitplanid}`;
 
     // title
@@ -84,7 +84,7 @@ function renderPosts(posts) {
           row <= 2 ? 'bg-purple-50 dark:bg-purple-900/50' :
             row <= 4 ? 'bg-orange-50 dark:bg-orange-900/50' :
               'bg-pink-50 dark:bg-pink-900/40';
-        cell.className = `border border-gray-300 dark:border-gray-600 rounded ${bgClass} p-1 h-12 flex flex-col items-start justify-start text-xs overflow-hidden`;
+        cell.className = `border border-gray-300 dark:border-dark-border rounded ${bgClass} p-1 h-12 flex flex-col items-start justify-start text-xs overflow-hidden`;
 
         const unit = post.unit_plan.units.find(u => u.col === col && u.row === row);
         if (unit) {
