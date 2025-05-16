@@ -1,3 +1,71 @@
+const CONFIG = {
+  selectors: {
+    searchInput: '#searchInput',
+    saveButton: '#saveButton',
+    unitList: '#unitList',
+    planName: '#planName',
+    prefillSelect: '#prefillSelect',
+    csCoreSelectWrapper: '#csCoreSelectWrapper',
+    csCoreSelect: '#csCoreSelect'
+  },
+  endpoints: {
+    recommendedUnits: '/units/recommended',
+    getPlan: '/plans/get',
+    savePlan: '/plans/save'
+  },
+  templates: {
+    prefillTemplates: {
+      cs: [
+        { unit_code: 'CITS1401', row: 1, col: 1 },
+        { unit_code: 'CITS1402', row: 1, col: 2 },
+        { unit_code: 'CITS1003', row: 2, col: 1 },
+        { unit_code: 'CITS2005', row: 3, col: 1 },
+        { unit_code: 'CITS2200', row: 3, col: 2 },
+        { unit_code: 'CITS2002', row: 4, col: 1 },
+        { unit_code: 'CITS2211', row: 4, col: 2 },
+        { unit_code: 'CITS3403', row: 5, col: 1 },
+        { unit_code: 'CITS3002', row: 5, col: 2 },
+        { unit_code: 'CITS3200', row: 6, col: 1 },
+        { unit_code: 'CITS3001', row: 6, col: 2 }
+      ],
+      cyber: [
+        { unit_code: 'CITS1401', row: 1, col: 1 },
+        { unit_code: 'PHIL1001', row: 1, col: 2 },
+        { unit_code: 'CITS1003', row: 2, col: 1 },
+        { unit_code: 'CITS2006', row: 3, col: 1 },
+        { unit_code: 'CITS2002', row: 4, col: 1 },
+        { unit_code: 'CITS3002', row: 5, col: 1 },
+        { unit_code: 'CITS3403', row: 5, col: 2 },
+        { unit_code: 'CITS3007', row: 5, col: 3 },
+        { unit_code: 'CITS3200', row: 6, col: 1 },
+        { unit_code: 'CITS3006', row: 6, col: 2 }
+      ],
+      data_science: [
+        { unit_code: 'CITS1401', row: 1, col: 1 },
+        { unit_code: 'PHIL1001', row: 1, col: 2 },
+        { unit_code: 'CITS1402', row: 2, col: 1 },
+        { unit_code: 'STAT1400', row: 2, col: 2 },
+        { unit_code: 'STAT2401', row: 3, col: 1 },
+        { unit_code: 'STAT2402', row: 4, col: 1 },
+        { unit_code: 'CITS2402', row: 4, col: 2 },
+        { unit_code: 'CITS3403', row: 5, col: 1 },
+        { unit_code: 'CITS3401', row: 5, col: 2 },
+        { unit_code: 'CITS3200', row: 6, col: 1 },
+        { unit_code: 'STAT3064', row: 6, col: 2 },
+        { unit_code: 'STAT3405', row: 6, col: 3 }
+      ]
+    },
+    csFinalCoreOptions: [
+      { code: "CITS3003", name: "Graphics and Animation", semester: 1 },
+      { code: "CITS3007", name: "Secure Coding", semester: 1 },
+      { code: "CITS3009", name: "WIL Internship", semester: 1 },
+      { code: "CITS3005", name: "Knowledge Representation", semester: 2 },
+      { code: "CITS3011", name: "Intelligent Agents", semester: 2 },
+      { code: "CITS3402", name: "High Performance Computing", semester: 2 }
+    ]
+  }
+};
+
 class UnitModel {
   constructor({ unit_name, unit_code, semester1, semester2, exam, prerequisites }) {
     this.unit_name = unit_name;
@@ -9,654 +77,514 @@ class UnitModel {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  // ───── Constants & State ─────
-  const searchInput = document.getElementById('searchInput');
-  const saveButton = document.getElementById('saveButton');
-  const unitList = document.getElementById('unitList');
-  const planName = document.getElementById('planName');
-  const cellSelector = '.unit-cell';
-  const dropZones = Array.from(document.querySelectorAll(cellSelector));
-  const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-  let allUnits = [];
-  let availableUnits = [];
-  let placedUnits = {}; // cell key is unit_code
-  const prefillTemplates = {
-    cs: [
-      { unit_code: 'CITS1401', row: 1, col: 1 },
-      { unit_code: 'CITS1402', row: 1, col: 2 },
-      { unit_code: 'CITS1003', row: 2, col: 1 },
-      { unit_code: 'CITS2005', row: 3, col: 1 },
-      { unit_code: 'CITS2200', row: 3, col: 2 },
-      { unit_code: 'CITS2002', row: 4, col: 1 },
-      { unit_code: 'CITS2211', row: 4, col: 2 },
-      { unit_code: 'CITS3403', row: 5, col: 1 },
-      { unit_code: 'CITS3002', row: 5, col: 2 },
-      { unit_code: 'CITS3200', row: 6, col: 1 },
-      { unit_code: 'CITS3001', row: 6, col: 2 }
-    ],
-    cyber: [
-      { unit_code: 'CITS1401', row: 1, col: 1 },
-      { unit_code: 'PHIL1001', row: 1, col: 2 },
-      { unit_code: 'CITS1003', row: 2, col: 1 },
-      { unit_code: 'CITS2006', row: 3, col: 1 },
-      { unit_code: 'CITS2002', row: 4, col: 1 },
-      { unit_code: 'CITS3002', row: 5, col: 1 },
-      { unit_code: 'CITS3403', row: 5, col: 2 },
-      { unit_code: 'CITS3007', row: 5, col: 3 },
-      { unit_code: 'CITS3200', row: 6, col: 1 },
-      { unit_code: 'CITS3006', row: 6, col: 2 },
-    ],
-    data_science: [
-      { unit_code: 'CITS1401', row: 1, col: 1 },
-      { unit_code: 'PHIL1001', row: 1, col: 2 },
-      { unit_code: 'CITS1402', row: 2, col: 1 },
-      { unit_code: 'STAT1400', row: 2, col: 2 },
-      { unit_code: 'STAT2401', row: 3, col: 1 },
-      { unit_code: 'STAT2402', row: 4, col: 1 },
-      { unit_code: 'CITS2402', row: 4, col: 2 },
-      { unit_code: 'CITS3403', row: 5, col: 1 },
-      { unit_code: 'CITS3401', row: 5, col: 2 },
-      { unit_code: 'CITS3200', row: 6, col: 1 },
-      { unit_code: 'STAT3064', row: 6, col: 2 },
-      { unit_code: 'STAT3405', row: 6, col: 3 },
-    ]
+// — constants —
+const { selectors, endpoints, templates } = CONFIG;
+
+const DOM = Object.fromEntries(
+  Object.entries(selectors).map(([key, sel]) => [key, document.querySelector(sel)])
+);
+
+const CELL_SELECTOR = '.unit-cell';
+const DROP_ZONES = Array.from(document.querySelectorAll(CELL_SELECTOR));
+const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+
+// — state —
+let allUnits = [];
+let availableUnits = [];
+let placedUnits = {}; // { 'row,col': 'CITS1401', ... }
+
+// — init —
+(function init() {
+  applyInitialPlan();
+  loadUnits();
+  setupPrefillHandler();
+  setupSearchFilter();
+  setupSaveHandler();
+  setupDragAndDrop();
+})();
+
+// — helpers —
+function byCode(code) {
+  return allUnits.find(u => u.unit_code === code);
+}
+
+const keyOf = cell => cell?.dataset.key || '';
+
+function createUnitDiv(unit) {
+  const div = document.createElement('div');
+  div.className = [
+    'unit', 'flex', 'flex-col', 'justify-center', 'items-stretch',
+    'w-full', 'h-full', 'p-2', 'rounded-lg', 'border',
+    'border-gray-300', 'dark:border-gray-700', 'cursor-move', 'gap-1',
+    'bg-white', 'dark:bg-dark-fg', 'shadow-sm'
+  ].join(' ');
+  div.dataset.code = unit.unit_code;
+  div.style.minWidth = '0';
+
+  const name = document.createElement('span');
+  name.className = 'flex-grow font-bold text-sm leading-tight w-full';
+  name.textContent = unit.unit_name;
+  name.style.minWidth = '0';
+  name.style.wordBreak = 'break-word';
+  div.appendChild(name);
+
+  const tags = document.createElement('div');
+  tags.className = 'flex flex-wrap gap-1 items-center';
+  if (unit.semester1) tags.appendChild(tag('Sem 1', 'bg-blue-100 text-blue-800'));
+  if (unit.semester2) tags.appendChild(tag('Sem 2', 'bg-green-100 text-green-800'));
+  if (unit.exam)      tags.appendChild(tag('Exam',  'bg-red-100 text-red-700'));
+  tags.appendChild(tag(unit.unit_code, 'bg-slate-200 text-slate-700'));
+  div.appendChild(tags);
+
+  div.draggable = true;
+  div.addEventListener('dragstart', dragStartHandler);
+  div.addEventListener('dragend',   dragEndHandler);
+  return div;
+}
+
+function tag(text, cls) {
+  const span = document.createElement('span');
+  span.className = `tag px-1 py-[1.5px] text-[10px] rounded font-semibold ${cls}`;
+  span.textContent = text;
+  return span;
+}
+
+function placeholderHtml() {
+  return '<div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>';
+}
+
+function resetAvailableUnits() {
+  const placedCodes = Object.values(placedUnits);
+  availableUnits = allUnits.filter(u => !placedCodes.includes(u.unit_code));
+}
+
+// — prerequisite utility —
+function checkPrerequisites(unit, placedWithTime) {
+  if (!unit?.prerequisites) return { ok: true };
+
+  const currentTime = placedWithTime[unit.unit_code];
+  if (currentTime === undefined) return { ok: true };
+
+  const groups = unit.prerequisites
+    .split('|')
+    .map(g => g.trim().split('+').map(c => c.trim()));
+
+  const ok = groups.some(group =>
+    group.every(pr => placedWithTime[pr] !== undefined && placedWithTime[pr] < currentTime)
+  );
+
+  const tooltip = groups.map(g => g.join(' AND ')).join(' OR ');
+  return { ok, tooltip, groups };
+}
+
+// — data loading —
+function loadUnits() {
+  fetch(endpoints.recommendedUnits)
+    .then(res => res.json())
+    .then(data => {
+      allUnits = data.map(u => new UnitModel(u));
+      resetAvailableUnits();
+      renderUnitList(availableUnits);
+      validateAllCells();
+    })
+    .catch(() => console.error('Failed to load units'));
+}
+
+// — grid/plan initialisation —
+async function applyInitialPlan() {
+  let init = { name: '', units: [] };
+  const planId = new URLSearchParams(location.search).get('id');
+  if (planId) {
+    try {
+      const res  = await fetch(`${endpoints.getPlan}?id=${planId}`, { credentials: 'include' });
+      const body = await res.json();
+      if (res.ok && body.ok) init = body.plan;
+      else console.warn('Could not load plan:', body.message);
+    } catch (e) { console.error('Error fetching plan:', e); }
   }
 
-  const csFinalCoreOptions = [
-    { code: "CITS3003", name: "Graphics and Animation", semester: 1 },
-    { code: "CITS3007", name: "Secure Coding",            semester: 1 },
-    { code: "CITS3009", name: "WIL Internship",           semester: 1 },
-    { code: "CITS3005", name: "Knowledge Representation", semester: 2 },
-    { code: "CITS3011", name: "Intelligent Agents",       semester: 2 },
-    { code: "CITS3402", name: "High Performance Computing", semester: 2 }
-  ];
+  clearGrid();
+  DOM.planName.value = init.name || '';
+  placedUnits = {};
 
-  // ───── Initialization ─────
-  function init() {
-    applyInitialPlan();
-    loadUnits();
-    setupPrefillHandler();
-    setupSearchFilter();
-    setupSaveHandler();
-    setupDragAndDrop();
-  }
+  (Array.isArray(init.units) ? init.units : Object.values(init.units)).forEach(u => {
+    const key  = `${u.row},${u.col}`;
+    const cell = document.querySelector(`${CELL_SELECTOR}[data-key="${key}"]`);
+    if (!cell) return;
 
-  // ───── Initial render of grid ─────
-  async function applyInitialPlan() {
-    // 1) fetch existing plan 
-    let init = { name: '', units: [] };
-    const planId = new URLSearchParams(window.location.search).get('id');
-    if (planId) {
-      try {
-        const resp = await fetch(`/plans/get?id=${planId}`, { credentials: 'include' });
-        const body = await resp.json();
-        if (resp.ok && body.ok) init = body.plan;
-        else console.warn('Could not load plan:', body.message);
-      } catch (err) {
-        console.error('Error fetching plan:', err);
-      }
+    const unitModel = new UnitModel({
+      unit_name: u.unitname,
+      unit_code: u.unitcode,
+      semester1: u.semester1,
+      semester2: u.semester2,
+      exam:      u.exam,
+      prerequisites: u.prerequisites
+    });
+    cell.innerHTML = '';
+    cell.appendChild(createUnitDiv(unitModel));
+    placedUnits[key] = unitModel.unit_code;
+  });
+
+  resetAvailableUnits();
+  renderUnitList(availableUnits);
+  validateAllCells();
+}
+
+function clearGrid() {
+  DROP_ZONES.forEach(z => z.innerHTML = placeholderHtml());
+  availableUnits = [...allUnits];
+  renderUnitList(availableUnits);
+}
+
+// — UI rendering —
+function renderUnitList(units) {
+  DOM.unitList.innerHTML = '';
+  units.forEach(u => DOM.unitList.appendChild(createUnitDiv(u)));
+  setDragHandlers(DOM.unitList);
+}
+
+// — prefill templates —
+function setupPrefillHandler() {
+  const select            = DOM.prefillSelect;
+  const coreSelectWrapper = DOM.csCoreSelectWrapper;
+  const coreSelect        = DOM.csCoreSelect;
+  if (!select) return;
+
+  select.addEventListener('change', () => {
+    const key = select.value;
+    clearGrid();
+
+    if (key === 'cs') {
+      applyTemplate(templates.prefillTemplates.cs);
+      coreSelectWrapper.classList.remove('hidden');
+      coreSelect.innerHTML = '<option value="">— Select one —</option>';
+      templates.csFinalCoreOptions.forEach(u => {
+        const o = document.createElement('option');
+        o.value = u.code;
+        o.textContent = `${u.code} – ${u.name} (Sem ${u.semester})`;
+        coreSelect.appendChild(o);
+      });
+    } else {
+      applyTemplate(templates.prefillTemplates[key] || []);
+      coreSelectWrapper.classList.add('hidden');
+      coreSelect.innerHTML = '';
+    }
+  });
+
+  coreSelect.addEventListener('change', () => {
+    const code = coreSelect.value;
+    const u    = templates.csFinalCoreOptions.find(x => x.code === code);
+    if (!u) return;
+
+    const row = u.semester === 1 ? 5 : 6;
+    const col = 3;
+    const key = `${row},${col}`;
+    const cell = document.querySelector(`${CELL_SELECTOR}[data-key="${key}"]`);
+    if (!cell) return;
+
+    cell.innerHTML = '';
+    const unit = byCode(code);
+    if (unit) {
+      cell.appendChild(createUnitDiv(unit));
+      placedUnits[key] = code;
     }
 
-    // 2) clear everything & set the plan‐name
-    clearGrid();
-    planName.value = init.name || '';
-    placedUnits = {};
-
-    // 3) normalise into an array if it was an object
-    const unitsArray = Array.isArray(init.units)
-      ? init.units
-      : Object.values(init.units);
-
-    // 4) for each saved entry in the users saved plan, place the corrsponding unit into the grid
-    unitsArray.forEach(u => {
-      const { row, col } = u;
-      const key = `${row},${col}`;
-      const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
-
-      // Build the unitmodel payload 
-      const dataForModel = {
-        unit_name: u.unitname,
-        unit_code: u.unitcode,
-        semester1: u.semester1,
-        semester2: u.semester2,
-        exam: u.exam
-      };
-
-      const uintm = new UnitModel(dataForModel);
-      const div = createUnitDiv(uintm);
-
-      cell.innerHTML = '';
-      cell.appendChild(div);
-      placedUnits[key] = uintm.unit_code;
-    });
-
-    // 5) rebuild sidebar and validate
     resetAvailableUnits();
     renderUnitList(availableUnits);
     validateAllCells();
-  }
+  });
+}
 
-    // ───── Prefill template logic ─────
-    function setupPrefillHandler() {
-        const select            = document.getElementById('prefillSelect');
-        const coreSelectWrapper = document.getElementById('csCoreSelectWrapper');
-        const coreSelect        = document.getElementById('csCoreSelect');
+function applyTemplate(template) {
+  clearGrid();
+  template.forEach(({ unit_code, row, col }) => {
+    const unit = byCode(unit_code);
+    if (!unit) return;
+    const cell = document.querySelector(`${CELL_SELECTOR}[data-key="${row},${col}"]`);
+    if (!cell) return;
+    cell.innerHTML = '';
+    cell.appendChild(createUnitDiv(unit));
+    availableUnits = availableUnits.filter(u => u.unit_code !== unit_code);
+  });
+  renderUnitList(availableUnits);
+}
 
-        if (!select) return;
-
-        // When you pick a major…
-        select.addEventListener('change', () => {
-            const key = select.value;
-            clearGrid();
-
-            if (key === 'cs') {
-                // 1) apply all the *fixed* CS units (minus the final core)
-                applyTemplate(prefillTemplates['cs']);
-
-                // 2) show + populate the dropdown
-                coreSelectWrapper.classList.remove('hidden');
-                coreSelect.innerHTML = '<option value="">— Select one —</option>';
-                csFinalCoreOptions.forEach(u => {
-                    const o = document.createElement('option');
-                    o.value       = u.code;
-                    o.textContent = `${u.code} – ${u.name} (Sem ${u.semester})`;
-                    coreSelect.appendChild(o);
-                });
-            } else {
-                applyTemplate(prefillTemplates[key] || []);
-                coreSelectWrapper.classList.add('hidden');
-                coreSelect.innerHTML = '';
-            }
-        });
-
-        // When you choose your final core…
-        coreSelect.addEventListener('change', () => {
-            const code = coreSelect.value;
-            const u    = csFinalCoreOptions.find(x => x.code === code);
-            if (!u) return;
-
-            const row = u.semester === 1 ? 5 : 6;
-            const col = 3;    
-            const key = `${row},${col}`;
-            const cell = document.querySelector(`.unit-cell[data-key="${key}"]`);
-            if (!cell) return;
-
-            // clear + drop in the chosen unit
-            cell.innerHTML = '';
-            const unitModel = allUnits.find(x => x.unit_code === code);
-            if (unitModel) {
-            cell.appendChild(createUnitDiv(unitModel));
-            placedUnits[key] = code;
-            }
-
-            // refresh sidebar & validation
-            resetAvailableUnits();
-            renderUnitList(availableUnits);
-            validateAllCells();
-        });
-        }
-
-
-  function applyTemplate(template) {
-    clearGrid();
-    template.forEach(({ unit_code, row, col }) => {
-      const unit = allUnits.find(u => u.unit_code === unit_code);
-      if (!unit) return console.warn(`Unit ${unit_code} not found`);
-
-      // Locate cell by data-key!
-      const cell = document.querySelector(`.unit-cell[data-key="${row},${col}"]`);
-      if (!cell) return;
-
-      const div = createUnitDiv(unit);
-      cell.innerHTML = "";          
-      cell.appendChild(div);
-
-      // Remove from available
-      availableUnits = availableUnits.filter(u => u.unit_code !== unit_code);
-    });
-    renderUnitList(availableUnits);
-  }
-
-  function clearGrid() {
-    dropZones.forEach(zone => {
-      // Remove any .unit divs
-      const oldUnits = Array.from(zone.querySelectorAll('.unit'));
-      oldUnits.forEach(div => div.remove());
-    });
-    availableUnits = [...allUnits];
-    renderUnitList(availableUnits);
-  }
-
-  // ───── Fetch all units for the list ─────
-  function loadUnits() {
-    fetch('/units/recommended')
-      .then(res => res.json())
-      .then(data => {
-        allUnits = data.map(u => new UnitModel(u));
-        resetAvailableUnits();
-        renderUnitList(availableUnits);
-        validateAllCells();
-      })
-      .catch(() => console.error('Failed to load units'));
-  }
-  function resetAvailableUnits() {
-    const placedCodes = Object.values(placedUnits);
-    availableUnits = allUnits.filter(u => !placedCodes.includes(u.unit_code));
-  }
-
-  // ───── DOM rendering ─────
-  function renderUnitList(units) {
-    unitList.innerHTML = '';
-    units.forEach(u => {
-      let div = createUnitDiv(u);
-      div.setAttribute('data-code', u.unit_code);
-      unitList.appendChild(div);
-    });
-    setDragHandlers(unitList);
-  }
-  function createUnitDiv(unit) {
-    const div = document.createElement('div');
-    div.className = [   //changed these classes to fill the parent container (cell)
-      'unit',
-      'flex', 'flex-col',
-      'justify-center', 'items-stretch',
-      'w-full', 'h-full',
-      'p-2', 'rounded-lg', 'border',
-      'border-gray-300', 'dark:border-gray-700', 'cursor-move', 'gap-1',
-      'bg-white', 'dark:bg-dark-fg', 'shadow-sm'
-    ].join(' ');
-    div.setAttribute('data-code', unit.unit_code);
-    div.style.minWidth = "0";
-
-    // Name
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'flex-grow font-bold text-sm leading-tight w-full';
-    nameSpan.textContent = unit.unit_name;
-    nameSpan.style.minWidth = "0";
-    nameSpan.style.wordBreak = "break-word";
-    div.appendChild(nameSpan);
-
-    // tags, I think this looks nice than just listing them
-    const tags = document.createElement('div');
-    tags.className = 'flex flex-wrap gap-1 items-center mt-0';
-    if (unit.semester1) tags.appendChild(tag('Sem 1', 'bg-blue-100 text-blue-800'));
-    if (unit.semester2) tags.appendChild(tag('Sem 2', 'bg-green-100 text-green-800'));
-    if (unit.exam) tags.appendChild(tag('Exam', 'bg-red-100 text-red-700'));
-    tags.appendChild(tag(unit.unit_code, 'bg-slate-200 text-slate-700'));
-    div.appendChild(tags);
-
-    // drag attributes
-    div.setAttribute('draggable', 'true');
+// — drag & drop —
+function dragStartHandler(e) {
+  e.dataTransfer.setData('text/plain', this.dataset.code);
+  e.dataTransfer.setData('sourceKey', this.closest(CELL_SELECTOR)?.dataset.key || '');
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => this.classList.add('opacity-50'));
+}
+function dragEndHandler() {
+  this.classList.remove('opacity-50');
+}
+function setDragHandlers(ctx = document) {
+  ctx.querySelectorAll('.unit').forEach(div => {
+    div.draggable = true;
+    div.removeEventListener('dragstart', dragStartHandler);
+    div.removeEventListener('dragend',   dragEndHandler);
     div.addEventListener('dragstart', dragStartHandler);
-    div.addEventListener('dragend', dragEndHandler);
+    div.addEventListener('dragend',   dragEndHandler);
+  });
+}
+function setupDragAndDrop() {
+  // list -> return to list
+  DOM.unitList.addEventListener('dragover', e => e.preventDefault());
+  DOM.unitList.addEventListener('drop', e => {
+    e.preventDefault();
+    const code = e.dataTransfer.getData('text/plain');
+    if (!code) return;
 
-    return div;
-  }
-  function tag(text, classes) {
-    const span = document.createElement('span');
-    span.className = `tag px-1 py-[1.5px] text-[10px] rounded font-semibold inline-block ${classes}`;
-    span.textContent = text;
-    return span;
-  }
-  function getPlaceholderHtml() {
-    return '<div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>';
-  }
+    const gridUnit = document.querySelector(`${CELL_SELECTOR} .unit[data-code="${code}"]`);
+    if (gridUnit) {
+      const cell = gridUnit.closest(CELL_SELECTOR);
+      gridUnit.remove();
+      cell.innerHTML = placeholderHtml();
+      delete placedUnits[cell.dataset.key];
+    }
+    if (!DOM.unitList.querySelector(`.unit[data-code="${code}"]`)) {
+      const unit = byCode(code);
+      if (unit) DOM.unitList.appendChild(createUnitDiv(unit));
+    }
+    resetAvailableUnits();
+    validateAllCells();
+  });
 
-  // ───── Drag/drop support ─────
-  function setupDragAndDrop() {
-    //  allow drop to return unit to list
-    unitList.addEventListener('dragover', e => e.preventDefault());
-    unitList.addEventListener('drop', e => {
+  // grid cells
+  DROP_ZONES.forEach(cell => {
+    cell.addEventListener('dragover', e => e.preventDefault());
+    cell.addEventListener('drop', e => {
       e.preventDefault();
       const code = e.dataTransfer.getData('text/plain');
+      const sourceKey = e.dataTransfer.getData('sourceKey');
       if (!code) return;
-      let gridUnit = document.querySelector(`.unit-cell .unit[data-code="${code}"]`);
-      if (gridUnit) {
-        let cell = gridUnit.closest('.unit-cell');
-        gridUnit.remove();
-        cell.innerHTML = getPlaceholderHtml();
-        delete placedUnits[cell.dataset.key];
+
+      if (keyOf(cell) === sourceKey) return;
+      
+      const existingDiv = cell.querySelector('.unit');
+      const targetKey = keyOf(cell);
+
+      const draggedUnit = sourceKey
+        ? document.querySelector(`${CELL_SELECTOR}[data-key="${sourceKey}"] .unit[data-code="${code}"]`)
+        : null;
+      if (draggedUnit) {
+        draggedUnit.remove();
+        document.querySelector(`${CELL_SELECTOR}[data-key="${sourceKey}"]`).innerHTML = placeholderHtml();
       }
-      if (!unitList.querySelector(`.unit[data-code="${code}"]`)) {
-        const unit = allUnits.find(u => u.unit_code === code);
-        if (unit) {
-          const div = createUnitDiv(unit);
-          unitList.appendChild(div);
-        }
+
+      cell.innerHTML = '';
+      cell.appendChild(draggedUnit || createUnitDiv(byCode(code)));
+      placedUnits[targetKey] = code;
+
+      // if the target was occupied, move that unit back to source cell (swap)
+      if (existingDiv && sourceKey) {
+        const srcCell = document.querySelector(`${CELL_SELECTOR}[data-key="${sourceKey}"]`);
+        srcCell.innerHTML = '';
+        srcCell.appendChild(existingDiv);
+        placedUnits[sourceKey] = existingDiv.dataset.code;
+      } else if (existingDiv) {
+        DOM.unitList.appendChild(existingDiv);
       }
+
       resetAvailableUnits();
+      renderUnitList(availableUnits);
       validateAllCells();
     });
+  });
+}
 
-    // Grid cells
-    dropZones.forEach(cell => {
-      cell.addEventListener('dragover', e => e.preventDefault());
-      cell.addEventListener('drop', function(e) {
-        e.preventDefault();
-        const code = e.dataTransfer.getData('text/plain');
-        if (!code) return;
+// — validation —
+function validateAllCells() {
+  DROP_ZONES.forEach(cell => {
+    const unitDiv = cell.querySelector('.unit');
+    if (!unitDiv) {
+      cell.classList.remove('ring-2', 'ring-red-400');
+      cell.querySelector('.semester-warning')?.remove();
+      return;
+    }
+    const unit = byCode(unitDiv.dataset.code);
+    if (!unit) return;
+    validateSemesterPlacement(cell, unit);
+  });
+  validatePrereqs();
+}
 
-        // Remove duplicates
-        let existing = document.querySelector(`.unit-cell .unit[data-code="${code}"]`);
-        if (existing) {
-          let oldCell = existing.closest('.unit-cell');
-          existing.remove();
-          oldCell.innerHTML = getPlaceholderHtml();
-          delete placedUnits[oldCell.dataset.key];
-        }
+function validateSemesterPlacement(cell, unit) {
+  const [row] = cell.dataset.key.split(',').map(Number);
+  const targetSemester = (row % 2 === 1) ? 1 : 2;
+  const ok = (targetSemester === 1 && unit.semester1) || (targetSemester === 2 && unit.semester2);
 
-        let fromList = unitList.querySelector(`.unit[data-code="${code}"]`);
-        if (fromList) fromList.remove();
+  cell.classList.remove('ring-2', 'ring-red-400');
+  cell.querySelector('.semester-warning')?.remove();
 
-        cell.innerHTML = '';
-        const unit = allUnits.find(u => u.unit_code === code);
-        if (!unit) return;
-        const div = createUnitDiv(unit);
-        cell.appendChild(div);
-        placedUnits[cell.dataset.key] = code;
-
-        resetAvailableUnits();
-        renderUnitList(availableUnits); // updates the sidebar
-        validateAllCells(); // updates all warnings
-      });
-    });
+  if (!ok) {
+    cell.classList.add('ring-2', 'ring-red-400');
+    const badge = document.createElement('div');
+    badge.className = 'semester-warning absolute top-1 right-1 bg-red-500 text-white text-[10px] px-1 rounded shadow';
+    badge.textContent = 'Wrong Semester';
+    badge.style.zIndex = 20;
+    cell.querySelector('.unit').style.position = 'relative';
+    cell.querySelector('.unit').appendChild(badge);
   }
-  function setDragHandlers(ctx) {
-    (ctx || document).querySelectorAll('.unit').forEach(div => {
-      div.setAttribute('draggable', 'true');
-      div.removeEventListener('dragstart', dragStartHandler);
-      div.removeEventListener('dragend', dragEndHandler);
-      div.addEventListener('dragstart', dragStartHandler);
-      div.addEventListener('dragend', dragEndHandler);
-    });
-  }
-  function dragStartHandler(e) {
-    const code = this.getAttribute('data-code');
-    e.dataTransfer.setData('text/plain', code);
-    e.dataTransfer.effectAllowed = 'move';
-    setTimeout(() => this.classList.add('opacity-50'), 0);
-  }
-  function dragEndHandler() {
-    this.classList.remove('opacity-50');
-  }
+}
 
-  // ───── Semester-check support ─────
-  function validateAllCells() {
-    dropZones.forEach(cell => {
-      const unitDiv = cell.querySelector('.unit');
-      if (unitDiv) {
-        const code = unitDiv.getAttribute('data-code');
-        const unit = allUnits.find(u => u.unit_code === code);
-        if (unit) {
-          validateSemesterPlacement(cell, unit);
-          validatePrereqs();
-        }
-      } else {
-        cell.classList.remove("ring-2", "ring-red-400");
-        const prevBadge = cell.querySelector('.semester-warning');
-        if (prevBadge) prevBadge.remove();
-      }
-    });
-  }
-  function validateSemesterPlacement(cell, unit) {
-    const key = cell.dataset.key.split(',');
-    const semIdx = parseInt(key[0]);
-    // in the jinja template we can know for sure that a key of 1 is semester 1 and a key of 2 is semsester 2
-    const targetSemester = (semIdx % 2 === 1) ? 1 : 2;
-    const ok = (targetSemester === 1 && unit.semester1) ||
-      (targetSemester === 2 && unit.semester2);
+function validatePrereqs() {
+  const placedWithTime = {};
+  DROP_ZONES.forEach(cell => {
+    const div = cell.querySelector('.unit');
+    if (!div) return;
+    const [row, col] = cell.dataset.key.split(',').map(Number);
+    placedWithTime[div.dataset.code] = (row - 1) * 4 + col;
+  });
 
-    cell.classList.remove("ring-2", "ring-red-400");
-    const prevBadge = cell.querySelector('.semester-warning');
-    if (prevBadge) prevBadge.remove();
+  DROP_ZONES.forEach(cell => {
+    const div = cell.querySelector('.unit');
+    if (!div) return;
+    const unit = byCode(div.dataset.code);
+    const { ok, tooltip } = checkPrerequisites(unit, placedWithTime);
+
+    cell.classList.remove('ring-2', 'ring-red-400');
+    cell.querySelector('.prereq-warning')?.remove();
 
     if (!ok) {
-      cell.classList.add("ring-2", "ring-red-400");
-      const unitDiv = cell.querySelector('.unit');
-      if (unitDiv) {
-        unitDiv.style.position = "relative";
-        const badge = document.createElement('div');
-        badge.className = "semester-warning absolute top-1 right-1 bg-red-500 text-white text-[10px] px-1 py-0.5 rounded shadow";
-        badge.innerText = "Wrong Semester";
-        badge.style.zIndex = 20;
-        unitDiv.appendChild(badge);
-      }
+      cell.classList.add('ring-2', 'ring-red-400');
+      const badge = document.createElement('div');
+      badge.className = 'prereq-warning absolute top-1 left-1 text-[10px] bg-red-500 text-white px-1 rounded';
+      badge.textContent = 'PREREQ!';
+      badge.style.zIndex = 20;
+      div.style.position = 'relative';
+      div.title = `Requires: ${tooltip}`;
+      div.appendChild(badge);
     }
-  }
+  });
+}
 
-  function validatePrereqs() {
+// — search —
+function setupSearchFilter() {
+  DOM.searchInput.addEventListener('input', () => {
+    const q = DOM.searchInput.value.trim().toLowerCase();
+    const filtered = q ? availableUnits.filter(u =>
+      u.unit_name.toLowerCase().includes(q) || u.unit_code.toLowerCase().includes(q)
+    ) : availableUnits;
+    renderUnitList(filtered);
+  });
+}
+
+// — save —
+function setupSaveHandler() {
+  DOM.saveButton.addEventListener('click', () => {
+    const name = DOM.planName.value.trim();
+    if (!name) return createAlert('Please enter a plan name.', 'error');
+
+    const major = DOM.prefillSelect.value;
+    if (major === 'cs' && !DOM.csCoreSelect.value)
+      return createAlert('Please select your final core unit before saving.', 'error');
+
+    const units = [];
+    DROP_ZONES.forEach(cell => {
+      const div = cell.querySelector('.unit');
+      if (!div) return;
+      units.push({
+        unit_name: byCode(div.dataset.code).unit_name,
+        unit_code: div.dataset.code,
+        column: +cell.dataset.key.split(',')[1],
+        row:    +cell.dataset.key.split(',')[0]
+      });
+    });
+    if (!units.length) return createAlert('Please place at least one unit.', 'error');
+
+    // prereq check before save
     const placedWithTime = {};
-    dropZones.forEach(cell => {
+    DROP_ZONES.forEach(cell => {
       const div = cell.querySelector('.unit');
       if (!div) return;
       const [r, c] = cell.dataset.key.split(',').map(Number);
       placedWithTime[div.dataset.code] = (r - 1) * 4 + c;
     });
 
-    dropZones.forEach(cell => {
-      cell.classList.remove('ring-2', 'ring-red-400');
-      const old = cell.querySelector('.prereq-warning');
-      if (old) old.remove();
-    });
+    const unsatisfied = units.filter(u => !checkPrerequisites(byCode(u.unit_code), placedWithTime).ok);
+    if (unsatisfied.length) return createAlert('Please make sure all units have their prerequisites satisfied.', 'error');
 
-    dropZones.forEach(cell => {
-      const div = cell.querySelector('.unit');
-      if (!div) return;
-      const code = div.dataset.code;
-      const unit = allUnits.find(u => u.unit_code === code);
-      if (!unit || !unit.prerequisites) return;
-
-      const currentTime = placedWithTime[code];
-      const groups = unit.prerequisites
-        .split('|')
-        .map(g => g.trim().split('+').map(c => c.trim()));
-
-      const ok = groups.some(group =>
-        group.every(pr => placedWithTime[pr] !== undefined && placedWithTime[pr] < currentTime)
-      );
-      if (!ok) {
-        cell.classList.add('ring-2', 'ring-red-400');
-        const badge = document.createElement('div');
-        badge.className = 'prereq-warning absolute top-1 left-1 text-[10px] bg-red-500 text-white px-1 rounded';
-        badge.textContent = 'PREREQ!';
-        badge.style.zIndex = 20;
-        div.style.position = 'relative';
-        div.appendChild(badge);
-
-        // create tooltip
-        const tooltipText = groups
-          .map(group => group.join(' AND '))
-          .join(' OR ');
-
-        div.setAttribute('title', `Requires: ${tooltipText}`);
-      }
-    });
-  }
-
-  // ───── Search/filter support ─────
-  function setupSearchFilter() {
-    searchInput.addEventListener('input', () => {
-      const q = searchInput.value.trim().toLowerCase();
-      let filtered = availableUnits;
-      if (q)
-        filtered = availableUnits.filter(u =>
-          u.unit_name.toLowerCase().includes(q) || u.unit_code.toLowerCase().includes(q)
-        );
-      renderUnitList(filtered);
-    });
-  }
-
-  // ───── Save logic ─────
-  function setupSaveHandler() {
-    saveButton.addEventListener('click', () => {
-      const name = planName.value.trim();
-      if (!name) return createAlert('Please enter a plan name.', 'error');
-
-      const major = document.getElementById('prefillSelect').value;
-
-      if (major === 'cs' && !document.getElementById('csCoreSelect').value) {
-          console.log("I can see that this user is doing cs");
-          createAlert('Please select your final core unit before saving.', 'error');
-          return;
-      }
-      const units = [];
-      for (let cell of dropZones) {
-        const div = cell.querySelector('.unit');
-        if (!div) continue;
-        const code = div.getAttribute('data-code');
-        const unit = allUnits.find(u => u.unit_code === code);
-        if (unit) {
-          units.push({
-            unit_name: unit.unit_name,
-            unit_code: unit.unit_code,
-            column: +cell.dataset.key.split(',')[1],
-            row: +cell.dataset.key.split(',')[0]
-          });
-        }
-      }
-      if (!units.length) return createAlert('Please place at least one unit.', 'error');
-
-      const placedWithTime = {};
-      for (let cell of dropZones) {
-        const div = cell.querySelector('.unit');
-        if (!div) continue;
-        const key = cell.dataset.key;
-        const [row, col] = key.split(',').map(Number);
-        const timeIndex = (row - 1) * 4 + col;
-        const code = div.getAttribute('data-code');
-        placedWithTime[code] = timeIndex;
-
-      }
-
-
-      // Check each unit's prerequisites
-      const unsatisfied = [];
-
-      for (let cell of dropZones) {
-        const div = cell.querySelector('.unit');
-        if (!div) continue;
-        const code = div.getAttribute('data-code');
-        const unit = allUnits.find(u => u.unit_code === code);
-        if (!unit) {
-          continue;
-        }
-
-        if (!unit.prerequisites) {
-          continue;
-        }
-
-
-        const currentTime = placedWithTime[code];
-
-        const groups = unit.prerequisites
-          .split('|')
-          .map(group => group.trim().split('+').map(c => c.trim()));
-
-
-        const satisfies = groups.some(group =>
-          group.every(prereq => {
-            const prereqTime = placedWithTime[prereq];
-            const status = prereqTime !== undefined && prereqTime < currentTime;
-            return status;
-          })
-        );
-
-        if (!satisfies && groups.length > 0 && groups[0][0] !== "") {
-          unsatisfied.push({ unit: code, groups });
-        }
-      }
-
-      // Show error if any
-      if (unsatisfied.length > 0) {
-        createAlert("Please make sure all units have their prerequisites satisfied.", 'error');
-        return;
-      }
-
-      fetch('/plans/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({ plan_name: name, units, plan_id: edit_plan_id })
+    fetch(endpoints.savePlan, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': CSRF_TOKEN
+      },
+      body: JSON.stringify({ plan_name: name, units, plan_id: edit_plan_id })
+    })
+      .then(r => r.json())
+      .then(j => {
+        createAlert(j.message, j.ok ? 'success' : 'error');
+        if (j.ok) setTimeout(() => (location.href = '/dashboard'), 1000);
       })
-        .then(res => res.json())
-        .then(json => {
-          createAlert(json.message, json.ok ? 'success' : 'error');
-          if (json.ok) setTimeout(() => location.href = '/dashboard', 1000);
-        })
-        .catch(() => createAlert('An error occurred while saving.', 'error'));
-    });
+      .catch(() => createAlert('An error occurred while saving.', 'error'));
+  });
 
-        
-      function createAlert(message, category) {
-          const map = {
-            success: {
-              bar: 'bg-green-300 dark:bg-green-800',
-              bg: 'bg-green-50 dark:bg-gray-800',
-              text: 'text-green-800 dark:text-green-400',
-              icon: '<path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 111.414 1.414z"/>'
-            },
-            error: {
-              bar: 'bg-red-300 dark:bg-red-800',
-              bg: 'bg-red-50 dark:bg-gray-800',
-              text: 'text-red-800 dark:text-red-400',
-              icon: '<path fill-rule="evenodd" d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" clip-rule="evenodd"/>'
-            }
-          };
-        
-          const cfg = map[category]
-        
-          const container = document.getElementById('flash-container');
-          if (!container) return;
-        
-          const nextId = container.querySelectorAll('[data-flash-id]').length + 1;
-        
-          const alert = document.createElement('div');
-          alert.setAttribute('id', `flash-${nextId}`);
-          alert.setAttribute('data-flash-id', nextId);
-          alert.setAttribute('role', 'alert');
-          alert.className = `
-            relative overflow-hidden flex items-center p-4 mb-4 text-sm font-medium
-            ${cfg.text} ${cfg.bg} animate-flash-in
-          `
-        
-          //same html as in base.html
-          alert.innerHTML = `
-            <div class="absolute top-0 left-0 h-1 ${cfg.bar}"
-                  style="animation: progress-bar 5s linear forwards;"></div>
-        
-            <svg class="shrink-0 w-4 h-4" aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              ${cfg.icon}
-            </svg>
-        
-            <div class="ms-3">${message}</div>
-        
-            <button type="button"
-              class="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-offset-2 p-1.5
-                      inline-flex items-center justify-center h-8 w-8"
-              data-flash-close="${nextId}">
-              <svg class="w-3 h-3"
-                    xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 14 14">
-                  <path stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-width="2"
-                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-              </svg>
-            </button>
-          `.trim();
-        
-          container.appendChild(alert);
-        
-          // auto dismiss(the dismiss function is defined in alert.js)
-          container.querySelectorAll('[data-flash-id]').forEach(el => {
-              setTimeout(() => dismiss(el), 5000);
-            });
+  function createAlert(message, category) {
+      const map = {
+        success: {
+          bar: 'bg-green-300 dark:bg-green-800',
+          bg: 'bg-green-50 dark:bg-gray-800',
+          text: 'text-green-800 dark:text-green-400',
+          icon: '<path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 111.414 1.414z"/>'
+        },
+        error: {
+          bar: 'bg-red-300 dark:bg-red-800',
+          bg: 'bg-red-50 dark:bg-gray-800',
+          text: 'text-red-800 dark:text-red-400',
+          icon: '<path fill-rule="evenodd" d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" clip-rule="evenodd"/>'
         }
+      };
+    
+      const cfg = map[category]
+    
+      const container = document.getElementById('flash-container');
+      if (!container) return;
+    
+      const nextId = container.querySelectorAll('[data-flash-id]').length + 1;
+    
+      const alert = document.createElement('div');
+      alert.setAttribute('id', `flash-${nextId}`);
+      alert.setAttribute('data-flash-id', nextId);
+      alert.setAttribute('role', 'alert');
+      alert.className = `
+        relative overflow-hidden flex items-center p-4 mb-4 text-sm font-medium
+        ${cfg.text} ${cfg.bg} animate-flash-in
+      `
+    
+      //same html as in base.html
+      alert.innerHTML = `
+        <div class="absolute top-0 left-0 h-1 ${cfg.bar}"
+              style="animation: progress-bar 5s linear forwards;"></div>
+    
+        <svg class="shrink-0 w-4 h-4" aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+          ${cfg.icon}
+        </svg>
+    
+        <div class="ms-3">${message}</div>
+    
+        <button type="button"
+          class="ms-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-offset-2 p-1.5
+                  inline-flex items-center justify-center h-8 w-8"
+          data-flash-close="${nextId}">
+          <svg class="w-3 h-3"
+                xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 14 14">
+              <path stroke="currentColor" stroke-linecap="round"
+                    stroke-linejoin="round" stroke-width="2"
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+          </svg>
+        </button>
+      `.trim();
+    
+      container.appendChild(alert);
+    
+      // auto dismiss(the dismiss function is defined in alert.js)
+      container.querySelectorAll('[data-flash-id]').forEach(el => {
+          setTimeout(() => dismiss(el), 5000);
+        });
   }
-
-  // ───── Kickoff ─────
-  init();
-});
+}
