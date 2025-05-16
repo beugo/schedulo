@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     ${!unit.shared ? `<a onclick="post_share(${unit.id})" class="text-green-600 hover:text-green-900">Share</a>` : ""}
                     <a href="/plans/view?id=${unit.id}" class="text-blue-600 hover:text-blue-900 ml-2">View</a>
                     <a href="/create?id=${unit.id}" class="text-blue-600 hover:text-blue-900 ml-2">Edit</a>
-                    <a onclick="post_delete(${unit.id})" class="text-red-600 hover:text-red-900 ml-2">Delete</a>
+                    <a onclick="post_delete(${unit.id})" class="text-red-600 hover:text-red-900 ml-2 cursor-pointer">Delete</a>
                 </td>
             `;
       tbody.appendChild(tr);
