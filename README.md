@@ -55,20 +55,18 @@ Schedulo is a web-based planning tool designed specifically for new Computer Sci
    cd src
    pip install -r requirements.txt
    ```
-
-4. **Run the Flask app**
-   Start the Flask development server:
-   ```bash
-   python run.py
-   ```
-
-5. **Seed Unit Data**
+   
+4. **Seed Unit Data**
    Seed the unit data:
    ```bash
    flask db upgrade
    python seed_units.py
    ```
-   
+5. **Run the Flask app**
+   Start the Flask development server:
+   ```bash
+   python run.py
+   ```
 6. **Access the application**  
    Open your web browser and go to [http://localhost:5000](http://localhost:5000) to use Schedulo.
 
