@@ -121,7 +121,7 @@ def save_plan():
                 {"message": "Trying to edit plan that does not exist?", "ok": False}), 400
 
         # edit name
-        existing_plan.name == plan_name
+        existing_plan.name = plan_name
 
         prev_units = (UnitPlanToUnit.query.filter_by(
             is_deleted=False,
@@ -163,12 +163,20 @@ def save_plan():
                 unit.row = row
                 unit.col = col
 
-            elif unit_code in only_in_prev:  # Delete unit from unit plan
-                unit = UnitPlanToUnit.query.filter_by(
-                    unit_plan_id=edit_plan_id,
-                    unit_id=unit_dict[unit_code].id,
-                    is_deleted=False
-                ).first()
+        if only_in_prev:
+            for code in only_in_prev:
+                link = (
+                    UnitPlanToUnit.query
+                    .join(Unit, Unit.id == UnitPlanToUnit.unit_id)
+                    .filter(
+                        UnitPlanToUnit.unit_plan_id == edit_plan_id,
+                        Unit.unit_code == code,
+                        UnitPlanToUnit.is_deleted == False,
+                    )
+                    .first()
+                )
+                if link:
+                    link.is_deleted = True
 
         db.session.commit()
 
