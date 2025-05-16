@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       barPercentage: 1.2,
       categoryPercentage: 0.6,
     };
-    // darkmode variants TODO: have the graph redraw when the user togles between the two modes
+    // darkmode variants 
     const gridColor = dark ? "rgba(255,255,255,0.05)" : "rgba(229,231,235,0.3)";
     const fontColor = dark ? "#D1D5DB" : "#6B7280";
     const labelColor = dark ? "#F9FAFB" : "#111827";

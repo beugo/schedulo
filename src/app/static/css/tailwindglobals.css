@@ -6,6 +6,7 @@
   --error: #ef4444;
   --default-dark-theme-text: #d1d7e0;
 }
+
 body {
   font-family: 'Inter', sans-serif;
 }
@@ -13,6 +14,7 @@ body {
 body.transitions-enabled {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 /* animation for alert progress bar */
 @keyframes progress-bar {
   from { width: 100%; }
