@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from base import BaseSeleniumTest, BASE_URL
 
+
 class FriendFlowTests(BaseSeleniumTest):
     def setUp(self):
         super().setUp()
@@ -22,7 +23,9 @@ class FriendFlowTests(BaseSeleniumTest):
             EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'alice')]"))
         )
 
-        alice = self.driver.find_element(By.XPATH, "//ul[@id='results']/li[text()='alice']")
+        alice = self.driver.find_element(
+            By.XPATH, "//ul[@id='results']/li[text()='alice']"
+        )
         alice.click()
 
         alert = self.wait.until(
@@ -33,8 +36,7 @@ class FriendFlowTests(BaseSeleniumTest):
     def test_remove_existing_friend(self):
         sleep(2)
         btn = self.driver.find_element(
-            By.CSS_SELECTOR,
-            "button[onclick=\"deleteFriend('joel')\"]"
+            By.CSS_SELECTOR, "button[onclick=\"deleteFriend('joel')\"]"
         )
         btn.click()
         sleep(2)
@@ -56,6 +58,7 @@ class AuthFlowTests(BaseSeleniumTest):
         sleep(2)
         self.assertIn(BASE_URL + "/", self.driver.current_url)
 
+
 class UnitCreateFlowTests(BaseSeleniumTest):
     def setUp(self):
         super().setUp()
@@ -65,18 +68,28 @@ class UnitCreateFlowTests(BaseSeleniumTest):
     def test_prefill_template_applies_units(self):
         select = self.driver.find_element(By.ID, "prefillSelect")
         select.click()
-        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cyber']").click()
+        self.driver.find_element(
+            By.CSS_SELECTOR, "#prefillSelect option[value='cyber']"
+        ).click()
 
-        sleep(1) 
+        sleep(1)
 
-        unit_cells_with_units = self.driver.find_elements(By.CSS_SELECTOR, ".unit-cell > .unit")
+        unit_cells_with_units = self.driver.find_elements(
+            By.CSS_SELECTOR, ".unit-cell > .unit"
+        )
 
-        self.assertGreater(len(unit_cells_with_units), 5, "Prefill template should populate at least 6 unit cells")
+        self.assertGreater(
+            len(unit_cells_with_units),
+            5,
+            "Prefill template should populate at least 6 unit cells",
+        )
 
     def test_save_unit_plan_and_redirect(self):
         select = self.driver.find_element(By.ID, "prefillSelect")
         select.click()
-        self.driver.find_element(By.CSS_SELECTOR, "#prefillSelect option[value='cyber']").click()
+        self.driver.find_element(
+            By.CSS_SELECTOR, "#prefillSelect option[value='cyber']"
+        ).click()
 
         sleep(1)
 

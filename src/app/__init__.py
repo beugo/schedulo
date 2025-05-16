@@ -14,6 +14,16 @@ migrate = Migrate()
 csrf = CSRFProtect()
 login_manager = LoginManager()
 
+from app.blueprints import (
+    auth_bp,
+    main_bp,
+    units_bp,
+    plans_bp,
+    friends_bp,
+    post_bp,
+    friend_req_bp,
+    chart_bp,
+)
 
 def create_app(config_class=DeploymentConfig):
     app = Flask(__name__)
@@ -28,23 +38,20 @@ def create_app(config_class=DeploymentConfig):
     login_manager.login_view = "auth.login_page"
     login_manager.login_message_category = "info"
 
-    from app.blueprints.auth import auth_bp
-    from app.blueprints.main import main_bp
-    from app.blueprints.units import units_bp
-    from app.blueprints.plans import plans_bp
-    from app.blueprints.friends import friends_bp
-    from app.blueprints.posts import post_bp
-    from app.blueprints.friendrequests import friend_req_bp
-    from app.blueprints.visualise import chart
+    blueprints = [
+        (auth_bp,         "/auth"),
+        (main_bp,         None),
+        (units_bp,        "/units"),
+        (plans_bp,        "/plans"),
+        (friends_bp,      "/friend"),
+        (post_bp,         "/share"),
+        (friend_req_bp,   "/friend_requests"),
+        (chart_bp,        "/chart"),
+    ]
 
-    app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(main_bp)
-    app.register_blueprint(units_bp, url_prefix="/units")
-    app.register_blueprint(plans_bp, url_prefix="/plans")
-    app.register_blueprint(friends_bp, url_prefix="/friend")
-    app.register_blueprint(post_bp, url_prefix="/share")
-    app.register_blueprint(friend_req_bp, url_prefix="/friend_requests")
-    app.register_blueprint(chart, url_prefix="/chart")
+    for bp, prefix in blueprints:
+        kwargs = {"url_prefix": prefix} if prefix else {}
+        app.register_blueprint(bp, **kwargs)
 
     return app
 
@@ -52,4 +59,5 @@ def create_app(config_class=DeploymentConfig):
 @login_manager.user_loader
 def load_user(user_id):
     from .models import User
+
     return User.query.get(int(user_id))

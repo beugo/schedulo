@@ -1,7 +1,7 @@
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
 from datetime import datetime
+
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 from app import db
 
@@ -91,8 +91,8 @@ class FriendRequests(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_deleted = db.Column(db.Boolean, default=False)
 
-class Post(db.Model):
 
+class Post(db.Model):
     """Post/Share UnitPlan"""
 
     __tablename__ = "posts"
@@ -102,7 +102,3 @@ class Post(db.Model):
     unit_plan_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     posted_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_deleted = db.Column(db.Boolean, default=False)
-
-
-
-

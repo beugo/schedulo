@@ -1,17 +1,18 @@
-document.addEventListener("DOMContentLoaded", function() {
-  const input = document.getElementById('searchInput');
-  const unitList = document.getElementById('unitList');
+document.addEventListener("DOMContentLoaded", function () {
+  const input = document.getElementById("searchInput");
+  const unitList = document.getElementById("unitList");
   let allUnits = [];
 
   function renderTable(units) {
     unitList.innerHTML = "";
-    units.forEach(unit => {
+    units.forEach((unit) => {
       const div = document.createElement("div");
-      div.id = "unit"
-      div.className = "p-4 mb-4 rounded-2xl bg-white transition bg-white dark:bg-dark-fg border-2 dark:border-dark-border shadow ext-gray-600 dark:text-dark-secondary cursor-pointer";
+      div.id = "unit";
+      div.className =
+        "p-4 mb-4 rounded-2xl bg-white transition bg-white dark:bg-dark-fg border-2 dark:border-dark-border shadow ext-gray-600 dark:text-dark-secondary cursor-pointer";
       div.onclick = () => {
         window.location.href = `discover?id=${unit.id}`;
-      }
+      };
       div.innerHTML = `
         <a target="_blank" class="text-xl font-semibold text-blue-600">
           ${unit.unit_code}: ${unit.unit_name}
@@ -22,7 +23,9 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="text-sm mt-2">
           <strong>Contact Hours:</strong>
           <ul class="list-disc list-inside mt-1">
-            ${JSON.parse(unit.contact_hours).map(([type, hours]) => `<li>${type}: ${hours}</li>`).join("")}
+            ${JSON.parse(unit.contact_hours)
+              .map(([type, hours]) => `<li>${type}: ${hours}</li>`)
+              .join("")}
           </ul>
         </div>
       `;
@@ -31,15 +34,17 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   fetch("/units/all")
-    .then(response => response.json())
-    .then(data => {
+    .then((response) => response.json())
+    .then((data) => {
       allUnits = data;
       renderTable(allUnits);
     });
 
-  input.addEventListener('input', function() {
+  input.addEventListener("input", function () {
     const query = input.value.trim().toLowerCase();
-    const filtered = allUnits.filter(unit => unit.unit_name.toLowerCase().includes(query));
+    const filtered = allUnits.filter((unit) =>
+      unit.unit_name.toLowerCase().includes(query),
+    );
     renderTable(filtered);
   });
 });

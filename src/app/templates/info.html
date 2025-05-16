@@ -4,49 +4,70 @@
 
 {% block content %}
 <section class="flex justify-center transition-colors duration-300 m-auto">
-    <div class="w-full max-w-6xl mx-auto bg-white dark:bg-dark-fg rounded-xl shadow-2xl px-8 py-10">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-dark-primary mb-2 text-center">
-            Welcome to Schedulo!
+  <div class="w-full max-w-6xl mx-auto bg-white dark:bg-dark-fg rounded-xl shadow-2xl px-8 py-10">
+
+    <!-- Header -->
+    <h2 class="text-3xl font-bold text-gray-900 dark:text-dark-primary mb-2 text-center">
+      Welcome to Schedulo!
+    </h2>
+    <p class="text-gray-700 dark:text-dark-secondary mb-8 text-left">
+      Schedulo is your ultimate tool for stress-free academic planning! Easily organize your units, ensure you meet all prerequisites, and make smarter choices to stay ahead in your degree.
+    </p>
+
+    <div class="space-y-8">
+
+      <!-- How It Works -->
+      <div class="max-w-3xl mx-auto bg-white dark:bg-dark-bg p-6 rounded-lg shadow-lg mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+          How Does It Work?
         </h2>
-        <p class="text-gray-700 dark:text-dark-secondary mb-8 text-left">
-            Schedulo is your ultimate tool for stress-free academic planning! Easily organize your units, ensure you meet all prerequisites, and make smarter choices to stay ahead in your degree.
+        <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+          <li>
+            <strong>Easy Unit Selection</strong> - Quickly find and select your units with our instant search and prefilled plan options.
+          </li>
+          <li>
+            <strong>Intelligent Degree Planning</strong> - Automatically checks and alerts you to potential clashes and missing prerequisites.
+          </li>
+          <li>
+            <strong>Interactive Visualization</strong> - Visualize your degree path clearly and intuitively.
+          </li>
+          <li>
+            <strong>Social Insights</strong> - Check out what units your friends are taking, discover popular choices, and get inspired by others.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Features -->
+      <div class="max-w-3xl mx-auto bg-white dark:bg-dark-bg p-6 rounded-lg shadow-lg mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+          Key Features
+        </h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+          <li><strong>Automatic Prerequisite Checks</strong> - No more surprises! Get alerts if prerequisites aren't met.</li>
+          <li><strong>Popular Unit Recommendations</strong> - Discover the most popular electives and core units among peers.</li>
+          <li><strong>Detailed Unit Info</strong> - Comprehensive information about each unit, including exam details, coordinators, and scheduling.</li>
+          <li><strong>Collaborative Planning</strong> - Share your plans and easily view friends' schedules.</li>
+          <li><strong>Seamless Experience</strong> - A clean, user-friendly interface designed for quick and easy use.</li>
+        </ul>
+      </div>
+
+      <!-- Call to Action -->
+      <div class="max-w-3xl mx-auto bg-white dark:bg-dark-bg p-6 rounded-lg shadow-lg text-center mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+          Ready to Plan Smarter?
+        </h2>
+        <p class="text-gray-700 dark:text-gray-300 mb-2">
+          <strong>Let's go!</strong>
         </p>
-        <div class='space-y-8'>
-            <div class="max-w-3xl mx-auto bg-white dark:bg-dark-bg p-6 rounded-lg shadow-lg mb-8">
-                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-                    How Does It Work?
-                </h2>
-                <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                    <li><strong>Easy Unit Selection</strong> - Quickly find and select your units with our instant search and prefilled plan options.</li>
-                    <li><strong>Intelligent Degree Planning</strong> - Automatically checks and alerts you to potential clashes and missing prerequisites.</li>
-                    <li><strong>Interactive Visualization</strong> - Visualize your degree path clearly and intuitively.</li>
-                    <li><strong>Social Insights</strong> - Check out what units your friends are taking, discover popular choices, and get inspired by others.</li>
-                </ul>
-            </div>
+        <a
+          href="{{ url_for('auth.register_page') }}"
+          class="mt-2 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition inline-block"
+        >
+          Sign Up Now
+        </a>
+      </div>
 
-            <div class="max-w-3xl mx-auto bg-white dark:bg-dark-bg p-6 rounded-lg shadow-lg mb-8">
-                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-                    Key Features
-                </h2>
-                <ul class="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
-                    <li><strong>Automatic Prerequisite Checks</strong> - No more surprises! Get alerts if prerequisites aren't met.</li>
-                    <li><strong>Popular Unit Recommendations</strong> - Discover the most popular electives and core units among peers.</li>
-                    <li><strong>Detailed Unit Info</strong> - Comprehensive information about each unit, including exam details, coordinators, and scheduling.</li>
-                    <li><strong>Collaborative Planning</strong> - Share your plans and easily view friends' schedules.</li>
-                    <li><strong>Seamless Experience</strong> - A clean, user-friendly interface designed for quick and easy use.</li>                    
-                </ul>
-            </div>
-
-            <div class="max-w-3xl mx-auto bg-white dark:bg-dark-bg p-6 rounded-lg shadow-lg text-center mb-8">
-                <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Ready to Plan Smarter?</h2>
-                <p class="text-gray-700 dark:text-gray-300 mb-2">
-                    <strong>Ready to streamline your academic journey? Let's go!</strong>
-                </p>
-                <a href="{{ url_for('auth.register_page')}}" class="mt-2 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition inline-block">
-                    Sign Up Now
-                </a>
-            </div>
-        </div>
     </div>
+  </div>
 </section>
 {% endblock %}

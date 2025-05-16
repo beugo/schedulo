@@ -28,26 +28,23 @@ def unitplans_page():
     return render_template("unitplans.html")
 
 
-@main_bp.route('/create', methods=['GET'])
+@main_bp.route("/create", methods=["GET"])
 @login_required
 def create_page():
-    plan_id = request.args.get('id')
+    plan_id = request.args.get("id")
     context = {
-        'plan_id': 0,
-        'plan_name': '',
-        'grid_units': {},
+        "plan_id": 0,
+        "plan_name": "",
+        "grid_units": {},
     }
     if plan_id:
         plan = UnitPlan.query.filter_by(
-            id=plan_id,
-            user_id=current_user.id,
-            is_deleted=False
+            id=plan_id, user_id=current_user.id, is_deleted=False
         ).first_or_404()
-        context['plan_name'] = plan.name
+        context["plan_name"] = plan.name
 
         plan_units = UnitPlanToUnit.query.filter_by(
-            unit_plan_id=plan.id,
-            is_deleted=False
+            unit_plan_id=plan.id, is_deleted=False
         ).all()
 
         # populate the context with all the units in that unit plan
@@ -58,14 +55,11 @@ def create_page():
                 continue
             # stringify the key
             key = f"{pu.row},{pu.col}"
-            grid[key] = {
-                "name": unit.unit_name,
-                "code": unit.unit_code
-            }
+            grid[key] = {"name": unit.unit_name, "code": unit.unit_code}
         context["grid_units"] = grid
         context["plan_id"] = plan_id
 
-    return render_template('create.html', **context)
+    return render_template("create.html", **context)
 
 
 @main_bp.route("/friends")
@@ -96,7 +90,7 @@ def discover():
         "semesterTwo": "",
     }
 
-    unit_id = request.args.get('id')
+    unit_id = request.args.get("id")
     if unit_id:
         unit = Unit.query.filter_by(id=unit_id).first()
         contact_hours_raw = unit.contact_hours

@@ -1,14 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Create Plan{% endblock %}
+
 {% block content %}
 <div class="w-full flex flex-col lg:flex-row gap-8 min-h-[80vh]">
-  <!-- Side Panel -->
+
+  <!-- SIDE PANEL -->
   <aside class="flex flex-col rounded-2xl bg-white dark:bg-dark-fg border border-gray-200 dark:border-gray-800 shadow-lg w-full lg:w-[30%] p-6 gap-7">
+    
+    <!-- Plan Name -->
     <div>
       <span class="uppercase text-xs text-gray-400 tracking-widest">Plan Editing</span>
-      <input type="text" id="planName" placeholder="Unit Plan Name" value="{{ plan_name }}"
-        class="mt-2 text-2xl font-bold text-gray-900 dark:text-white bg-transparent outline-none w-full border-b border-gray-200 dark:border-gray-800 focus:border-blue-400 transition px-0 py-1"/>
+      <input
+        id="planName"
+        type="text"
+        placeholder="Unit Plan Name"
+        value="{{ plan_name }}"
+        class="mt-2 text-2xl font-bold text-gray-900 dark:text-white bg-transparent outline-none w-full border-b border-gray-200 dark:border-gray-800 focus:border-blue-400 transition px-0 py-1"
+      />
     </div>
+
+    <!-- Major Selector -->
     <select
       id="prefillSelect"
       class="mb-4 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700
@@ -20,105 +31,143 @@
       <option value="cyber">Cybersecurity</option>
       <option value="data_science">Data Science</option>
     </select>
-    <!-- Final CS-core chooser (hidden by default) -->
+
+    <!-- CS Core Selector -->
     <div id="csCoreSelectWrapper" class="mb-4 hidden">
-      <label for="csCoreSelect"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label
+        for="csCoreSelect"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+      >
         Final Core Unit for Computer Science
       </label>
-      <select id="csCoreSelect"
-              class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700
-                    bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-100
-                    focus:ring-2 focus:ring-blue-400 transition">
+      <select
+        id="csCoreSelect"
+        class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700
+               bg-white dark:bg-dark-bg text-gray-800 dark:text-gray-100
+               focus:ring-2 focus:ring-blue-400 transition"
+      >
         <option value="">— Select one —</option>
       </select>
     </div>
+
+    <!-- Unit Search -->
     <div>
       <h3 class="font-semibold text-gray-700 dark:text-gray-100 text-lg mb-2">Search Units</h3>
       <div class="flex gap-3 mb-3">
-        <select id="searchType"
-          class="w-1/3 px-3 py-2 rounded-lg border border-gray-200 text-[0.75rem] dark:border-gray-700 bg-gray-50 dark:bg-dark-bg text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 transition">
+        <select
+          id="searchType"
+          class="w-1/3 px-3 py-2 rounded-lg border border-gray-200 text-[0.75rem] dark:border-gray-700 bg-gray-50 dark:bg-dark-bg text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 transition"
+        >
           <option value="name">Name</option>
           <option value="code">Unit Code</option>
         </select>
-        <input id="searchInput" type="text" placeholder="Filter units..." autocomplete="off"
-          class=" w-2/3 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-dark-bg text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 transition"/>
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Filter units..."
+          autocomplete="off"
+          class="w-2/3 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-dark-bg text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 transition"
+        />
       </div>
-      <ul id="unitList"
-        class="bg-gray-50 dark:bg-dark-bg rounded-xl p-4 max-h-[60vh] overflow-y-auto shadow-inner border border-gray-100 dark:border-gray-800"></ul>
+      <ul
+        id="unitList"
+        class="bg-gray-50 dark:bg-dark-bg rounded-xl p-4 max-h-[60vh] overflow-y-auto shadow-inner border border-gray-100 dark:border-gray-800"
+      ></ul>
     </div>
+
+    <!-- Actions -->
     <div class="mb-auto flex flex-row gap-4 pt-2">
-      <a href="{{ url_for('main.create_page') }}" class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white text-sm transition font-semibold">Clear</a>
+      <a
+        href="{{ url_for('main.create_page') }}"
+        class="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white text-sm transition font-semibold"
+      >
+        Clear
+      </a>
       <div class="flex-grow"></div>
-      <button id="saveButton" class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 rounded-lg text-white text-sm transition font-bold shadow-md">Save</button>
+      <button
+        id="saveButton"
+        class="px-4 py-2 bg-gradient-to-r from-sky-400 to-blue-600 hover:from-sky-500 hover:to-blue-700 rounded-lg text-white text-sm transition font-bold shadow-md"
+      >
+        Save
+      </button>
     </div>
+
   </aside>
-  <!-- Main Grid -->
+
+  <!-- GRID AREA -->
   <main class="flex-grow w-full">
-    {% set year_titles = ["Year 1","Year 2","Year 3"] %}
+    {% set year_titles = ["Year 1", "Year 2", "Year 3"] %}
     {% set year_bg_colors = [
       'from-purple-50 dark:from-purple-900/50',
       'from-orange-50 dark:from-orange-900/50',
-      'from-pink-50 dark:from-pink-900/40',
+      'from-pink-50 dark:from-pink-900/40'
     ] %}
+
     <div class="flex flex-col gap-8 w-full">
       {% for y in range(3) %}
       <section class="p-5 rounded-2xl bg-gradient-to-br to-white dark:to-gray-950 {{ year_bg_colors[y] }} shadow-inner border border-gray-200 dark:border-gray-800">
-        <!-- Year Header -->
+        
+        <!-- YEAR HEADER -->
         <div class="mb-4 flex items-center gap-3">
-          <span class="text-xs text-gray-400 dark:text-gray-500 uppercase font-semibold tracking-widest pl-1">{{ year_titles[y] }}</span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 uppercase font-semibold tracking-widest pl-1">
+            {{ year_titles[y] }}
+          </span>
           <div class="flex-1 h-px bg-gray-100 dark:bg-gray-800 mt-1"></div>
         </div>
-        <!-- Semesters -->
+
+        <!-- SEMESTERS -->
         <div>
-          <!-- Sem 1 -->
+          <!-- SEM 1 -->
           <span class="text-xs text-gray-400 dark:text-gray-600 font-semibold px-1">Semester 1</span>
           <div class="grid grid-cols-4 gap-5 relative">
-            {% for slot in range(1,5) %}
+            {% for slot in range(1, 5) %}
               {% set key = (y*2+1, slot) %}
               {% set cell = grid_units.get(key) %}
-              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex items-stretch justify-stretch flex-col px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}">
+              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex flex-col justify-stretch px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}">
                 {% if cell %}
-                <div class="flex flex-col h-full w-full p-1 rounded-lg border border-gray-300 cursor-move gap-1 bg-white dark:bg-gray-900 shadow-sm unit overflow-hidden" draggable="true" style="min-width:0;">
-                  <span class="flex-grow font-bold text-xs leading-tight truncate" style="min-width:0; word-break:break-word;">{{ cell.name }}</span>
-                  <div class="flex flex-wrap gap-1 items-center mt-0">
-                    {% if cell.semester1 %}
-                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-blue-100 text-blue-800">Sem 1</span>
-                    {% endif %}
-                    {% if cell.semester2 %}
-                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-green-100 text-green-800">Sem 2</span>
-                    {% endif %}
-                    {% if cell.exam %}
-                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-red-100 text-red-700">Exam</span>
-                    {% endif %}
-                    <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-slate-200 text-slate-700">{{ cell.code }}</span>
+                  <div class="flex flex-col h-full w-full p-1 rounded-lg border border-gray-300 cursor-move gap-1 bg-white dark:bg-gray-900 shadow-sm unit overflow-hidden" draggable="true" style="min-width:0;">
+                    <span class="flex-grow font-bold text-xs leading-tight truncate">{{ cell.name }}</span>
+                    <div class="flex flex-wrap gap-1 items-center mt-0">
+                      {% if cell.semester1 %}
+                        <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold bg-blue-100 text-blue-800">Sem 1</span>
+                      {% endif %}
+                      {% if cell.semester2 %}
+                        <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold bg-green-100 text-green-800">Sem 2</span>
+                      {% endif %}
+                      {% if cell.exam %}
+                        <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold bg-red-100 text-red-700">Exam</span>
+                      {% endif %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold bg-slate-200 text-slate-700">{{ cell.code }}</span>
+                    </div>
                   </div>
-                </div>
                 {% else %}
-                <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
+                  <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
                 {% endif %}
               </div>
             {% endfor %}
-            <!-- Divider & Sem 2 -->
+
+            <!-- SEMESTER DIVIDER -->
             <div class="absolute left-0 right-0 mx-2 top-[calc(50%)] h-0.5 bg-gray-100 dark:bg-gray-800 rounded" style="z-index:1;"></div>
+
+            <!-- SEM 2 -->
             <span class="mt-8 col-span-4 text-xs text-gray-400 dark:text-gray-600 font-semibold px-1">Semester 2</span>
-            {% for slot in range(1,5) %}
+            {% for slot in range(1, 5) %}
               {% set key = (y*2+2, slot) %}
               {% set cell = grid_units.get(key) %}
-              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex items-stretch justify-stretch flex-col px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}">
+              <div class="unit-cell rounded-xl border-2 border-gray-300 dark:border-gray-700 bg-white/90 dark:bg-gray-900/80 shadow-sm h-24 flex flex-col justify-stretch px-0 py-0" data-key="{{ key.0 }},{{ key.1 }}">
                 {% if cell %}
-                <div class="flex flex-col h-full w-full p-1 rounded-lg border border-gray-300 cursor-move gap-1 bg-white dark:bg-gray-900 shadow-sm unit overflow-hidden" draggable="true" style="min-width:0;">
-                  <span class="flex-grow font-bold text-xs leading-tight truncate" style="min-width:0; word-break:break-word;">{{ cell.name }}</span>
-                  <div class="flex flex-wrap gap-1 items-center mt-0">
-                    <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-green-100 text-green-800">Sem 2</span>
-                    {% if cell.exam %}
-                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-red-100 text-red-700">Exam</span>
-                    {% endif %}
-                    <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold inline-block bg-slate-200 text-slate-700">{{ cell.code }}</span>
+                  <div class="flex flex-col h-full w-full p-1 rounded-lg border border-gray-300 cursor-move gap-1 bg-white dark:bg-gray-900 shadow-sm unit overflow-hidden" draggable="true" style="min-width:0;">
+                    <span class="flex-grow font-bold text-xs leading-tight truncate">{{ cell.name }}</span>
+                    <div class="flex flex-wrap gap-1 items-center mt-0">
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold bg-green-100 text-green-800">Sem 2</span>
+                      {% if cell.exam %}
+                        <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold bg-red-100 text-red-700">Exam</span>
+                      {% endif %}
+                      <span class="tag px-1 py-[1px] text-[10px] rounded font-semibold bg-slate-200 text-slate-700">{{ cell.code }}</span>
+                    </div>
                   </div>
-                </div>
                 {% else %}
-                <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
+                  <div class="text-gray-300 dark:text-gray-600 italic text-xs text-center">Drop unit here</div>
                 {% endif %}
               </div>
             {% endfor %}
@@ -129,6 +178,7 @@
     </div>
   </main>
 </div>
+
 <script>
   const edit_plan_id = {{ plan_id }};
 </script>

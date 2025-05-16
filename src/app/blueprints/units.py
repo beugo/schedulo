@@ -21,15 +21,18 @@ def search_units():
 def all_units():
     units = Unit.query.filter_by(is_deleted=False).all()
     return jsonify(
-        [{
-            "id": u.id,
-            "unit_name": u.unit_name,
-            "unit_code": u.unit_code,
-            "unit_coordinator": u.unit_coordinator,
-            "contact_hours": u.contact_hours,
-            "prerequisites": u.prerequisites,
-            "description": u.description,
-        } for u in units]
+        [
+            {
+                "id": u.id,
+                "unit_name": u.unit_name,
+                "unit_code": u.unit_code,
+                "unit_coordinator": u.unit_coordinator,
+                "contact_hours": u.contact_hours,
+                "prerequisites": u.prerequisites,
+                "description": u.description,
+            }
+            for u in units
+        ]
     )
 
 
@@ -38,15 +41,16 @@ def recommended_units():
     if not current_user.is_authenticated:
         return jsonify({"ok": False}), 401
     # get IDs of friends
-    friend_ids = db.session.query(UserFriend.user_id).filter(
-        UserFriend.friend_id == current_user.id,
-        UserFriend.is_deleted == False
-    ).union(
-        db.session.query(UserFriend.friend_id).filter(
-            UserFriend.user_id == current_user.id,
-            UserFriend.is_deleted == False
+    friend_ids = (
+        db.session.query(UserFriend.user_id)
+        .filter(UserFriend.friend_id == current_user.id, UserFriend.is_deleted == False)
+        .union(
+            db.session.query(UserFriend.friend_id).filter(
+                UserFriend.user_id == current_user.id, UserFriend.is_deleted == False
+            )
         )
-    ).subquery()
+        .subquery()
+    )
 
     # count usage of units in friends' plans
     unit_counts = (
@@ -56,7 +60,7 @@ def recommended_units():
         .filter(
             UnitPlan.user_id.in_(friend_ids),
             Unit.is_deleted == False,
-            UnitPlanToUnit.is_deleted == False
+            UnitPlanToUnit.is_deleted == False,
         )
         .group_by(Unit.id)
         .subquery()
@@ -64,8 +68,9 @@ def recommended_units():
 
     # query units
     units = (
-        db.session.query(Unit, db.func.coalesce(
-            unit_counts.c.count, 0).label("friend_use_count"))
+        db.session.query(
+            Unit, db.func.coalesce(unit_counts.c.count, 0).label("friend_use_count")
+        )
         .outerjoin(unit_counts, Unit.id == unit_counts.c.id)
         .filter(Unit.is_deleted == False)
         .order_by(db.desc("friend_use_count"))
@@ -75,16 +80,17 @@ def recommended_units():
     # JSON response
     recommended = []
     for unit, count in units:
-        recommended.append({
-            "id": unit.id,
-            "unit_name": unit.unit_name,
-            "unit_code": unit.unit_code,
-            "value": count,
-            "exam": unit.exam,
-            "semester1": unit.semester1,
-            "semester2": unit.semester2,
-            "prerequisites": unit.prerequisites or ""
-        })
+        recommended.append(
+            {
+                "id": unit.id,
+                "unit_name": unit.unit_name,
+                "unit_code": unit.unit_code,
+                "value": count,
+                "exam": unit.exam,
+                "semester1": unit.semester1,
+                "semester2": unit.semester2,
+                "prerequisites": unit.prerequisites or "",
+            }
+        )
 
     return jsonify(recommended)
-
