@@ -109,7 +109,7 @@ def create_users_and_plans(db_session):
     db_session.query(UnitPlan).delete()
     db_session.flush()
 
-    prefillTemplates = {
+    prefill_templates = {
         "cs": [
             {"unit_code": "CITS1401", "row": 1, "col": 1},
             {"unit_code": "CITS1402", "row": 1, "col": 2},
@@ -203,7 +203,7 @@ def create_users_and_plans(db_session):
         user = users[name]
 
         chosen_template_key = random.choice(["cs", "cyber", "data_science"])
-        chosen_template = prefillTemplates[chosen_template_key]
+        chosen_template = prefill_templates[chosen_template_key]
 
         for idx in (1, 2):
             plan = UnitPlan(user_id=user.id, name=f"{name.title()}'s Plan {idx}")

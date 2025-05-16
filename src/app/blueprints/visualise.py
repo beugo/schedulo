@@ -1,9 +1,7 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, jsonify
 from flask_login import current_user
 from app import db
 from app.models import Unit, UnitPlan, UnitPlanToUnit, UserFriend, Post
-from app.utils.unit_plan_helper import get_plan_core_info
-from sqlalchemy import or_
 
 chart_bp = Blueprint("chart", __name__)
 
