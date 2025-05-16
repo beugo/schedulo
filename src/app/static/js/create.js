@@ -108,6 +108,8 @@ function byCode(code) {
   return allUnits.find(u => u.unit_code === code);
 }
 
+const keyOf = cell => cell?.dataset.key || '';
+
 function createUnitDiv(unit) {
   const div = document.createElement('div');
   div.className = [
@@ -310,6 +312,7 @@ function applyTemplate(template) {
 // — drag & drop —
 function dragStartHandler(e) {
   e.dataTransfer.setData('text/plain', this.dataset.code);
+  e.dataTransfer.setData('sourceKey', this.closest(CELL_SELECTOR)?.dataset.key || '');
   e.dataTransfer.effectAllowed = 'move';
   setTimeout(() => this.classList.add('opacity-50'));
 }
@@ -354,24 +357,35 @@ function setupDragAndDrop() {
     cell.addEventListener('drop', e => {
       e.preventDefault();
       const code = e.dataTransfer.getData('text/plain');
+      const sourceKey = e.dataTransfer.getData('sourceKey');
       if (!code) return;
 
-      const existing = document.querySelector(`${CELL_SELECTOR} .unit[data-code="${code}"]`);
-      if (existing) {
-        const oldCell = existing.closest(CELL_SELECTOR);
-        existing.remove();
-        oldCell.innerHTML = placeholderHtml();
-        delete placedUnits[oldCell.dataset.key];
+      if (keyOf(cell) === sourceKey) return;
+      
+      const existingDiv = cell.querySelector('.unit');
+      const targetKey = keyOf(cell);
+
+      const draggedUnit = sourceKey
+        ? document.querySelector(`${CELL_SELECTOR}[data-key="${sourceKey}"] .unit[data-code="${code}"]`)
+        : null;
+      if (draggedUnit) {
+        draggedUnit.remove();
+        document.querySelector(`${CELL_SELECTOR}[data-key="${sourceKey}"]`).innerHTML = placeholderHtml();
       }
 
-      const fromList = DOM.unitList.querySelector(`.unit[data-code="${code}"]`);
-      if (fromList) fromList.remove();
-
       cell.innerHTML = '';
-      const unit = byCode(code);
-      if (!unit) return;
-      cell.appendChild(createUnitDiv(unit));
-      placedUnits[cell.dataset.key] = code;
+      cell.appendChild(draggedUnit || createUnitDiv(byCode(code)));
+      placedUnits[targetKey] = code;
+
+      // if the target was occupied, move that unit back to source cell (swap)
+      if (existingDiv && sourceKey) {
+        const srcCell = document.querySelector(`${CELL_SELECTOR}[data-key="${sourceKey}"]`);
+        srcCell.innerHTML = '';
+        srcCell.appendChild(existingDiv);
+        placedUnits[sourceKey] = existingDiv.dataset.code;
+      } else if (existingDiv) {
+        DOM.unitList.appendChild(existingDiv);
+      }
 
       resetAvailableUnits();
       renderUnitList(availableUnits);
