@@ -1,23 +1,24 @@
 // initial theme preference
 if (
-    localStorage.theme === 'dark' ||
-    (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-  ) {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
-  }
+  localStorage.theme === "dark" ||
+  (!("theme" in localStorage) &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches)
+) {
+  document.documentElement.classList.add("dark");
+} else {
+  document.documentElement.classList.remove("dark");
+}
 
 function toggleDarkMode() {
-  if (document.documentElement.classList.contains('dark')) {
-    document.documentElement.classList.remove('dark');
-    localStorage.theme = 'light';
+  if (document.documentElement.classList.contains("dark")) {
+    document.documentElement.classList.remove("dark");
+    localStorage.theme = "light";
   } else {
-      document.documentElement.classList.add('dark');
-      localStorage.theme = 'dark';
+    document.documentElement.classList.add("dark");
+    localStorage.theme = "dark";
   }
 }
 // only enable transitions after the utility classes are applied
-window.addEventListener('DOMContentLoaded', () => {
-  document.body.classList.add('transitions-enabled');
+window.addEventListener("DOMContentLoaded", () => {
+  document.body.classList.add("transitions-enabled");
 });
